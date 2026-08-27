@@ -1,0 +1,51 @@
+<section class="ingredient-input" aria-labelledby="ingredient-details-heading">
+  <h2 id="ingredient-details-heading" class="ingredient-input__heading">Ingredient details</h2>
+
+  <div class="ingredient-input__ingredient-column">
+    <label class="ingredient-input__label" for="ingredient-name">Ingredient</label>
+    <input
+      id="ingredient-name"
+      class="ingredient-input__text-field"
+      type="text"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="ingredient-input__serving-column">
+    <span id="serving-size-label" class="ingredient-input__label">Serving size</span>
+
+    <div
+      class="ingredient-input__serving-controls"
+      role="group"
+      aria-labelledby="serving-size-label"
+    >
+      <input class="ingredient-input__amount-field" type="number" min="1" aria-label="Amount" />
+
+      <span class="ingredient-input__unit-control">
+        <select class="ingredient-input__unit-field" aria-label="Unit">
+          <option>gram</option>
+          <option>piece</option>
+          <option>liter</option>
+        </select>
+
+        <svg
+          class="ingredient-input__unit-icon"
+          width="10"
+          height="5"
+          viewBox="0 0 10 5"
+          aria-hidden="true"
+        >
+          <path d="M5 5 0 0h10L5 5Z" />
+        </svg>
+      </span>
+
+      <button class="ingredient-input__add-button" type="button" aria-label="Add ingredient">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path
+            d="M9 18c-.283 0-.521-.096-.713-.288A.968.968 0 0 1 8 17v-7H1a.968.968 0 0 1-.713-.287A.968.968 0 0 1 0 9c0-.283.096-.521.287-.713A.968.968 0 0 1 1 8h7V1c0-.283.096-.521.287-.713A.968.968 0 0 1 9 0c.283 0 .521.096.713.287A.968.968 0 0 1 10 1v7h7c.283 0 .521.096.712.287A.968.968 0 0 1 18 9a.968.968 0 0 1-.288.713A.968.968 0 0 1 17 10h-7v7a.968.968 0 0 1-.287.712A.968.968 0 0 1 9 18Z"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</section>

@@ -50,4 +50,14 @@
     line-height: functions.px-to-rem(30);
     text-align: center;
   }
+
+  &__form {
+    margin: 0;
+  }
+
+  &__workspace {
+    display: flex;
+    align-items: flex-start;
+    gap: functions.px-to-rem(32);
+  }
 }

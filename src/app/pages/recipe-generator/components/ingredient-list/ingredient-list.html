@@ -1,0 +1,56 @@
+<section class="ingredient-list" aria-labelledby="ingredient-list-heading">
+  <h2 id="ingredient-list-heading" class="ingredient-list__title">List of your Ingredients</h2>
+
+  <ul class="ingredient-list__items">
+    @for (ingredient of ingredients; track ingredient.name) {
+      <li class="ingredient-list__item">
+        <span class="ingredient-list__details">
+          <span class="ingredient-list__quantity">
+            <span class="ingredient-list__bullet" aria-hidden="true">•</span>
+            <span class="ingredient-list__amount">{{ ingredient.amount }}</span>
+          </span>
+
+          <span class="ingredient-list__name">{{ ingredient.name }}</span>
+        </span>
+
+        <span class="ingredient-list__actions">
+          <button
+            class="ingredient-list__action"
+            type="button"
+            [attr.aria-label]="ingredient.editLabel"
+          >
+            <svg
+              class="ingredient-list__edit-icon"
+              width="13"
+              height="14"
+              viewBox="0 0 12.5 13.75"
+              aria-hidden="true"
+            >
+              <path
+                d="M1.25 13.75c-.344 0-.638-.122-.883-.367A1.2 1.2 0 0 1 0 12.5c0-.344.122-.638.367-.883s.539-.367.883-.367h10c.344 0 .638.122.883.367s.367.539.367.883-.122.638-.367.883-.539.367-.883.367h-10ZM2.5 8.75h.875L8.25 3.891 7.359 3 2.5 7.875v.875ZM1.25 9.375V7.609c0-.083.016-.164.047-.242s.078-.148.14-.211L8.25.359c.115-.114.247-.203.398-.265S8.958 0 9.125 0s.328.031.484.094.297.156.422.281l.86.875c.125.115.216.25.273.406s.086.318.086.485c0 .156-.029.31-.086.46s-.148.29-.273.415L4.094 9.812a.615.615 0 0 1-.211.141.638.638 0 0 1-.242.047H1.875a.603.603 0 0 1-.445-.18.603.603 0 0 1-.18-.445Z"
+              />
+            </svg>
+          </button>
+
+          <button
+            class="ingredient-list__action"
+            type="button"
+            [attr.aria-label]="ingredient.deleteLabel"
+          >
+            <svg
+              class="ingredient-list__delete-icon"
+              width="13"
+              height="15"
+              viewBox="0 0 12.667 14.25"
+              aria-hidden="true"
+            >
+              <path
+                d="M2.375 14.25c-.435 0-.808-.155-1.118-.465a1.523 1.523 0 0 1-.465-1.118V2.375a.764.764 0 0 1-.564-.228A.764.764 0 0 1 0 1.583c0-.224.076-.412.228-.564A.764.764 0 0 1 .792.792h3.166c0-.225.076-.413.228-.564A.764.764 0 0 1 4.75 0h3.167c.224 0 .412.076.564.228a.764.764 0 0 1 .227.564h3.167c.224 0 .412.076.564.227a.764.764 0 0 1 .228.564.764.764 0 0 1-.228.564.764.764 0 0 1-.564.228v10.292c0 .435-.155.808-.465 1.118s-.683.465-1.118.465H2.375Zm7.917-11.875H2.375v10.292h7.917V2.375ZM4.75 11.083c.224 0 .412-.076.564-.227a.764.764 0 0 0 .228-.564V4.75a.764.764 0 0 0-.228-.564.764.764 0 0 0-.564-.228.764.764 0 0 0-.564.228.764.764 0 0 0-.228.564v5.542c0 .224.076.412.228.564a.764.764 0 0 0 .564.227Zm3.167 0c.224 0 .412-.076.564-.227a.764.764 0 0 0 .227-.564V4.75a.764.764 0 0 0-.227-.564.764.764 0 0 0-.564-.228.764.764 0 0 0-.564.228.764.764 0 0 0-.228.564v5.542c0 .224.076.412.228.564a.764.764 0 0 0 .564.227Z"
+              />
+            </svg>
+          </button>
+        </span>
+      </li>
+    }
+  </ul>
+</section>
