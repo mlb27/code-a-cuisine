@@ -1,0 +1,32 @@
+@use '../../../styles/functions';
+
+:host {
+  display: block;
+}
+
+.app-header {
+  width: 100%;
+  height: functions.px-to-rem(136);
+  padding: functions.px-to-rem(40) functions.px-to-rem(40) 0 functions.px-to-rem(68);
+
+  &__home-link,
+  &__logo {
+    display: block;
+  }
+
+  &__home-link {
+    width: functions.px-to-rem(142);
+    height: functions.px-to-rem(48);
+    border-radius: functions.px-to-rem(5);
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid currentColor;
+      outline-offset: functions.px-to-rem(3);
+    }
+  }
+
+  &__logo {
+    width: 100%;
+    height: 100%;
+  }
+}
