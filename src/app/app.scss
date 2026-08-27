@@ -2,8 +2,13 @@
 
 .app {
   width: 100%;
-  max-width: functions.px-to-rem(1440);
   min-height: 100vh;
   min-height: 100svh;
   margin-inline: auto;
+}
+
+@media (min-width: 1440px) {
+  .app {
+    max-width: functions.px-to-rem(1440);
+  }
 }

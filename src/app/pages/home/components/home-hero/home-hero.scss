@@ -10,6 +10,7 @@
   min-height: functions.px-to-rem(888);
 
   &__visuals {
+    display: none;
     position: absolute;
     inset: 0;
     z-index: 0;
@@ -157,6 +158,12 @@
     height: functions.px-to-rem(16);
     margin-inline: functions.px-to-rem(-1);
     overflow: visible;
+  }
+}
+
+@media (min-width: 1440px) {
+  .home-hero__visuals {
+    display: block;
   }
 }
 
