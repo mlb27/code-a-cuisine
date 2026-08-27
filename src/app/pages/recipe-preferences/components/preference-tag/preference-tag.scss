@@ -1,0 +1,58 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+}
+
+.preference-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: functions.px-to-rem(12);
+
+  &__button {
+    width: calc(100% + functions.px-to-rem(1));
+    height: functions.px-to-rem(28);
+    padding: functions.px-to-rem(4) functions.px-to-rem(12);
+    border: 0;
+    border-radius: functions.px-to-rem(30);
+    background-color: variables.$cream;
+    color: variables.$middle-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(20);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+    cursor: pointer;
+    transition:
+      background-color 300ms ease-out,
+      color 300ms ease-out;
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$middle-green;
+      outline-offset: functions.px-to-rem(2);
+    }
+  }
+
+  &__hint {
+    color: variables.$middle-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(14);
+    font-weight: 500;
+    line-height: functions.px-to-rem(10);
+    white-space: nowrap;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .preference-tag__button:hover {
+    background-color: variables.$middle-green;
+    color: variables.$cream;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preference-tag__button {
+    transition: none;
+  }
+}
