@@ -1,1 +1,31 @@
-/* You can add global styles to this file, and also import other style files */
+@use './styles/fonts';
+@use './styles/variables' as variables;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: variables.$primary-green;
+  color: variables.$cream;
+  font-family: 'Quicksand', sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+img {
+  display: block;
+}
