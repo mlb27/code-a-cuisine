@@ -5,6 +5,8 @@
 }
 
 .app-header {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: functions.px-to-rem(136);
   padding: functions.px-to-rem(40) functions.px-to-rem(40) 0 functions.px-to-rem(68);

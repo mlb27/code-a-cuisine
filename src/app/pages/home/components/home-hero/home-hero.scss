@@ -8,7 +8,39 @@
 .home-hero {
   position: relative;
   min-height: functions.px-to-rem(888);
-  overflow: hidden;
+
+  &__visuals {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  &__dish {
+    position: absolute;
+    max-width: none;
+
+    &--chicken {
+      top: functions.px-to-rem(-136);
+      left: functions.px-to-rem(916);
+      width: functions.px-to-rem(480);
+      height: functions.px-to-rem(430);
+    }
+
+    &--salmon {
+      top: functions.px-to-rem(131);
+      left: functions.px-to-rem(903);
+      width: functions.px-to-rem(494);
+      height: functions.px-to-rem(492);
+    }
+
+    &--steak {
+      top: functions.px-to-rem(435.215);
+      left: functions.px-to-rem(909.591);
+      width: functions.px-to-rem(492.817);
+      height: functions.px-to-rem(452.785);
+    }
+  }
 
   &__main-cta {
     position: absolute;
@@ -19,6 +51,7 @@
     gap: functions.px-to-rem(64);
     width: functions.px-to-rem(755);
     height: functions.px-to-rem(303);
+    z-index: 1;
   }
 
   &__text {
@@ -79,6 +112,7 @@
     gap: functions.px-to-rem(16);
     width: functions.px-to-rem(594);
     height: functions.px-to-rem(52);
+    z-index: 1;
   }
 
   &__secondary-title {
