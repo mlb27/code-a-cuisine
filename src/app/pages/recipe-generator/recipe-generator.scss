@@ -1,3 +1,53 @@
+@use '../../../styles/functions';
+@use '../../../styles/variables' as variables;
+
 :host {
   display: block;
+  min-height: 100vh;
+  min-height: 100svh;
+  background-color: variables.$white;
+  box-shadow: 0 0 0 100vmax variables.$white;
+  clip-path: inset(0 -100vmax);
+  color: variables.$dark-green;
+}
+
+.recipe-generator {
+  width: functions.px-to-rem(1087);
+  margin: functions.px-to-rem(64) auto 0;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: functions.px-to-rem(24);
+  }
+
+  &__title {
+    width: functions.px-to-rem(567);
+    height: functions.px-to-rem(65);
+    margin: 0 auto;
+    color: variables.$middle-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(54);
+    font-weight: 600;
+    line-height: functions.px-to-rem(65);
+    text-align: center;
+  }
+
+  &__step {
+    display: flex;
+    flex-direction: column;
+    gap: functions.px-to-rem(64);
+  }
+
+  &__description {
+    align-self: center;
+    width: functions.px-to-rem(919);
+    height: functions.px-to-rem(30);
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(24);
+    font-weight: 500;
+    line-height: functions.px-to-rem(30);
+    text-align: center;
+  }
 }

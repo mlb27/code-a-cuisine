@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
+export type HeaderBackgroundTheme = 'dark' | 'light';
 
 /** Displays the shared Code à Cuisine header. */
 @Component({
@@ -8,4 +10,11 @@ import { RouterLink } from '@angular/router';
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
-export class Header {}
+export class Header {
+  @Input() backgroundTheme: HeaderBackgroundTheme = 'dark';
+
+  protected readonly logoPaths: Record<HeaderBackgroundTheme, string> = {
+    dark: 'img/logo/code-a-cuisine-logo.svg',
+    light: 'img/logo/code-a-cuisine-logo-green.svg',
+  };
+}
