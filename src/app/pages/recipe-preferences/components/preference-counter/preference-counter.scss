@@ -1,0 +1,91 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+}
+
+.preference-counter {
+  display: flex;
+  flex-direction: column;
+  gap: functions.px-to-rem(16);
+
+  &__heading {
+    height: functions.px-to-rem(25);
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(20);
+    font-weight: 500;
+    line-height: functions.px-to-rem(25);
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(8);
+    height: functions.px-to-rem(28);
+  }
+
+  &__button {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(28);
+    align-items: center;
+    justify-content: center;
+    width: functions.px-to-rem(28);
+    height: functions.px-to-rem(28);
+    padding: functions.px-to-rem(4);
+    border: 0;
+    border-radius: functions.px-to-rem(4);
+    background-color: transparent;
+    color: variables.$dark-green;
+    cursor: pointer;
+    transition: background-color 300ms ease-out;
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$middle-green;
+      outline-offset: functions.px-to-rem(2);
+    }
+  }
+
+  &__icon {
+    width: functions.px-to-rem(20);
+    height: functions.px-to-rem(20);
+    overflow: visible;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: functions.px-to-rem(2.2);
+  }
+
+  &__value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: functions.px-to-rem(22);
+    height: functions.px-to-rem(20);
+    padding: 0 functions.px-to-rem(5);
+    background-color: rgba(variables.$primary-green, 0.2);
+  }
+
+  &__value,
+  &__label {
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(20);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+    white-space: nowrap;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .preference-counter__button:hover {
+    background-color: rgba(variables.$primary-green, 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preference-counter__button {
+    transition: none;
+  }
+}

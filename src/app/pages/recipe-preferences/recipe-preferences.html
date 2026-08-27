@@ -1,0 +1,23 @@
+<app-header backgroundTheme="light" backLabel="Ingredients" backLink="/generator" />
+
+<main class="recipe-preferences">
+  <section class="recipe-preferences__content" aria-labelledby="preferences-heading">
+    <h1 id="preferences-heading" class="recipe-preferences__title">Choose your preferences</h1>
+
+    <div class="recipe-preferences__counters">
+      <app-preference-counter
+        class="recipe-preferences__counter recipe-preferences__counter--portions"
+        heading="How many portions do you need?"
+        itemLabel="Portions"
+        [value]="2"
+      />
+
+      <app-preference-counter
+        class="recipe-preferences__counter recipe-preferences__counter--people"
+        heading="How many are cooking?"
+        itemLabel="Person"
+        [value]="1"
+      />
+    </div>
+  </section>
+</main>

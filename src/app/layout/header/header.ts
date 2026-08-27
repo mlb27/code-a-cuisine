@@ -12,6 +12,8 @@ export type HeaderBackgroundTheme = 'dark' | 'light';
 })
 export class Header {
   @Input() backgroundTheme: HeaderBackgroundTheme = 'dark';
+  @Input() backLabel = '';
+  @Input() backLink = '';
 
   protected readonly logoPaths: Record<HeaderBackgroundTheme, string> = {
     dark: 'img/logo/code-a-cuisine-logo.svg',

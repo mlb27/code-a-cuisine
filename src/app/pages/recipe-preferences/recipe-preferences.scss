@@ -1,0 +1,54 @@
+@use '../../../styles/functions';
+@use '../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  min-height: 100svh;
+  background-color: variables.$white;
+  box-shadow: 0 0 0 100vmax variables.$white;
+  clip-path: inset(0 -100vmax);
+  color: variables.$dark-green;
+}
+
+.recipe-preferences {
+  width: functions.px-to-rem(721);
+  margin: functions.px-to-rem(64) auto 0;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: functions.px-to-rem(56);
+  }
+
+  &__title {
+    width: functions.px-to-rem(416);
+    height: functions.px-to-rem(35);
+    margin: 0 auto;
+    color: variables.$dark-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(28);
+    font-weight: 600;
+    line-height: functions.px-to-rem(35);
+    text-align: center;
+  }
+
+  &__counters {
+    display: flex;
+    align-items: flex-start;
+    gap: functions.px-to-rem(90);
+    width: 100%;
+    height: functions.px-to-rem(69);
+    padding-inline: functions.px-to-rem(24);
+  }
+
+  &__counter {
+    &--portions {
+      width: functions.px-to-rem(320);
+    }
+
+    &--people {
+      width: functions.px-to-rem(263);
+    }
+  }
+}

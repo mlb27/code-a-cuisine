@@ -1,0 +1,30 @@
+<section class="preference-counter">
+  <h2 class="preference-counter__heading">{{ heading }}</h2>
+
+  <div class="preference-counter__controls">
+    <button
+      class="preference-counter__button"
+      type="button"
+      [attr.aria-label]="'Decrease ' + itemLabel"
+    >
+      <svg class="preference-counter__icon" viewBox="0 0 20 20" aria-hidden="true">
+        <rect x="1.1" y="1.1" width="17.8" height="17.8" rx="1.1" />
+        <path d="M5.56 10h8.88" />
+      </svg>
+    </button>
+
+    <span class="preference-counter__value">{{ value }}</span>
+    <span class="preference-counter__label">{{ itemLabel }}</span>
+
+    <button
+      class="preference-counter__button"
+      type="button"
+      [attr.aria-label]="'Increase ' + itemLabel"
+    >
+      <svg class="preference-counter__icon" viewBox="0 0 20 20" aria-hidden="true">
+        <rect x="1.1" y="1.1" width="17.8" height="17.8" rx="1.1" />
+        <path d="M5.56 10h8.88M10 5.56v8.88" />
+      </svg>
+    </button>
+  </div>
+</section>

@@ -1,4 +1,8 @@
-<header class="app-header" [attr.data-background-theme]="backgroundTheme">
+<header
+  class="app-header"
+  [attr.data-background-theme]="backgroundTheme"
+  [attr.data-has-back-link]="backLink && backLabel ? true : null"
+>
   <a class="app-header__home-link" routerLink="/" aria-label="Go to Code à Cuisine home">
     <img
       class="app-header__logo"
@@ -8,4 +12,13 @@
       height="48"
     />
   </a>
+
+  @if (backLink && backLabel) {
+    <a class="app-header__back-link" [routerLink]="backLink">
+      <svg class="app-header__back-icon" viewBox="0 0 22 16" aria-hidden="true">
+        <path d="M21 8H1m0 0 6.36-6.36M1 8l6.36 6.36" />
+      </svg>
+      <span>{{ backLabel }}</span>
+    </a>
+  }
 </header>
