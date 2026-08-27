@@ -1,0 +1,148 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+}
+
+.home-hero {
+  position: relative;
+  min-height: functions.px-to-rem(888);
+  overflow: hidden;
+
+  &__main-cta {
+    position: absolute;
+    top: functions.px-to-rem(104);
+    left: functions.px-to-rem(65);
+    display: flex;
+    flex-direction: column;
+    gap: functions.px-to-rem(64);
+    width: functions.px-to-rem(755);
+    height: functions.px-to-rem(303);
+  }
+
+  &__text {
+    width: 100%;
+    height: functions.px-to-rem(179);
+  }
+
+  &__eyebrow {
+    height: functions.px-to-rem(60);
+    margin: 0;
+    color: variables.$light-cream;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(48);
+    font-weight: 600;
+    line-height: functions.px-to-rem(60);
+  }
+
+  &__title {
+    width: 100%;
+    height: functions.px-to-rem(119);
+    margin: 0;
+    color: variables.$cream;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: functions.px-to-rem(104);
+    font-weight: 700;
+    line-height: functions.px-to-rem(119);
+  }
+
+  &__primary-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: functions.px-to-rem(183);
+    height: functions.px-to-rem(60);
+    background-color: variables.$cream;
+    color: variables.$button-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(24);
+    font-weight: 600;
+    line-height: functions.px-to-rem(30);
+    text-decoration: none;
+    transition:
+      background-color 300ms ease-out,
+      color 300ms ease-out;
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$light-cream;
+      outline-offset: functions.px-to-rem(3);
+    }
+  }
+
+  &__secondary-cta {
+    position: absolute;
+    top: functions.px-to-rem(710);
+    left: functions.px-to-rem(65);
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(16);
+    width: functions.px-to-rem(594);
+    height: functions.px-to-rem(52);
+  }
+
+  &__secondary-title {
+    width: functions.px-to-rem(342);
+    height: functions.px-to-rem(34);
+    margin: 0;
+    color: variables.$cream;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: functions.px-to-rem(32);
+    font-weight: 500;
+    line-height: functions.px-to-rem(33);
+  }
+
+  &__secondary-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: functions.px-to-rem(10);
+    width: functions.px-to-rem(236);
+    height: functions.px-to-rem(52);
+    padding-inline: functions.px-to-rem(26);
+    border-radius: functions.px-to-rem(5);
+    color: variables.$cream;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(20);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+    text-decoration: none;
+    transition:
+      background-color 300ms ease-in,
+      color 300ms ease-in;
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$cream;
+      outline-offset: functions.px-to-rem(3);
+    }
+  }
+
+  &__secondary-icon {
+    flex: 0 0 auto;
+    width: functions.px-to-rem(26);
+    height: functions.px-to-rem(16);
+    margin-inline: functions.px-to-rem(-1);
+    overflow: visible;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-hero {
+    &__primary-button:hover {
+      background-color: variables.$button-green;
+      color: variables.$cream;
+    }
+
+    &__secondary-button:hover {
+      background-color: variables.$cream;
+      color: variables.$button-green;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__primary-button,
+  .home-hero__secondary-button {
+    transition: none;
+  }
+}
