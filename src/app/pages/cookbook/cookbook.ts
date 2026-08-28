@@ -13,6 +13,7 @@ interface MostLikedRecipe {
 
 interface Cuisine {
   name: string;
+  slug: string;
   emoji: string;
   imageSource: string;
   imageAlt: string;
@@ -57,36 +58,42 @@ export class Cookbook {
   protected readonly cuisines: Cuisine[] = [
     {
       name: 'Italian',
+      slug: 'italian',
       emoji: '🤌',
       imageSource: 'img/cookbook/italian-cuisine.png',
       imageAlt: 'Italian pasta and pizza dishes',
     },
     {
       name: 'German',
+      slug: 'german',
       emoji: '🥨',
       imageSource: 'img/cookbook/german-cuisine.png',
       imageAlt: 'German dishes with schnitzel, pretzels and dumplings',
     },
     {
       name: 'Japanese',
+      slug: 'japanese',
       emoji: '🥢',
       imageSource: 'img/cookbook/japanese-cuisine.png',
       imageAlt: 'Fresh Japanese salmon sushi',
     },
     {
       name: 'Gourmet',
+      slug: 'gourmet',
       emoji: '✨',
       imageSource: 'img/cookbook/gourmet-cuisine.png',
       imageAlt: 'A colorful gourmet dish',
     },
     {
       name: 'Indian',
+      slug: 'indian',
       emoji: '🍛',
       imageSource: 'img/cookbook/indian-cuisine.png',
       imageAlt: 'An Indian thali with rice, bread and curries',
     },
     {
       name: 'Fusion',
+      slug: 'fusion',
       emoji: '🍢',
       imageSource: 'img/cookbook/fusion-cuisine.png',
       imageAlt: 'A modern fusion cuisine tasting plate',

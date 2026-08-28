@@ -1,0 +1,26 @@
+<app-header backgroundTheme="light" backLabel="Cookbook" backLink="/cookbook" />
+
+<div class="cuisine-recipes__action-bar">
+  <a class="cuisine-recipes__generate-button" routerLink="/generator">Generate a recipe</a>
+</div>
+
+<main class="cuisine-recipes">
+  <section class="cuisine-recipes__hero" [attr.aria-label]="cuisineName + ' cuisine'">
+    <img src="img/cuisine-recipes/italian-cuisine-banner.png" alt="" width="1143" height="144" />
+    <h1>{{ cuisineName }} cuisine</h1>
+  </section>
+
+  <section class="cuisine-recipes__list" [attr.aria-label]="cuisineName + ' recipes'">
+    @for (recipe of recipes; track recipe.number) {
+      <app-cuisine-recipe-card
+        [recipeNumber]="recipe.number"
+        [title]="recipe.title"
+        [cookingTime]="recipe.cookingTime"
+        [likes]="recipe.likes"
+        [tags]="recipe.tags"
+      />
+    }
+  </section>
+
+  <app-cuisine-pagination class="cuisine-recipes__pagination" />
+</main>

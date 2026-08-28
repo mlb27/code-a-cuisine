@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { Cookbook } from './pages/cookbook/cookbook';
+import { CuisineRecipes } from './pages/cuisine-recipes/cuisine-recipes';
 import { Home } from './pages/home/home';
 import { RecipeDetails } from './pages/recipe-details/recipe-details';
 import { RecipeGenerator } from './pages/recipe-generator/recipe-generator';
@@ -37,5 +38,9 @@ export const routes: Routes = [
   {
     path: 'cookbook',
     component: Cookbook,
+  },
+  {
+    path: 'cookbook/:cuisine',
+    component: CuisineRecipes,
   },
 ];

@@ -35,6 +35,7 @@
       @for (cuisine of cuisines; track cuisine.name) {
         <app-cuisine-card
           [name]="cuisine.name"
+          [slug]="cuisine.slug"
           [emoji]="cuisine.emoji"
           [imageSource]="cuisine.imageSource"
           [imageAlt]="cuisine.imageAlt"

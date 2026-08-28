@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 })
 export class CuisineCard {
   @Input({ required: true }) name = '';
+  @Input({ required: true }) slug = '';
   @Input({ required: true }) emoji = '';
   @Input({ required: true }) imageSource = '';
   @Input({ required: true }) imageAlt = '';
