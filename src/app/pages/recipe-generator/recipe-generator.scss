@@ -79,6 +79,7 @@
     font-size: functions.px-to-rem(24);
     font-weight: 600;
     line-height: functions.px-to-rem(30);
+    white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
     transition:
@@ -96,7 +97,6 @@
   .recipe-generator__next-button:hover {
     background-color: variables.$button-green-hover;
     color: variables.$white;
-    font-weight: 700;
   }
 }
 

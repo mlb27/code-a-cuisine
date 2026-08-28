@@ -76,6 +76,7 @@
     font-size: functions.px-to-rem(24);
     font-weight: 600;
     line-height: functions.px-to-rem(30);
+    white-space: nowrap;
     text-decoration: none;
     transition:
       background-color 300ms ease-out,
@@ -154,7 +155,6 @@
   .home-hero {
     &__primary-button:hover {
       background-color: variables.$cream-hover;
-      font-weight: 700;
     }
 
     &__secondary-button:hover {
