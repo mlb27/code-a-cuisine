@@ -48,6 +48,10 @@
       outline: functions.px-to-rem(2) solid variables.$middle-green;
       outline-offset: functions.px-to-rem(1);
     }
+
+    &[aria-current='page'] {
+      background-color: variables.$loader-green;
+    }
   }
 
   &__ellipsis {
@@ -57,8 +61,8 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .pagination__button:hover {
-    background-color: variables.$loader-green;
+  .pagination__button:hover:not([aria-current='page']) {
+    background-color: rgba(variables.$loader-green, 0.4);
   }
 }
 

@@ -16,6 +16,13 @@ interface CuisineRecipe extends RecipeTemplate {
   number: number;
 }
 
+interface CuisineDetails {
+  name: string;
+  bannerSource: string;
+  bannerHeight: number;
+  headingTop: number;
+}
+
 /** Displays the saved recipes for the selected cuisine. */
 @Component({
   selector: 'app-cuisine-recipes',
@@ -24,15 +31,45 @@ interface CuisineRecipe extends RecipeTemplate {
   styleUrl: './cuisine-recipes.scss',
 })
 export class CuisineRecipes {
-  protected readonly cuisineName: string;
+  protected readonly cuisine: CuisineDetails;
 
-  private readonly cuisineNames: Record<string, string> = {
-    fusion: 'Fusion',
-    german: 'German',
-    gourmet: 'Gourmet',
-    indian: 'Indian',
-    italian: 'Italian',
-    japanese: 'Japanese',
+  private readonly cuisines: Record<string, CuisineDetails> = {
+    fusion: {
+      name: 'Fusion',
+      bannerSource: 'img/cuisine-recipes/fusion-cuisine-banner.png',
+      bannerHeight: 132,
+      headingTop: 39,
+    },
+    german: {
+      name: 'German',
+      bannerSource: 'img/cuisine-recipes/german-cuisine-banner.png',
+      bannerHeight: 151,
+      headingTop: 48,
+    },
+    gourmet: {
+      name: 'Gourmet',
+      bannerSource: 'img/cuisine-recipes/gourmet-cuisine-banner.png',
+      bannerHeight: 165,
+      headingTop: 74,
+    },
+    indian: {
+      name: 'Indian',
+      bannerSource: 'img/cuisine-recipes/indian-cuisine-banner.png',
+      bannerHeight: 132,
+      headingTop: 39,
+    },
+    italian: {
+      name: 'Italian',
+      bannerSource: 'img/cuisine-recipes/italian-cuisine-banner.png',
+      bannerHeight: 144,
+      headingTop: 51,
+    },
+    japanese: {
+      name: 'Japanese',
+      bannerSource: 'img/cuisine-recipes/japanese-cuisine-banner.png',
+      bannerHeight: 156,
+      headingTop: 50,
+    },
   };
 
   private readonly recipeTemplates: RecipeTemplate[] = [
@@ -63,6 +100,6 @@ export class CuisineRecipes {
 
   constructor(route: ActivatedRoute) {
     const cuisineSlug = route.snapshot.paramMap.get('cuisine')?.toLowerCase() ?? 'italian';
-    this.cuisineName = this.cuisineNames[cuisineSlug] ?? 'Italian';
+    this.cuisine = this.cuisines[cuisineSlug] ?? this.cuisines['italian'];
   }
 }

@@ -49,7 +49,6 @@
   &__hero {
     position: relative;
     width: 100%;
-    height: functions.px-to-rem(144);
     overflow: hidden;
 
     img {
@@ -90,8 +89,9 @@
 
 @media (hover: hover) and (pointer: fine) {
   .cuisine-recipes__generate-button:hover {
-    background-color: variables.$cream;
-    color: variables.$button-green;
+    background-color: variables.$button-green-hover;
+    color: variables.$white;
+    font-weight: 700;
   }
 }
 

@@ -5,12 +5,16 @@
 </div>
 
 <main class="cuisine-recipes">
-  <section class="cuisine-recipes__hero" [attr.aria-label]="cuisineName + ' cuisine'">
-    <img src="img/cuisine-recipes/italian-cuisine-banner.png" alt="" width="1143" height="144" />
-    <h1>{{ cuisineName }} cuisine</h1>
+  <section
+    class="cuisine-recipes__hero"
+    [attr.aria-label]="cuisine.name + ' cuisine'"
+    [style.height.px]="cuisine.bannerHeight"
+  >
+    <img [src]="cuisine.bannerSource" alt="" width="1143" [attr.height]="cuisine.bannerHeight" />
+    <h1 [style.top.px]="cuisine.headingTop">{{ cuisine.name }} cuisine</h1>
   </section>
 
-  <section class="cuisine-recipes__list" [attr.aria-label]="cuisineName + ' recipes'">
+  <section class="cuisine-recipes__list" [attr.aria-label]="cuisine.name + ' recipes'">
     @for (recipe of recipes; track recipe.number) {
       <app-cuisine-recipe-card
         [recipeNumber]="recipe.number"
