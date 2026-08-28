@@ -5,7 +5,7 @@
   display: block;
   flex: 0 0 auto;
   width: functions.px-to-rem(577);
-  height: functions.px-to-rem(209);
+  height: functions.px-to-rem(176);
 }
 
 .ingredient-input {
@@ -33,7 +33,7 @@
   &__ingredient-column {
     flex: 0 0 functions.px-to-rem(301);
     min-width: 0;
-    height: functions.px-to-rem(159);
+    height: functions.px-to-rem(72);
   }
 
   &__serving-column {
