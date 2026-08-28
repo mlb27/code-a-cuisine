@@ -1,0 +1,16 @@
+<a class="cuisine-card" routerLink="/recipe">
+  <h2 class="cuisine-card__title">
+    <span>{{ name }} cuisine</span>
+    <span class="cuisine-card__emoji" aria-hidden="true">{{ emoji }}</span>
+  </h2>
+
+  <span class="cuisine-card__image-frame">
+    <img
+      class="cuisine-card__image"
+      [src]="imageSource"
+      [alt]="imageAlt"
+      width="400"
+      height="400"
+    />
+  </span>
+</a>

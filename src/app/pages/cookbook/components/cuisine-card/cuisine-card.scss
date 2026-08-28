@@ -1,0 +1,66 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  width: functions.px-to-rem(400);
+  height: functions.px-to-rem(443);
+}
+
+.cuisine-card {
+  display: flex;
+  flex-direction: column;
+  gap: functions.px-to-rem(8);
+  width: 100%;
+  height: 100%;
+  color: variables.$middle-green;
+  text-decoration: none;
+
+  &__title {
+    display: flex;
+    align-items: flex-start;
+    gap: functions.px-to-rem(8);
+    height: functions.px-to-rem(35);
+    margin: 0;
+    font-size: functions.px-to-rem(28);
+    font-weight: 600;
+    line-height: functions.px-to-rem(35);
+  }
+
+  &__emoji {
+    font-size: functions.px-to-rem(28);
+    line-height: functions.px-to-rem(28);
+  }
+
+  &__image-frame {
+    display: block;
+    width: functions.px-to-rem(400);
+    height: functions.px-to-rem(400);
+    overflow: hidden;
+    background-color: variables.$loader-green;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 300ms ease;
+  }
+
+  &:focus-visible {
+    outline: functions.px-to-rem(3) solid variables.$middle-green;
+    outline-offset: functions.px-to-rem(4);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cuisine-card:hover .cuisine-card__image {
+    transform: scale(1.035);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cuisine-card__image {
+    transition: none;
+  }
+}

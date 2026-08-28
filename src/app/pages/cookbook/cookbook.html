@@ -1,1 +1,54 @@
-<main class="cookbook"></main>
+<app-header backgroundTheme="light" backLabel="Back" backLink="/recipe" />
+
+<main class="cookbook">
+  <div class="cookbook__content">
+    <section class="cookbook__overview" aria-labelledby="cookbook-heading">
+      <div class="cookbook__intro">
+        <h1 id="cookbook-heading" class="cookbook__title">Cookbook</h1>
+        <p class="cookbook__description">
+          From quick bites to gourmet delights, explore them all in our ultimate cookbook and get
+          inspired for your next culinary adventure.
+        </p>
+      </div>
+
+      <section class="cookbook__most-liked" aria-labelledby="most-liked-heading">
+        <div class="cookbook__most-liked-heading">
+          <h2 id="most-liked-heading">Most liked recipes</h2>
+          <svg viewBox="0 0 30 26" aria-hidden="true">
+            <path d="M15 24.1 4.8 14.35A7.3 7.3 0 0 1 15 3.95a7.3 7.3 0 0 1 10.2 10.4L15 24.1Z" />
+          </svg>
+        </div>
+
+        <div class="cookbook__most-liked-track">
+          @for (recipe of mostLikedRecipes; track $index) {
+            <app-most-liked-recipe-card
+              [title]="recipe.title"
+              [cookingTime]="recipe.cookingTime"
+              [likes]="recipe.likes"
+            />
+          }
+        </div>
+      </section>
+    </section>
+
+    <section class="cookbook__cuisines" aria-label="Cuisine categories">
+      @for (cuisine of cuisines; track cuisine.name) {
+        <app-cuisine-card
+          [name]="cuisine.name"
+          [emoji]="cuisine.emoji"
+          [imageSource]="cuisine.imageSource"
+          [imageAlt]="cuisine.imageAlt"
+        />
+      }
+    </section>
+  </div>
+
+  <a class="cookbook__generate-link" routerLink="/generator">
+    <span>Generate new recipe</span>
+    <svg viewBox="-1 -8 26 16" aria-hidden="true">
+      <path
+        d="M0-1C-.552-1-1-.552-1 0S-.552 1 0 1V-1ZM24.707.707c.391-.39.391-1.024 0-1.414L18.343-7.071a1 1 0 0 0-1.414 1.414L22.586 0l-5.657 5.657a1 1 0 0 0 1.414 1.414L24.707.707ZM0 0v1h24v-2H0v1Z"
+      />
+    </svg>
+  </a>
+</main>

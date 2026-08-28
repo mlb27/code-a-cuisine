@@ -1,0 +1,108 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  flex: 0 0 functions.px-to-rem(370);
+  width: functions.px-to-rem(370);
+  height: functions.px-to-rem(124);
+}
+
+.recipe-card {
+  display: flex;
+  gap: functions.px-to-rem(24);
+  width: 100%;
+  height: 100%;
+  padding: functions.px-to-rem(16) functions.px-to-rem(12);
+  overflow: hidden;
+  border-radius: functions.px-to-rem(16);
+  background-color: rgba(219, 224, 219, 0.7);
+  color: variables.$middle-green;
+  text-decoration: none;
+  transition:
+    background-color 300ms ease,
+    transform 300ms ease;
+
+  &__copy {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(258);
+    flex-direction: column;
+    gap: functions.px-to-rem(8);
+    min-width: 0;
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(4);
+    height: functions.px-to-rem(24);
+    color: variables.$primary-green;
+    font-size: functions.px-to-rem(16);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+    white-space: nowrap;
+  }
+
+  &__time-icon {
+    flex: 0 0 functions.px-to-rem(20);
+    width: functions.px-to-rem(20);
+    height: functions.px-to-rem(20);
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  &__title {
+    display: -webkit-box;
+    width: functions.px-to-rem(263);
+    margin: 0;
+    overflow: hidden;
+    font-size: functions.px-to-rem(24);
+    font-weight: 500;
+    line-height: functions.px-to-rem(30);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  &__likes {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(64);
+    align-items: center;
+    height: functions.px-to-rem(32);
+    padding: functions.px-to-rem(6) functions.px-to-rem(12);
+    border-radius: functions.px-to-rem(30);
+    background-color: rgba(57, 96, 57, 0.3);
+    color: variables.$dark-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(16);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+  }
+
+  &__heart {
+    flex: 0 0 functions.px-to-rem(20);
+    width: functions.px-to-rem(20);
+    height: functions.px-to-rem(20);
+    fill: variables.$middle-green;
+  }
+
+  &:focus-visible {
+    outline: functions.px-to-rem(3) solid variables.$middle-green;
+    outline-offset: functions.px-to-rem(-3);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .recipe-card:hover {
+    background-color: rgba(196, 208, 196, 0.95);
+    transform: translateY(functions.px-to-rem(-3));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recipe-card {
+    transition: none;
+  }
+}
