@@ -1,0 +1,97 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  width: 100%;
+  height: functions.px-to-rem(321);
+}
+
+.recipe-ingredients {
+  width: 100%;
+  height: 100%;
+
+  &__heading {
+    position: relative;
+    width: 100%;
+    height: functions.px-to-rem(148);
+  }
+
+  &__heading-image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
+
+  &__title {
+    position: absolute;
+    top: functions.px-to-rem(54);
+    left: 50%;
+    height: functions.px-to-rem(40);
+    margin: 0;
+    color: variables.$middle-green;
+    font-size: functions.px-to-rem(32);
+    font-weight: 600;
+    line-height: functions.px-to-rem(40);
+    transform: translateX(-50%);
+  }
+
+  &__columns {
+    display: flex;
+    gap: functions.px-to-rem(80);
+    width: functions.px-to-rem(730);
+    height: functions.px-to-rem(174);
+    margin: functions.px-to-rem(-1) auto 0;
+  }
+
+  &__column {
+    flex: 0 0 functions.px-to-rem(338);
+    height: functions.px-to-rem(174);
+
+    &--extra {
+      flex-basis: functions.px-to-rem(312);
+      height: functions.px-to-rem(166);
+    }
+  }
+
+  &__column-title {
+    height: functions.px-to-rem(30);
+    margin: 0;
+    color: variables.$button-green;
+    font-size: functions.px-to-rem(24);
+    font-weight: 600;
+    line-height: functions.px-to-rem(30);
+  }
+
+  &__list {
+    width: 100%;
+    height: functions.px-to-rem(120);
+    margin: functions.px-to-rem(24) 0 0;
+    padding-left: functions.px-to-rem(24);
+    color: variables.$dark-green;
+    font-size: functions.px-to-rem(24);
+    font-weight: 500;
+    line-height: functions.px-to-rem(30);
+
+    &--extra {
+      margin-top: functions.px-to-rem(16);
+    }
+
+    li {
+      padding-left: functions.px-to-rem(2);
+    }
+
+    li::marker {
+      font-size: functions.px-to-rem(15);
+    }
+  }
+
+  &__quantity {
+    display: inline-block;
+    width: functions.px-to-rem(100);
+  }
+
+  &__list--extra &__quantity {
+    width: functions.px-to-rem(72);
+  }
+}

@@ -1,0 +1,122 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  width: 100%;
+  height: functions.px-to-rem(532);
+}
+
+.recipe-directions {
+  width: 100%;
+  height: 100%;
+
+  &__heading {
+    position: relative;
+    width: 100%;
+    height: functions.px-to-rem(133);
+  }
+
+  &__heading-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: functions.px-to-rem(134);
+    object-fit: fill;
+  }
+
+  &__title {
+    position: absolute;
+    top: functions.px-to-rem(60);
+    left: 50%;
+    height: functions.px-to-rem(40);
+    margin: 0;
+    color: variables.$middle-green;
+    font-size: functions.px-to-rem(32);
+    font-weight: 600;
+    line-height: functions.px-to-rem(40);
+    transform: translateX(-50%);
+  }
+
+  &__steps {
+    display: grid;
+    grid-template-columns: repeat(2, functions.px-to-rem(400));
+    column-gap: functions.px-to-rem(64);
+    row-gap: functions.px-to-rem(40);
+    width: functions.px-to-rem(864);
+    height: functions.px-to-rem(375);
+    margin: functions.px-to-rem(24) auto 0;
+  }
+
+  &__step {
+    width: functions.px-to-rem(400);
+    color: variables.$dark-green;
+  }
+
+  &__step-header {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(16);
+    width: 100%;
+    height: functions.px-to-rem(32);
+  }
+
+  &__step-heading {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: functions.px-to-rem(8);
+    height: functions.px-to-rem(32);
+  }
+
+  &__step-number {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(32);
+    align-items: center;
+    justify-content: center;
+    width: functions.px-to-rem(32);
+    height: functions.px-to-rem(32);
+    border-radius: 50%;
+    background-color: variables.$cream;
+    font-size: functions.px-to-rem(18);
+    font-weight: 500;
+    line-height: functions.px-to-rem(23);
+  }
+
+  &__step-title {
+    height: functions.px-to-rem(30);
+    margin: 0;
+    font-size: functions.px-to-rem(24);
+    font-weight: 500;
+    line-height: functions.px-to-rem(30);
+  }
+
+  &__chef {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: functions.px-to-rem(4);
+    height: functions.px-to-rem(27);
+    padding: functions.px-to-rem(2) functions.px-to-rem(4);
+    border-radius: functions.px-to-rem(6);
+    background-color: #d7dfd7;
+    font-size: functions.px-to-rem(18);
+    font-weight: 500;
+    line-height: functions.px-to-rem(23);
+  }
+
+  &__chef-icon {
+    width: auto;
+    height: functions.px-to-rem(22);
+    object-fit: contain;
+  }
+
+  &__description {
+    width: 100%;
+    margin: functions.px-to-rem(32) 0 0;
+    font-size: functions.px-to-rem(18);
+    font-weight: 500;
+    line-height: functions.px-to-rem(23);
+  }
+}

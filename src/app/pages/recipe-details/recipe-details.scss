@@ -6,202 +6,200 @@
   min-height: 100vh;
   min-height: 100svh;
   background-color: variables.$white;
+  box-shadow: 0 0 0 100vmax variables.$white;
+  clip-path: inset(0 -100vmax);
   color: variables.$dark-green;
 }
 
 .recipe-details {
   width: calc(100% - functions.px-to-rem(192));
   max-width: functions.px-to-rem(1248);
-  margin: functions.px-to-rem(64) auto functions.px-to-rem(122);
+  margin: functions.px-to-rem(64) auto 0;
+  padding-bottom: functions.px-to-rem(122);
 
-  &__content {
-    min-height: functions.px-to-rem(1520);
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: functions.px-to-rem(48);
+    width: 100%;
+    height: functions.px-to-rem(1322);
     padding: functions.px-to-rem(36) functions.px-to-rem(44);
     border: functions.px-to-rem(4) solid variables.$cream;
     border-radius: functions.px-to-rem(20);
     background-color: rgba(variables.$cream, 0.3);
   }
 
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  &__sections {
+    flex: 0 0 functions.px-to-rem(853);
     width: 100%;
-    height: functions.px-to-rem(245);
-    padding: functions.px-to-rem(24);
-    border-radius: functions.px-to-rem(20);
-    background-color: variables.$cream;
+    height: functions.px-to-rem(853);
   }
 
-  &__summary {
+  &__meal-feedback {
     display: flex;
-    flex: 0 0 functions.px-to-rem(619);
-    flex-direction: column;
-    height: functions.px-to-rem(197);
-  }
-
-  &__cooking-time,
-  &__cooks {
-    display: flex;
+    align-self: center;
     align-items: center;
-    color: variables.$primary-green;
-    font-family: 'Quicksand', sans-serif;
-    font-weight: 500;
-  }
-
-  &__cooking-time {
-    gap: functions.px-to-rem(4);
-    width: functions.px-to-rem(290);
-    height: functions.px-to-rem(24);
-    font-size: functions.px-to-rem(20);
-    line-height: functions.px-to-rem(20);
-  }
-
-  &__clock {
-    flex: 0 0 functions.px-to-rem(24);
-    width: functions.px-to-rem(24);
-    height: functions.px-to-rem(24);
-    fill: currentColor;
-  }
-
-  &__title {
-    width: 100%;
-    height: functions.px-to-rem(130);
-    margin: functions.px-to-rem(8) 0 0;
-    color: variables.$middle-green;
-    font-family: 'Quicksand', sans-serif;
-    font-size: functions.px-to-rem(54);
-    font-weight: 600;
-    line-height: functions.px-to-rem(65);
-  }
-
-  &__cooks {
-    gap: functions.px-to-rem(16);
-    height: functions.px-to-rem(27);
-    margin-top: functions.px-to-rem(8);
-    font-size: functions.px-to-rem(18);
-    line-height: functions.px-to-rem(23);
-  }
-
-  &__cook-count {
-    font-size: functions.px-to-rem(20);
-    line-height: functions.px-to-rem(20);
-  }
-
-  &__cook {
-    display: flex;
-    align-items: center;
-    gap: functions.px-to-rem(4);
-    color: variables.$dark-green;
-  }
-
-  &__cook-icon {
-    flex: 0 0 auto;
-    height: functions.px-to-rem(22);
-    object-fit: contain;
-
-    &--first {
-      width: functions.px-to-rem(28);
-    }
-
-    &--second {
-      width: functions.px-to-rem(25);
-    }
-  }
-
-  &__metadata {
-    display: flex;
-    flex: 0 0 functions.px-to-rem(339);
-    flex-direction: column;
     gap: functions.px-to-rem(24);
-    height: functions.px-to-rem(143);
+    width: functions.px-to-rem(709);
+    height: functions.px-to-rem(48);
   }
 
-  &__tags {
+  &__feedback-copy {
     display: flex;
     align-items: center;
-    gap: functions.px-to-rem(16);
-    height: functions.px-to-rem(32);
+    gap: functions.px-to-rem(8);
+    width: functions.px-to-rem(633);
+    height: functions.px-to-rem(25);
     margin: 0;
-    padding: 0;
-    list-style: none;
+    white-space: nowrap;
+
+    strong {
+      font-size: functions.px-to-rem(20);
+      font-weight: 700;
+      line-height: functions.px-to-rem(25);
+    }
+
+    span {
+      font-size: functions.px-to-rem(16);
+      font-weight: 400;
+      line-height: functions.px-to-rem(20);
+    }
   }
 
-  &__tag,
-  &__favorite {
+  &__heart-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: functions.px-to-rem(32);
-    border-radius: functions.px-to-rem(30);
-    background-color: rgba(variables.$primary-green, 0.2);
-    color: variables.$dark-green;
-    font-weight: 500;
+    width: functions.px-to-rem(52);
+    height: functions.px-to-rem(48);
+    padding: functions.px-to-rem(6);
+    border: 0;
+    border-radius: functions.px-to-rem(5);
+    background-color: transparent;
+    color: variables.$button-green;
+    cursor: pointer;
+    transition: background-color 100ms ease-out;
+
+    svg {
+      width: functions.px-to-rem(40);
+      height: functions.px-to-rem(36);
+      fill: currentColor;
+    }
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$button-green;
+      outline-offset: functions.px-to-rem(3);
+    }
   }
 
-  &__tag {
-    padding: functions.px-to-rem(4.5) functions.px-to-rem(12);
-    font-size: functions.px-to-rem(18);
-    line-height: functions.px-to-rem(23);
-  }
-
-  &__favorite {
-    gap: 0;
-    width: functions.px-to-rem(64);
-    padding: functions.px-to-rem(6) functions.px-to-rem(12);
-    font-family: 'Ubuntu', sans-serif;
-    font-size: functions.px-to-rem(16);
-    line-height: functions.px-to-rem(20);
-  }
-
-  &__heart {
-    width: functions.px-to-rem(20);
-    height: functions.px-to-rem(20);
-    fill: currentColor;
-  }
-
-  &__nutrition {
-    padding-left: functions.px-to-rem(8);
-    color: variables.$dark-green;
-  }
-
-  &__nutrition-title {
-    height: functions.px-to-rem(23);
-    margin: 0 0 functions.px-to-rem(8);
-    font-size: functions.px-to-rem(18);
-    font-weight: 500;
-    line-height: functions.px-to-rem(23);
-  }
-
-  &__nutrition-list {
+  &__cookbook-promo {
     display: flex;
-    gap: functions.px-to-rem(24);
-    height: functions.px-to-rem(56);
-    margin: 0;
-  }
+    align-items: center;
+    justify-content: center;
+    gap: functions.px-to-rem(32);
+    width: 100%;
+    height: functions.px-to-rem(142);
+    margin-top: functions.px-to-rem(56);
+    border-radius: functions.px-to-rem(20);
+    background-color: rgba(variables.$primary-green, 0.1);
 
-  &__nutrition-item {
-    display: flex;
-    flex-direction: column;
-    height: functions.px-to-rem(56);
-
-    dt,
-    dd {
+    h2 {
+      width: functions.px-to-rem(579);
+      height: functions.px-to-rem(30);
       margin: 0;
+      font-size: functions.px-to-rem(24);
+      font-weight: 600;
+      line-height: functions.px-to-rem(30);
+    }
+  }
+
+  &__cookbook-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: functions.px-to-rem(169);
+    height: functions.px-to-rem(62);
+    padding: functions.px-to-rem(16) functions.px-to-rem(26);
+    background-color: variables.$primary-green;
+    color: variables.$cream;
+    font-size: functions.px-to-rem(24);
+    font-weight: 600;
+    line-height: functions.px-to-rem(30);
+    text-decoration: none;
+    transition:
+      background-color 300ms ease-out,
+      color 300ms ease-out;
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$primary-green;
+      outline-offset: functions.px-to-rem(3);
+    }
+  }
+
+  &__generation-cta {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    height: functions.px-to-rem(52);
+    margin-top: functions.px-to-rem(64);
+    padding-right: functions.px-to-rem(1);
+  }
+
+  &__generate-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: functions.px-to-rem(10);
+    width: functions.px-to-rem(285);
+    height: functions.px-to-rem(52);
+    padding-inline: functions.px-to-rem(26);
+    border-radius: functions.px-to-rem(5);
+    color: variables.$primary-green;
+    font-size: functions.px-to-rem(20);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+    text-decoration: none;
+    transition:
+      background-color 300ms ease-in,
+      color 300ms ease-in;
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$primary-green;
+      outline-offset: functions.px-to-rem(3);
+    }
+  }
+
+  &__generate-icon {
+    flex: 0 0 auto;
+    width: functions.px-to-rem(26);
+    height: functions.px-to-rem(16);
+    margin-inline: functions.px-to-rem(-1);
+    overflow: visible;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .recipe-details {
+    &__heart-button:hover {
+      background-color: variables.$cream;
     }
 
-    dt {
-      height: functions.px-to-rem(28);
-      font-size: functions.px-to-rem(22);
-      font-weight: 700;
-      line-height: functions.px-to-rem(28);
+    &__cookbook-button:hover {
+      background-color: variables.$cream;
+      color: variables.$button-green;
     }
 
-    dd {
-      margin-top: functions.px-to-rem(8);
-      font-size: functions.px-to-rem(20);
-      font-weight: 500;
-      line-height: functions.px-to-rem(20);
+    &__generate-link:hover {
+      background-color: variables.$primary-green;
+      color: variables.$cream;
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recipe-details__heart-button,
+  .recipe-details__cookbook-button,
+  .recipe-details__generate-link {
+    transition: none;
   }
 }

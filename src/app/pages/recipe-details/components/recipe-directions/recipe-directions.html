@@ -1,0 +1,38 @@
+<section class="recipe-directions" aria-labelledby="directions-title">
+  <div class="recipe-directions__heading">
+    <img
+      class="recipe-directions__heading-image"
+      src="img/recipe-details/directions-heading.png"
+      alt=""
+      width="1152"
+      height="134"
+    />
+    <h2 id="directions-title" class="recipe-directions__title">Directions</h2>
+  </div>
+
+  <div class="recipe-directions__steps">
+    @for (step of steps; track step.number) {
+      <article class="recipe-directions__step">
+        <header class="recipe-directions__step-header">
+          <div class="recipe-directions__step-heading">
+            <span class="recipe-directions__step-number">{{ step.number }}.</span>
+            <h3 class="recipe-directions__step-title">{{ step.title }}</h3>
+          </div>
+
+          <span class="recipe-directions__chef">
+            <img
+              class="recipe-directions__chef-icon"
+              [src]="step.chefIcon"
+              alt=""
+              [width]="step.chefIconWidth"
+              height="22"
+            />
+            <span>{{ step.chef }}</span>
+          </span>
+        </header>
+
+        <p class="recipe-directions__description">{{ step.description }}</p>
+      </article>
+    }
+  </div>
+</section>
