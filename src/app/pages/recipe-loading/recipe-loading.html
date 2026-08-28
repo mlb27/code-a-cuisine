@@ -1,0 +1,19 @@
+<app-header backgroundTheme="dark" [compact]="true" />
+
+<main class="recipe-loading">
+  <section class="recipe-loading__content" aria-labelledby="loading-heading">
+    <div class="recipe-loading__animation" aria-hidden="true">
+      <img
+        class="recipe-loading__animation-image"
+        src="img/loading/recipe-loader.gif"
+        alt=""
+        width="253"
+        height="291"
+      />
+    </div>
+
+    <h1 id="loading-heading" class="recipe-loading__title" aria-label="Generating...">
+      Generating<span class="recipe-loading__dots" aria-hidden="true"></span>
+    </h1>
+  </section>
+</main>

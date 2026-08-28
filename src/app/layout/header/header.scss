@@ -22,6 +22,10 @@
     height: functions.px-to-rem(136);
   }
 
+  &[data-compact='true'] {
+    height: functions.px-to-rem(88);
+  }
+
   &__home-link,
   &__logo {
     display: block;

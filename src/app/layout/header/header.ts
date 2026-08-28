@@ -14,6 +14,7 @@ export class Header {
   @Input() backgroundTheme: HeaderBackgroundTheme = 'dark';
   @Input() backLabel = '';
   @Input() backLink = '';
+  @Input() compact = false;
 
   protected readonly logoPaths: Record<HeaderBackgroundTheme, string> = {
     dark: 'img/logo/code-a-cuisine-logo.svg',

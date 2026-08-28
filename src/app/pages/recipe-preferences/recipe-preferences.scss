@@ -126,6 +126,9 @@
 
   &__generate-button {
     align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: functions.px-to-rem(258);
     height: functions.px-to-rem(62);
     padding: functions.px-to-rem(16) functions.px-to-rem(26);
@@ -136,6 +139,7 @@
     font-size: functions.px-to-rem(24);
     font-weight: 600;
     line-height: functions.px-to-rem(30);
+    text-decoration: none;
     cursor: pointer;
     transition:
       background-color 300ms ease-out,

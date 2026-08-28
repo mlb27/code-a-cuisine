@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { Header } from '../../layout/header/header';
 import { PreferenceCounter } from './components/preference-counter/preference-counter';
@@ -13,7 +14,7 @@ interface PreferenceOption {
 /** Displays the second step of the recipe generator. */
 @Component({
   selector: 'app-recipe-preferences',
-  imports: [Header, PreferenceCounter, PreferenceTag],
+  imports: [Header, PreferenceCounter, PreferenceTag, RouterLink],
   templateUrl: './recipe-preferences.html',
   styleUrl: './recipe-preferences.scss',
 })

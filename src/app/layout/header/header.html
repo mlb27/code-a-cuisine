@@ -1,6 +1,7 @@
 <header
   class="app-header"
   [attr.data-background-theme]="backgroundTheme"
+  [attr.data-compact]="compact ? true : null"
   [attr.data-has-back-link]="backLink && backLabel ? true : null"
 >
   <a class="app-header__home-link" routerLink="/" aria-label="Go to Code à Cuisine home">

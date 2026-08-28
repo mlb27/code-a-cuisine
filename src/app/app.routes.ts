@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { Cookbook } from './pages/cookbook/cookbook';
 import { Home } from './pages/home/home';
 import { RecipeGenerator } from './pages/recipe-generator/recipe-generator';
+import { RecipeLoading } from './pages/recipe-loading/recipe-loading';
 import { RecipePreferences } from './pages/recipe-preferences/recipe-preferences';
 
 export const routes: Routes = [
@@ -18,6 +19,10 @@ export const routes: Routes = [
   {
     path: 'generator/preferences',
     component: RecipePreferences,
+  },
+  {
+    path: 'generator/loading',
+    component: RecipeLoading,
   },
   {
     path: 'cookbook',
