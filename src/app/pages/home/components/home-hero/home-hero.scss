@@ -7,7 +7,7 @@
 
 .home-hero {
   position: relative;
-  min-height: functions.px-to-rem(888);
+  min-height: max(functions.px-to-rem(888), calc(100svh - functions.px-to-rem(136)));
 
   &__visuals {
     display: none;
@@ -17,30 +17,13 @@
     pointer-events: none;
   }
 
-  &__dish {
+  &__visual {
     position: absolute;
+    top: functions.px-to-rem(-142);
+    left: functions.px-to-rem(884.67);
+    width: functions.px-to-rem(553);
+    height: functions.px-to-rem(1747);
     max-width: none;
-
-    &--chicken {
-      top: functions.px-to-rem(-136);
-      left: functions.px-to-rem(916);
-      width: functions.px-to-rem(480);
-      height: functions.px-to-rem(430);
-    }
-
-    &--salmon {
-      top: functions.px-to-rem(131);
-      left: functions.px-to-rem(903);
-      width: functions.px-to-rem(494);
-      height: functions.px-to-rem(492);
-    }
-
-    &--steak {
-      top: functions.px-to-rem(435.215);
-      left: functions.px-to-rem(909.591);
-      width: functions.px-to-rem(492.817);
-      height: functions.px-to-rem(452.785);
-    }
   }
 
   &__main-cta {
@@ -170,13 +153,12 @@
 @media (hover: hover) and (pointer: fine) {
   .home-hero {
     &__primary-button:hover {
-      background-color: variables.$button-green;
-      color: variables.$cream;
+      background-color: variables.$cream-hover;
+      font-weight: 700;
     }
 
     &__secondary-button:hover {
-      background-color: variables.$cream;
-      color: variables.$button-green;
+      background-color: rgba(variables.$cream-hover, 0.2);
     }
   }
 }
