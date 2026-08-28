@@ -10,6 +10,85 @@
 }
 
 .recipe-results {
+  width: 100%;
+  max-width: functions.px-to-rem(1440);
   min-height: functions.px-to-rem(648);
-  margin-top: functions.px-to-rem(64);
+  margin: functions.px-to-rem(64) auto 0;
+
+  &__intro {
+    display: flex;
+    gap: functions.px-to-rem(96);
+    width: 100%;
+    height: functions.px-to-rem(222);
+    padding: 0 functions.px-to-rem(40) 0 functions.px-to-rem(80);
+  }
+
+  &__intro-copy {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(610);
+    flex-direction: column;
+    gap: functions.px-to-rem(24);
+    height: functions.px-to-rem(205);
+  }
+
+  &__title,
+  &__description {
+    margin: 0;
+  }
+
+  &__title {
+    width: 100%;
+    height: functions.px-to-rem(65);
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(54);
+    font-weight: 600;
+    line-height: functions.px-to-rem(65);
+  }
+
+  &__description {
+    width: functions.px-to-rem(617);
+    height: functions.px-to-rem(60);
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(24);
+    font-weight: 500;
+    line-height: functions.px-to-rem(30);
+  }
+
+  &__preferences {
+    display: flex;
+    gap: functions.px-to-rem(16);
+    height: functions.px-to-rem(32);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__preference {
+    height: functions.px-to-rem(32);
+    padding: functions.px-to-rem(4.5) functions.px-to-rem(12);
+    border-radius: functions.px-to-rem(30);
+    background-color: variables.$cream;
+    color: variables.$middle-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(18);
+    font-weight: 500;
+    line-height: functions.px-to-rem(23);
+  }
+
+  &__visual {
+    position: relative;
+    flex: 0 0 functions.px-to-rem(574);
+    height: functions.px-to-rem(222);
+    overflow: hidden;
+    margin: 0;
+    border-radius: functions.px-to-rem(20);
+    background-color: variables.$white;
+  }
+
+  &__visual-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
 }

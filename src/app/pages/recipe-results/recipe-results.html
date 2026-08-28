@@ -1,3 +1,29 @@
 <app-header backgroundTheme="dark" [compact]="true" />
 
-<main class="recipe-results" aria-label="Recipe results"></main>
+<main class="recipe-results">
+  <section class="recipe-results__intro" aria-labelledby="results-heading">
+    <div class="recipe-results__intro-copy">
+      <h1 id="results-heading" class="recipe-results__title">The recipe results</h1>
+
+      <p class="recipe-results__description">
+        We took what you have and let our AI do the thinking. Here are 3 easy recipes you can make
+        right now!
+      </p>
+
+      <ul class="recipe-results__preferences" aria-label="Selected preferences">
+        <li class="recipe-results__preference">Italian</li>
+        <li class="recipe-results__preference">Quick</li>
+      </ul>
+    </div>
+
+    <figure class="recipe-results__visual">
+      <img
+        class="recipe-results__visual-image"
+        src="img/results/results-kitchen.png"
+        alt="A kitchen robot preparing food"
+        width="574"
+        height="222"
+      />
+    </figure>
+  </section>
+</main>
