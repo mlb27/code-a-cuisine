@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { Header } from '../../layout/header/header';
 import { RecipeResultCard } from './components/recipe-result-card/recipe-result-card';
@@ -12,7 +13,7 @@ interface RecipeSuggestion {
 /** Displays the generated recipe suggestions. */
 @Component({
   selector: 'app-recipe-results',
-  imports: [Header, RecipeResultCard],
+  imports: [Header, RecipeResultCard, RouterLink],
   templateUrl: './recipe-results.html',
   styleUrl: './recipe-results.scss',
 })
