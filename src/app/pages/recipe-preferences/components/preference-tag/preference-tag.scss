@@ -46,8 +46,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .preference-tag__button:hover {
-    background-color: variables.$middle-green;
-    color: variables.$cream;
+    background-color: variables.$cream-hover;
   }
 }
 

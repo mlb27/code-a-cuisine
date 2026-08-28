@@ -154,8 +154,9 @@
 
 @media (hover: hover) and (pointer: fine) {
   .recipe-preferences__generate-button:hover {
-    background-color: variables.$cream;
-    color: variables.$primary-green;
+    background-color: variables.$button-green-hover;
+    color: variables.$white;
+    font-weight: 700;
   }
 }
 

@@ -142,8 +142,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .cookbook__generate-link:hover {
-    background-color: variables.$primary-green;
-    color: variables.$cream;
+    background-color: rgba(variables.$primary-green, 0.1);
   }
 }
 

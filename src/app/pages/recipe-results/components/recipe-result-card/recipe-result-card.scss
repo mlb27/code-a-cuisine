@@ -13,7 +13,7 @@
   height: functions.px-to-rem(338);
   padding: functions.px-to-rem(32) functions.px-to-rem(24);
   border-radius: functions.px-to-rem(20);
-  background-color: #dbe0db;
+  background-color: variables.$card-gray;
   color: variables.$dark-green;
   transition: background-color 100ms linear;
 
@@ -113,12 +113,12 @@
 
 @media (hover: hover) and (pointer: fine) {
   .recipe-card:hover {
-    background-color: variables.$cream;
+    background-color: rgba(variables.$card-hover-gray, 0.9);
   }
 
   .recipe-card__button:hover {
-    background-color: variables.$middle-green;
-    color: variables.$cream;
+    background-color: variables.$cream-hover;
+    font-weight: 700;
   }
 }
 

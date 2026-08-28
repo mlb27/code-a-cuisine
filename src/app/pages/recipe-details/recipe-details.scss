@@ -181,17 +181,17 @@
 @media (hover: hover) and (pointer: fine) {
   .recipe-details {
     &__heart-button:hover {
-      background-color: variables.$cream;
+      background-color: rgba(variables.$card-hover-gray, 0.6);
     }
 
     &__cookbook-button:hover {
-      background-color: variables.$cream;
-      color: variables.$button-green;
+      background-color: variables.$button-green-hover;
+      color: variables.$white;
+      font-weight: 700;
     }
 
     &__generate-link:hover {
-      background-color: variables.$primary-green;
-      color: variables.$cream;
+      background-color: rgba(variables.$primary-green, 0.1);
     }
   }
 }
