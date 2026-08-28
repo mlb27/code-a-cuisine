@@ -1,0 +1,15 @@
+@use '../../../styles/functions';
+@use '../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  min-height: 100svh;
+  background-color: variables.$primary-green;
+  color: variables.$cream;
+}
+
+.recipe-results {
+  min-height: functions.px-to-rem(648);
+  margin-top: functions.px-to-rem(64);
+}
