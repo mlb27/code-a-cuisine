@@ -16,7 +16,192 @@
 
   &__content {
     min-height: functions.px-to-rem(1520);
+    padding: functions.px-to-rem(36) functions.px-to-rem(44);
+    border: functions.px-to-rem(4) solid variables.$cream;
+    border-radius: functions.px-to-rem(20);
+    background-color: rgba(variables.$cream, 0.3);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: functions.px-to-rem(245);
+    padding: functions.px-to-rem(24);
     border-radius: functions.px-to-rem(20);
     background-color: variables.$cream;
+  }
+
+  &__summary {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(619);
+    flex-direction: column;
+    height: functions.px-to-rem(197);
+  }
+
+  &__cooking-time,
+  &__cooks {
+    display: flex;
+    align-items: center;
+    color: variables.$primary-green;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+  }
+
+  &__cooking-time {
+    gap: functions.px-to-rem(4);
+    width: functions.px-to-rem(290);
+    height: functions.px-to-rem(24);
+    font-size: functions.px-to-rem(20);
+    line-height: functions.px-to-rem(20);
+  }
+
+  &__clock {
+    flex: 0 0 functions.px-to-rem(24);
+    width: functions.px-to-rem(24);
+    height: functions.px-to-rem(24);
+    fill: currentColor;
+  }
+
+  &__title {
+    width: 100%;
+    height: functions.px-to-rem(130);
+    margin: functions.px-to-rem(8) 0 0;
+    color: variables.$middle-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(54);
+    font-weight: 600;
+    line-height: functions.px-to-rem(65);
+  }
+
+  &__cooks {
+    gap: functions.px-to-rem(16);
+    height: functions.px-to-rem(27);
+    margin-top: functions.px-to-rem(8);
+    font-size: functions.px-to-rem(18);
+    line-height: functions.px-to-rem(23);
+  }
+
+  &__cook-count {
+    font-size: functions.px-to-rem(20);
+    line-height: functions.px-to-rem(20);
+  }
+
+  &__cook {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(4);
+    color: variables.$dark-green;
+  }
+
+  &__cook-icon {
+    flex: 0 0 auto;
+    height: functions.px-to-rem(22);
+    object-fit: contain;
+
+    &--first {
+      width: functions.px-to-rem(28);
+    }
+
+    &--second {
+      width: functions.px-to-rem(25);
+    }
+  }
+
+  &__metadata {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(339);
+    flex-direction: column;
+    gap: functions.px-to-rem(24);
+    height: functions.px-to-rem(143);
+  }
+
+  &__tags {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(16);
+    height: functions.px-to-rem(32);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__tag,
+  &__favorite {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: functions.px-to-rem(32);
+    border-radius: functions.px-to-rem(30);
+    background-color: rgba(variables.$primary-green, 0.2);
+    color: variables.$dark-green;
+    font-weight: 500;
+  }
+
+  &__tag {
+    padding: functions.px-to-rem(4.5) functions.px-to-rem(12);
+    font-size: functions.px-to-rem(18);
+    line-height: functions.px-to-rem(23);
+  }
+
+  &__favorite {
+    gap: 0;
+    width: functions.px-to-rem(64);
+    padding: functions.px-to-rem(6) functions.px-to-rem(12);
+    font-family: 'Ubuntu', sans-serif;
+    font-size: functions.px-to-rem(16);
+    line-height: functions.px-to-rem(20);
+  }
+
+  &__heart {
+    width: functions.px-to-rem(20);
+    height: functions.px-to-rem(20);
+    fill: currentColor;
+  }
+
+  &__nutrition {
+    padding-left: functions.px-to-rem(8);
+    color: variables.$dark-green;
+  }
+
+  &__nutrition-title {
+    height: functions.px-to-rem(23);
+    margin: 0 0 functions.px-to-rem(8);
+    font-size: functions.px-to-rem(18);
+    font-weight: 500;
+    line-height: functions.px-to-rem(23);
+  }
+
+  &__nutrition-list {
+    display: flex;
+    gap: functions.px-to-rem(24);
+    height: functions.px-to-rem(56);
+    margin: 0;
+  }
+
+  &__nutrition-item {
+    display: flex;
+    flex-direction: column;
+    height: functions.px-to-rem(56);
+
+    dt,
+    dd {
+      margin: 0;
+    }
+
+    dt {
+      height: functions.px-to-rem(28);
+      font-size: functions.px-to-rem(22);
+      font-weight: 700;
+      line-height: functions.px-to-rem(28);
+    }
+
+    dd {
+      margin-top: functions.px-to-rem(8);
+      font-size: functions.px-to-rem(20);
+      font-weight: 500;
+      line-height: functions.px-to-rem(20);
+    }
   }
 }
