@@ -1,0 +1,69 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  width: functions.px-to-rem(263);
+  height: functions.px-to-rem(27);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: functions.px-to-rem(24);
+  width: 100%;
+  height: 100%;
+
+  &__pages {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(10);
+    width: functions.px-to-rem(163);
+    height: functions.px-to-rem(27);
+  }
+
+  &__button,
+  &__ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: functions.px-to-rem(27);
+    color: variables.$dark-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(18);
+    font-weight: 500;
+    line-height: functions.px-to-rem(23);
+  }
+
+  &__button {
+    min-width: functions.px-to-rem(23);
+    padding: 0 functions.px-to-rem(8);
+    border: 0;
+    border-radius: functions.px-to-rem(2);
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 300ms ease-out;
+
+    &:focus-visible {
+      outline: functions.px-to-rem(2) solid variables.$middle-green;
+      outline-offset: functions.px-to-rem(1);
+    }
+  }
+
+  &__ellipsis {
+    flex: 0 0 functions.px-to-rem(21);
+    width: functions.px-to-rem(21);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pagination__button:hover {
+    background-color: variables.$loader-green;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagination__button {
+    transition: none;
+  }
+}

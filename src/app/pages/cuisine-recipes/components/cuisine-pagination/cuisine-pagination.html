@@ -1,0 +1,20 @@
+<nav class="pagination" aria-label="Recipe pages">
+  <button class="pagination__button" type="button" aria-label="Previous page">&lt;</button>
+
+  <div class="pagination__pages">
+    @for (page of visiblePages; track page) {
+      <button
+        class="pagination__button"
+        type="button"
+        [attr.aria-current]="page === 1 ? 'page' : null"
+      >
+        {{ page }}
+      </button>
+    }
+
+    <span class="pagination__ellipsis" aria-hidden="true">. . .</span>
+    <button class="pagination__button" type="button">8</button>
+  </div>
+
+  <button class="pagination__button" type="button" aria-label="Next page">&gt;</button>
+</nav>

@@ -1,0 +1,141 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  width: functions.px-to-rem(900);
+  height: functions.px-to-rem(66);
+}
+
+.recipe-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: functions.px-to-rem(6) functions.px-to-rem(10);
+  border-radius: functions.px-to-rem(16);
+  color: variables.$middle-green;
+  text-decoration: none;
+  transition: background-color 200ms ease-out;
+
+  &__details {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(520);
+    align-items: flex-end;
+    gap: functions.px-to-rem(8);
+    height: functions.px-to-rem(54);
+  }
+
+  &__number {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(30);
+    align-items: center;
+    justify-content: center;
+    width: functions.px-to-rem(30);
+    height: functions.px-to-rem(30);
+    border-radius: 50%;
+    background-color: #f6e3cf;
+    font-size: functions.px-to-rem(18);
+    font-weight: 500;
+    line-height: functions.px-to-rem(23);
+  }
+
+  &__copy {
+    display: flex;
+    flex: 0 0 functions.px-to-rem(482);
+    flex-direction: column;
+    width: functions.px-to-rem(482);
+    height: functions.px-to-rem(54);
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(4);
+    height: functions.px-to-rem(24);
+    color: variables.$primary-green;
+    font-size: functions.px-to-rem(16);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+
+    svg {
+      flex: 0 0 functions.px-to-rem(20);
+      width: functions.px-to-rem(20);
+      height: functions.px-to-rem(20);
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+  }
+
+  &__title {
+    height: functions.px-to-rem(30);
+    margin: 0;
+    overflow: hidden;
+    font-size: functions.px-to-rem(24);
+    font-weight: 500;
+    line-height: functions.px-to-rem(30);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: functions.px-to-rem(8);
+    min-width: functions.px-to-rem(144);
+    height: functions.px-to-rem(32);
+  }
+
+  &__tag,
+  &__likes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: functions.px-to-rem(32);
+    padding: functions.px-to-rem(6) functions.px-to-rem(12);
+    border-radius: functions.px-to-rem(30);
+    background-color: rgba(variables.$primary-green, 0.2);
+    color: variables.$dark-green;
+    font-size: functions.px-to-rem(18);
+    font-weight: 500;
+    line-height: functions.px-to-rem(23);
+    white-space: nowrap;
+  }
+
+  &__likes {
+    flex: 0 0 functions.px-to-rem(64);
+    justify-content: flex-start;
+    background-color: rgba(variables.$primary-green, 0.3);
+    font-size: functions.px-to-rem(16);
+    line-height: functions.px-to-rem(20);
+
+    svg {
+      flex: 0 0 functions.px-to-rem(20);
+      width: functions.px-to-rem(20);
+      height: functions.px-to-rem(20);
+      fill: variables.$dark-green;
+    }
+  }
+
+  &:focus-visible {
+    outline: functions.px-to-rem(3) solid variables.$middle-green;
+    outline-offset: functions.px-to-rem(-3);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .recipe-card:hover {
+    background-color: rgba(variables.$button-green, 0.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recipe-card {
+    transition: none;
+  }
+}
