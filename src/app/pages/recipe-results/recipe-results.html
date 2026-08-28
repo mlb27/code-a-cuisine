@@ -26,4 +26,14 @@
       />
     </figure>
   </section>
+
+  <section class="recipe-results__recipes" aria-label="Generated recipes">
+    @for (recipe of recipeSuggestions; track recipe.number) {
+      <app-recipe-result-card
+        [recipeNumber]="recipe.number"
+        [title]="recipe.title"
+        [cookingTime]="recipe.cookingTime"
+      />
+    }
+  </section>
 </main>

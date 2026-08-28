@@ -1,0 +1,130 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+}
+
+.recipe-card {
+  display: flex;
+  flex-direction: column;
+  gap: functions.px-to-rem(48);
+  width: functions.px-to-rem(411);
+  height: functions.px-to-rem(338);
+  padding: functions.px-to-rem(32) functions.px-to-rem(24);
+  border-radius: functions.px-to-rem(20);
+  background-color: #dbe0db;
+  color: variables.$dark-green;
+  transition: background-color 100ms linear;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: functions.px-to-rem(16);
+    width: functions.px-to-rem(363);
+    height: functions.px-to-rem(166);
+  }
+
+  &__number {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(16);
+    width: functions.px-to-rem(253);
+    height: functions.px-to-rem(30);
+  }
+
+  &__pot {
+    display: block;
+    width: functions.px-to-rem(40);
+    height: functions.px-to-rem(28);
+  }
+
+  &__label {
+    width: functions.px-to-rem(197);
+    height: functions.px-to-rem(30);
+    color: variables.$middle-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(24);
+    font-weight: 600;
+    line-height: functions.px-to-rem(30);
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: functions.px-to-rem(16);
+    width: 100%;
+    height: functions.px-to-rem(120);
+  }
+
+  &__title {
+    width: 100%;
+    height: functions.px-to-rem(80);
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(32);
+    font-weight: 600;
+    line-height: functions.px-to-rem(40);
+  }
+
+  &__cooking-time {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(4);
+    width: functions.px-to-rem(290);
+    height: functions.px-to-rem(24);
+    color: variables.$primary-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(20);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+  }
+
+  &__clock {
+    flex: 0 0 functions.px-to-rem(24);
+    width: functions.px-to-rem(24);
+    height: functions.px-to-rem(24);
+    fill: currentColor;
+  }
+
+  &__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: functions.px-to-rem(106);
+    height: functions.px-to-rem(60);
+    background-color: variables.$cream;
+    color: variables.$button-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(24);
+    font-weight: 600;
+    line-height: functions.px-to-rem(30);
+    text-decoration: none;
+    transition:
+      background-color 300ms ease-out,
+      color 300ms ease-out;
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$button-green;
+      outline-offset: functions.px-to-rem(3);
+    }
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .recipe-card:hover {
+    background-color: variables.$cream;
+  }
+
+  .recipe-card__button:hover {
+    background-color: variables.$middle-green;
+    color: variables.$cream;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recipe-card,
+  .recipe-card__button {
+    transition: none;
+  }
+}

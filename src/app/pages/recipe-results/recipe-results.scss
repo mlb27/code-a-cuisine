@@ -91,4 +91,13 @@
     height: 100%;
     object-fit: fill;
   }
+
+  &__recipes {
+    display: grid;
+    grid-template-columns: repeat(3, functions.px-to-rem(411));
+    gap: functions.px-to-rem(24);
+    width: functions.px-to-rem(1281);
+    height: functions.px-to-rem(338);
+    margin: functions.px-to-rem(88) auto 0;
+  }
 }

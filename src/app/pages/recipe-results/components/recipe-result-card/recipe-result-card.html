@@ -1,0 +1,29 @@
+<article class="recipe-card">
+  <div class="recipe-card__content">
+    <div class="recipe-card__number">
+      <img
+        class="recipe-card__pot"
+        src="img/results/recipe-pot.png"
+        alt=""
+        width="40"
+        height="28"
+      />
+      <span class="recipe-card__label">Recipe {{ recipeNumber }}</span>
+    </div>
+
+    <div class="recipe-card__details">
+      <h2 class="recipe-card__title">{{ title }}</h2>
+
+      <div class="recipe-card__cooking-time">
+        <svg class="recipe-card__clock" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8.01 8.01 0 0 1-8 8Zm1-13h-2v6l5.25 3.15 1-1.64L13 12Z"
+          />
+        </svg>
+        <span>Cooking time: {{ cookingTime }}</span>
+      </div>
+    </div>
+  </div>
+
+  <a class="recipe-card__button" routerLink="/recipe">View</a>
+</article>
