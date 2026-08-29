@@ -98,6 +98,64 @@
   }
 }
 
+@media (max-width: 767px) {
+  :host {
+    flex-basis: functions.px-to-rem(285);
+    width: functions.px-to-rem(285);
+    height: functions.px-to-rem(106);
+  }
+
+  .recipe-card {
+    gap: functions.px-to-rem(16);
+    padding: functions.px-to-rem(16) functions.px-to-rem(12);
+
+    &__copy {
+      flex-basis: functions.px-to-rem(195);
+      width: functions.px-to-rem(195);
+    }
+
+    &__time {
+      height: functions.px-to-rem(20);
+    }
+
+    &__time-icon {
+      flex-basis: functions.px-to-rem(16);
+      width: functions.px-to-rem(16);
+      height: functions.px-to-rem(16);
+    }
+
+    &__title {
+      width: functions.px-to-rem(195);
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__likes {
+      flex-basis: functions.px-to-rem(50);
+      width: functions.px-to-rem(50);
+      height: functions.px-to-rem(24);
+      padding: functions.px-to-rem(2) functions.px-to-rem(6);
+    }
+  }
+}
+
+@media (max-width: 349px) {
+  :host {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .recipe-card {
+    &__copy {
+      flex: 1 1 auto;
+      width: auto;
+    }
+
+    &__title {
+      width: 100%;
+    }
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .recipe-card {
     transition: none;

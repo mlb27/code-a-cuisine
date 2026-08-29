@@ -21,6 +21,10 @@ interface CuisineDetails {
   bannerSource: string;
   bannerHeight: number;
   headingTop: number;
+  mobileBannerSource: string;
+  mobileBannerHeight: number;
+  mobileHeadingTop: number;
+  mobileHeadingWidth: number;
 }
 
 /** Displays the saved recipes for the selected cuisine. */
@@ -39,36 +43,60 @@ export class CuisineRecipes {
       bannerSource: 'img/cuisine-recipes/fusion-cuisine-banner.png',
       bannerHeight: 132,
       headingTop: 39,
+      mobileBannerSource: 'img/cuisine-recipes/mobile-fusion-cuisine-banner.png',
+      mobileBannerHeight: 91,
+      mobileHeadingTop: 34,
+      mobileHeadingWidth: 118,
     },
     german: {
       name: 'German',
       bannerSource: 'img/cuisine-recipes/german-cuisine-banner.png',
       bannerHeight: 151,
       headingTop: 48,
+      mobileBannerSource: 'img/cuisine-recipes/mobile-german-cuisine-banner.png',
+      mobileBannerHeight: 91,
+      mobileHeadingTop: 34,
+      mobileHeadingWidth: 132,
     },
     gourmet: {
       name: 'Gourmet',
       bannerSource: 'img/cuisine-recipes/gourmet-cuisine-banner.png',
       bannerHeight: 165,
       headingTop: 74,
+      mobileBannerSource: 'img/cuisine-recipes/mobile-gourmet-cuisine-banner.png',
+      mobileBannerHeight: 90,
+      mobileHeadingTop: 33,
+      mobileHeadingWidth: 139,
     },
     indian: {
       name: 'Indian',
       bannerSource: 'img/cuisine-recipes/indian-cuisine-banner.png',
       bannerHeight: 132,
       headingTop: 39,
+      mobileBannerSource: 'img/cuisine-recipes/mobile-indian-cuisine-banner.png',
+      mobileBannerHeight: 91,
+      mobileHeadingTop: 34,
+      mobileHeadingWidth: 116,
     },
     italian: {
       name: 'Italian',
       bannerSource: 'img/cuisine-recipes/italian-cuisine-banner.png',
       bannerHeight: 144,
       headingTop: 51,
+      mobileBannerSource: 'img/cuisine-recipes/mobile-italian-cuisine-banner.png',
+      mobileBannerHeight: 94,
+      mobileHeadingTop: 35,
+      mobileHeadingWidth: 117,
     },
     japanese: {
       name: 'Japanese',
       bannerSource: 'img/cuisine-recipes/japanese-cuisine-banner.png',
       bannerHeight: 156,
       headingTop: 50,
+      mobileBannerSource: 'img/cuisine-recipes/mobile-japanese-cuisine-banner.png',
+      mobileBannerHeight: 90,
+      mobileHeadingTop: 30,
+      mobileHeadingWidth: 147,
     },
   };
 

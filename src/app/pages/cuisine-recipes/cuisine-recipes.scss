@@ -74,6 +74,11 @@
     }
   }
 
+  &__hero-picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
   &__list {
     display: flex;
     flex-direction: column;
@@ -88,6 +93,112 @@
   }
 }
 
+.cuisine-recipes__generate-label-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  :host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  app-header {
+    order: 0;
+  }
+
+  .cuisine-recipes {
+    order: 1;
+    width: calc(100% - functions.px-to-rem(35));
+    max-width: functions.px-to-rem(340);
+    height: functions.px-to-rem(1579);
+    margin: functions.px-to-rem(40) auto 0;
+
+    &__hero {
+      width: 100%;
+      height: var(--mobile-banner-height) !important;
+    }
+
+    &__hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &__hero h1 {
+      top: var(--mobile-heading-top) !important;
+      width: var(--mobile-heading-width);
+      height: functions.px-to-rem(23);
+      font-size: functions.px-to-rem(18);
+      font-weight: 600;
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__list {
+      width: 100%;
+      height: functions.px-to-rem(1378);
+      margin: functions.px-to-rem(40) 0 0;
+      gap: functions.px-to-rem(32);
+    }
+
+    &__list app-cuisine-recipe-card:nth-child(3n + 1) {
+      height: functions.px-to-rem(140);
+    }
+
+    &__list app-cuisine-recipe-card:nth-child(n + 10) {
+      display: none;
+    }
+
+    &__list app-cuisine-recipe-card:nth-child(even) {
+      background: rgba(variables.$cream, 0.7);
+      border-radius: functions.px-to-rem(16);
+    }
+
+    &__pagination {
+      margin: functions.px-to-rem(40) auto 0;
+    }
+
+    &__action-bar {
+      order: 2;
+      width: functions.px-to-rem(155);
+      height: functions.px-to-rem(52);
+      margin: functions.px-to-rem(40) auto;
+      padding: 0;
+    }
+
+    &__generate-button {
+      width: functions.px-to-rem(155);
+      height: functions.px-to-rem(52);
+      padding: functions.px-to-rem(4) functions.px-to-rem(16);
+      font-size: functions.px-to-rem(16);
+      line-height: functions.px-to-rem(20);
+    }
+
+    &__generate-label-desktop {
+      display: none;
+    }
+
+    &__generate-label-mobile {
+      display: inline;
+    }
+  }
+}
+
+@media (max-width: 349px) {
+  .cuisine-recipes {
+    height: auto;
+
+    &__list {
+      height: auto;
+    }
+
+    &__list app-cuisine-recipe-card:nth-child(3n + 1) {
+      height: auto;
+      min-height: functions.px-to-rem(140);
+    }
+  }
+}
 @media (hover: hover) and (pointer: fine) {
   .cuisine-recipes__generate-button:hover {
     background-color: variables.$button-green-hover;

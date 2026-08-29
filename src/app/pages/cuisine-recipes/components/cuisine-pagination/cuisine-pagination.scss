@@ -66,6 +66,11 @@
   }
 }
 
+@media (max-width: 767px) {
+  .pagination__button[aria-current='page'] {
+    background-color: transparent;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .pagination__button {
     transition: none;

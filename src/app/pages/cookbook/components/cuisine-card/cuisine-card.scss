@@ -59,6 +59,22 @@
   }
 }
 
+@media (max-width: 767px) {
+  :host {
+    width: 100%;
+    max-width: functions.px-to-rem(320);
+    height: functions.px-to-rem(303);
+  }
+
+  .cuisine-card {
+    height: functions.px-to-rem(303);
+
+    &__image-frame {
+      width: 100%;
+      height: functions.px-to-rem(260);
+    }
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .cuisine-card__image {
     transition: none;

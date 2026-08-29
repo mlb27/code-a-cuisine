@@ -1,7 +1,10 @@
 <app-header backgroundTheme="light" backLabel="Cookbook" backLink="/cookbook" />
 
 <div class="cuisine-recipes__action-bar">
-  <a class="cuisine-recipes__generate-button" routerLink="/generator">Generate a recipe</a>
+  <a class="cuisine-recipes__generate-button" routerLink="/generator">
+    <span class="cuisine-recipes__generate-label-desktop">Generate a recipe</span>
+    <span class="cuisine-recipes__generate-label-mobile">Generate recipe</span>
+  </a>
 </div>
 
 <main class="cuisine-recipes">
@@ -9,8 +12,14 @@
     class="cuisine-recipes__hero"
     [attr.aria-label]="cuisine.name + ' cuisine'"
     [style.height.px]="cuisine.bannerHeight"
+    [style.--mobile-banner-height]="cuisine.mobileBannerHeight + 'px'"
+    [style.--mobile-heading-top]="cuisine.mobileHeadingTop + 'px'"
+    [style.--mobile-heading-width]="cuisine.mobileHeadingWidth + 'px'"
   >
-    <img [src]="cuisine.bannerSource" alt="" width="1143" [attr.height]="cuisine.bannerHeight" />
+    <picture class="cuisine-recipes__hero-picture">
+      <source media="(max-width: 767px)" [srcset]="cuisine.mobileBannerSource" />
+      <img [src]="cuisine.bannerSource" alt="" width="1143" [attr.height]="cuisine.bannerHeight" />
+    </picture>
     <h1 [style.top.px]="cuisine.headingTop">{{ cuisine.name }} cuisine</h1>
   </section>
 
