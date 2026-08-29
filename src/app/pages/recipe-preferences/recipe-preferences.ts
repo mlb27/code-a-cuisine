@@ -2,7 +2,11 @@ import { Component, inject, Signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Header } from '../../layout/header/header';
-import { CookingTimeCategory, RECIPE_PORTIONS } from '../../shared/models/recipe-preferences';
+import {
+  CookingTimeCategory,
+  CuisineStyle,
+  RECIPE_PORTIONS,
+} from '../../shared/models/recipe-preferences';
 import { RecipeGeneratorService } from '../../shared/services/recipe-generator.service';
 import { PreferenceCounter } from './components/preference-counter/preference-counter';
 import { PreferenceTag } from './components/preference-tag/preference-tag';
@@ -15,6 +19,10 @@ interface PreferenceOption {
 
 interface CookingTimeOption extends PreferenceOption {
   value: CookingTimeCategory;
+}
+
+interface CuisineOption extends PreferenceOption {
+  value: CuisineStyle;
 }
 
 /** Displays the second step of the recipe generator. */
@@ -31,6 +39,8 @@ export class RecipePreferences {
   protected readonly minimumPortionCount: number = RECIPE_PORTIONS.minimum;
   protected readonly cookingTime: Signal<CookingTimeCategory | null> =
     this.recipeGeneratorService.cookingTime;
+  protected readonly cuisineStyle: Signal<CuisineStyle | null> =
+    this.recipeGeneratorService.cuisineStyle;
   protected readonly portionCount: Signal<number> = this.recipeGeneratorService.portionCount;
   protected readonly cookingTimeOptions: CookingTimeOption[] = [
     { label: 'Quick', value: 'quick', width: 83, hint: 'up to 20 min' },
@@ -38,13 +48,13 @@ export class RecipePreferences {
     { label: 'Complex', value: 'complex', width: 110, hint: 'over 45 min' },
   ];
 
-  protected readonly cuisineOptions: PreferenceOption[] = [
-    { label: 'German', width: 100 },
-    { label: 'Italian', width: 82 },
-    { label: 'Indian', width: 82 },
-    { label: 'Japanese', width: 117 },
-    { label: 'Gourmet', width: 107 },
-    { label: 'Fusion', width: 85 },
+  protected readonly cuisineOptions: CuisineOption[] = [
+    { label: 'German', value: 'german', width: 100 },
+    { label: 'Italian', value: 'italian', width: 82 },
+    { label: 'Indian', value: 'indian', width: 82 },
+    { label: 'Japanese', value: 'japanese', width: 117 },
+    { label: 'Gourmet', value: 'gourmet', width: 107 },
+    { label: 'Fusion', value: 'fusion', width: 85 },
   ];
 
   protected readonly dietOptions: PreferenceOption[] = [
@@ -57,6 +67,11 @@ export class RecipePreferences {
   /** Updates the cooking-time category used for the current recipe request. */
   protected updateCookingTime(cookingTime: CookingTimeCategory): void {
     this.recipeGeneratorService.setCookingTime(cookingTime);
+  }
+
+  /** Updates the cuisine style used for the current recipe request. */
+  protected updateCuisineStyle(cuisineStyle: CuisineStyle): void {
+    this.recipeGeneratorService.setCuisineStyle(cuisineStyle);
   }
 
   /** Updates the portion count used for the current recipe request. */

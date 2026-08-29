@@ -68,7 +68,12 @@
 
           <div class="recipe-preferences__options">
             @for (option of cuisineOptions; track option.label) {
-              <app-preference-tag [label]="option.label" [style.width.px]="option.width" />
+              <app-preference-tag
+                [label]="option.label"
+                [selected]="cuisineStyle() === option.value"
+                [style.width.px]="option.width"
+                (selectionChange)="updateCuisineStyle(option.value)"
+              />
             }
           </div>
         </section>

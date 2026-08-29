@@ -10,10 +10,13 @@ import {
 import {
   COOKING_TIME_CATEGORIES,
   CookingTimeCategory,
+  CUISINE_STYLES,
+  CuisineStyle,
   RECIPE_PORTIONS,
 } from '../models/recipe-preferences';
 
 const COOKING_TIME_STORAGE_KEY: string = 'code-a-cuisine-generator-cooking-time';
+const CUISINE_STYLE_STORAGE_KEY: string = 'code-a-cuisine-generator-cuisine-style';
 const INGREDIENT_STORAGE_KEY: string = 'code-a-cuisine-generator-ingredients';
 const PORTION_STORAGE_KEY: string = 'code-a-cuisine-generator-portions';
 
@@ -25,6 +28,9 @@ export class RecipeGeneratorService {
   private readonly cookingTimeState: WritableSignal<CookingTimeCategory | null> = signal(
     this.loadCookingTime(),
   );
+  private readonly cuisineStyleState: WritableSignal<CuisineStyle | null> = signal(
+    this.loadCuisineStyle(),
+  );
   private readonly ingredientsState: WritableSignal<Ingredient[]> = signal(this.loadIngredients());
   private readonly portionCountState: WritableSignal<number> = signal(this.loadPortionCount());
   private readonly editingIngredientId: WritableSignal<number | null> = signal(null);
@@ -32,6 +38,7 @@ export class RecipeGeneratorService {
 
   public readonly cookingTime: Signal<CookingTimeCategory | null> =
     this.cookingTimeState.asReadonly();
+  public readonly cuisineStyle: Signal<CuisineStyle | null> = this.cuisineStyleState.asReadonly();
   public readonly ingredients: Signal<Ingredient[]> = this.ingredientsState.asReadonly();
   public readonly portionCount: Signal<number> = this.portionCountState.asReadonly();
   public readonly hasIngredients: Signal<boolean> = computed(
@@ -78,6 +85,13 @@ export class RecipeGeneratorService {
     if (!this.isCookingTimeCategory(cookingTime)) return;
     this.cookingTimeState.set(cookingTime);
     this.persistCookingTime(cookingTime);
+  }
+
+  /** Stores the cuisine style for the current generator session. */
+  public setCuisineStyle(cuisineStyle: CuisineStyle): void {
+    if (!this.isCuisineStyle(cuisineStyle)) return;
+    this.cuisineStyleState.set(cuisineStyle);
+    this.persistCuisineStyle(cuisineStyle);
   }
 
   /** Stores a valid portion count for the current generator session. */
@@ -203,6 +217,31 @@ export class RecipeGeneratorService {
     return COOKING_TIME_CATEGORIES.some(
       (category: CookingTimeCategory): boolean => category === value,
     );
+  }
+
+  /** Restores a validated cuisine style from session storage. */
+  private loadCuisineStyle(): CuisineStyle | null {
+    try {
+      const storedValue: string | null =
+        this.getStorage()?.getItem(CUISINE_STYLE_STORAGE_KEY) ?? null;
+      return this.isCuisineStyle(storedValue) ? storedValue : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Stores the selected cuisine style when session storage is available. */
+  private persistCuisineStyle(cuisineStyle: CuisineStyle): void {
+    try {
+      this.getStorage()?.setItem(CUISINE_STYLE_STORAGE_KEY, cuisineStyle);
+    } catch {
+      return;
+    }
+  }
+
+  /** Checks whether a value is one of the supported cuisine styles. */
+  private isCuisineStyle(value: unknown): value is CuisineStyle {
+    return CUISINE_STYLES.some((cuisineStyle: CuisineStyle): boolean => cuisineStyle === value);
   }
 
   /** Restores the selected portion count or returns the configured default. */
