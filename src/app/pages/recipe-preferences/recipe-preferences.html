@@ -94,7 +94,12 @@
 
           <div class="recipe-preferences__options">
             @for (option of dietOptions; track option.label) {
-              <app-preference-tag [label]="option.label" [style.width.px]="option.width" />
+              <app-preference-tag
+                [label]="option.label"
+                [selected]="dietPreference() === option.value"
+                [style.width.px]="option.width"
+                (selectionChange)="updateDietPreference(option.value)"
+              />
             }
           </div>
         </section>

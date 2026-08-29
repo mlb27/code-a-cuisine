@@ -23,3 +23,9 @@ export const CUISINE_STYLES = [
 
 /** One selectable cuisine style. */
 export type CuisineStyle = (typeof CUISINE_STYLES)[number];
+
+/** Diet preferences supported by recipe generation. */
+export const DIET_PREFERENCES = ['vegetarian', 'vegan', 'keto', 'unrestricted'] as const;
+
+/** One selectable diet preference. */
+export type DietPreference = (typeof DIET_PREFERENCES)[number];

@@ -5,6 +5,7 @@ import { Header } from '../../layout/header/header';
 import {
   CookingTimeCategory,
   CuisineStyle,
+  DietPreference,
   RECIPE_PORTIONS,
 } from '../../shared/models/recipe-preferences';
 import { RecipeGeneratorService } from '../../shared/services/recipe-generator.service';
@@ -25,6 +26,10 @@ interface CuisineOption extends PreferenceOption {
   value: CuisineStyle;
 }
 
+interface DietOption extends PreferenceOption {
+  value: DietPreference;
+}
+
 /** Displays the second step of the recipe generator. */
 @Component({
   selector: 'app-recipe-preferences',
@@ -41,6 +46,8 @@ export class RecipePreferences {
     this.recipeGeneratorService.cookingTime;
   protected readonly cuisineStyle: Signal<CuisineStyle | null> =
     this.recipeGeneratorService.cuisineStyle;
+  protected readonly dietPreference: Signal<DietPreference | null> =
+    this.recipeGeneratorService.dietPreference;
   protected readonly portionCount: Signal<number> = this.recipeGeneratorService.portionCount;
   protected readonly cookingTimeOptions: CookingTimeOption[] = [
     { label: 'Quick', value: 'quick', width: 83, hint: 'up to 20 min' },
@@ -57,11 +64,11 @@ export class RecipePreferences {
     { label: 'Fusion', value: 'fusion', width: 85 },
   ];
 
-  protected readonly dietOptions: PreferenceOption[] = [
-    { label: 'Vegetarian', width: 128 },
-    { label: 'Vegan', width: 85 },
-    { label: 'Keto', width: 68 },
-    { label: 'No preferences', width: 169 },
+  protected readonly dietOptions: DietOption[] = [
+    { label: 'Vegetarian', value: 'vegetarian', width: 128 },
+    { label: 'Vegan', value: 'vegan', width: 85 },
+    { label: 'Keto', value: 'keto', width: 68 },
+    { label: 'No preferences', value: 'unrestricted', width: 169 },
   ];
 
   /** Updates the cooking-time category used for the current recipe request. */
@@ -72,6 +79,11 @@ export class RecipePreferences {
   /** Updates the cuisine style used for the current recipe request. */
   protected updateCuisineStyle(cuisineStyle: CuisineStyle): void {
     this.recipeGeneratorService.setCuisineStyle(cuisineStyle);
+  }
+
+  /** Updates the diet preference used for the current recipe request. */
+  protected updateDietPreference(dietPreference: DietPreference): void {
+    this.recipeGeneratorService.setDietPreference(dietPreference);
   }
 
   /** Updates the portion count used for the current recipe request. */

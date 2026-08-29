@@ -12,11 +12,14 @@ import {
   CookingTimeCategory,
   CUISINE_STYLES,
   CuisineStyle,
+  DIET_PREFERENCES,
+  DietPreference,
   RECIPE_PORTIONS,
 } from '../models/recipe-preferences';
 
 const COOKING_TIME_STORAGE_KEY: string = 'code-a-cuisine-generator-cooking-time';
 const CUISINE_STYLE_STORAGE_KEY: string = 'code-a-cuisine-generator-cuisine-style';
+const DIET_PREFERENCE_STORAGE_KEY: string = 'code-a-cuisine-generator-diet-preference';
 const INGREDIENT_STORAGE_KEY: string = 'code-a-cuisine-generator-ingredients';
 const PORTION_STORAGE_KEY: string = 'code-a-cuisine-generator-portions';
 
@@ -31,6 +34,9 @@ export class RecipeGeneratorService {
   private readonly cuisineStyleState: WritableSignal<CuisineStyle | null> = signal(
     this.loadCuisineStyle(),
   );
+  private readonly dietPreferenceState: WritableSignal<DietPreference | null> = signal(
+    this.loadDietPreference(),
+  );
   private readonly ingredientsState: WritableSignal<Ingredient[]> = signal(this.loadIngredients());
   private readonly portionCountState: WritableSignal<number> = signal(this.loadPortionCount());
   private readonly editingIngredientId: WritableSignal<number | null> = signal(null);
@@ -39,6 +45,8 @@ export class RecipeGeneratorService {
   public readonly cookingTime: Signal<CookingTimeCategory | null> =
     this.cookingTimeState.asReadonly();
   public readonly cuisineStyle: Signal<CuisineStyle | null> = this.cuisineStyleState.asReadonly();
+  public readonly dietPreference: Signal<DietPreference | null> =
+    this.dietPreferenceState.asReadonly();
   public readonly ingredients: Signal<Ingredient[]> = this.ingredientsState.asReadonly();
   public readonly portionCount: Signal<number> = this.portionCountState.asReadonly();
   public readonly hasIngredients: Signal<boolean> = computed(
@@ -92,6 +100,13 @@ export class RecipeGeneratorService {
     if (!this.isCuisineStyle(cuisineStyle)) return;
     this.cuisineStyleState.set(cuisineStyle);
     this.persistCuisineStyle(cuisineStyle);
+  }
+
+  /** Stores the diet preference for the current generator session. */
+  public setDietPreference(dietPreference: DietPreference): void {
+    if (!this.isDietPreference(dietPreference)) return;
+    this.dietPreferenceState.set(dietPreference);
+    this.persistDietPreference(dietPreference);
   }
 
   /** Stores a valid portion count for the current generator session. */
@@ -242,6 +257,33 @@ export class RecipeGeneratorService {
   /** Checks whether a value is one of the supported cuisine styles. */
   private isCuisineStyle(value: unknown): value is CuisineStyle {
     return CUISINE_STYLES.some((cuisineStyle: CuisineStyle): boolean => cuisineStyle === value);
+  }
+
+  /** Restores a validated diet preference from session storage. */
+  private loadDietPreference(): DietPreference | null {
+    try {
+      const storedValue: string | null =
+        this.getStorage()?.getItem(DIET_PREFERENCE_STORAGE_KEY) ?? null;
+      return this.isDietPreference(storedValue) ? storedValue : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Stores the selected diet preference when session storage is available. */
+  private persistDietPreference(dietPreference: DietPreference): void {
+    try {
+      this.getStorage()?.setItem(DIET_PREFERENCE_STORAGE_KEY, dietPreference);
+    } catch {
+      return;
+    }
+  }
+
+  /** Checks whether a value is one of the supported diet preferences. */
+  private isDietPreference(value: unknown): value is DietPreference {
+    return DIET_PREFERENCES.some(
+      (dietPreference: DietPreference): boolean => dietPreference === value,
+    );
   }
 
   /** Restores the selected portion count or returns the configured default. */
