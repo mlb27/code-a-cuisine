@@ -185,6 +185,53 @@
   }
 }
 
+@media (max-width: 767px) {
+  :host {
+    width: 100%;
+    max-width: functions.px-to-rem(340);
+    height: functions.px-to-rem(211);
+  }
+
+  .ingredient-input {
+    flex-direction: column;
+    gap: functions.px-to-rem(16);
+    padding: functions.px-to-rem(25) functions.px-to-rem(20);
+
+    &__ingredient-column {
+      flex-basis: functions.px-to-rem(70);
+      width: 100%;
+      height: functions.px-to-rem(70);
+    }
+
+    &__serving-column {
+      flex-basis: functions.px-to-rem(75);
+      width: 100%;
+      height: functions.px-to-rem(75);
+      padding-left: functions.px-to-rem(2.5);
+    }
+
+    &__label {
+      height: functions.px-to-rem(23);
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__text-field {
+      height: functions.px-to-rem(36);
+      margin-top: functions.px-to-rem(11);
+    }
+
+    &__serving-controls {
+      margin-top: functions.px-to-rem(16);
+    }
+
+    &__amount-field::placeholder {
+      color: rgba(variables.$dark-green, 0.4);
+      opacity: 1;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ingredient-input__add-button {
     transition: none;

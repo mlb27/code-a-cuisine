@@ -135,3 +135,56 @@
     background-color: variables.$cream;
   }
 }
+
+@media (max-width: 767px) {
+  :host {
+    width: 100%;
+    max-width: functions.px-to-rem(340);
+    height: functions.px-to-rem(130);
+  }
+
+  :host:has(.ingredient-list__item) {
+    height: functions.px-to-rem(239);
+  }
+
+  .ingredient-list {
+    padding: functions.px-to-rem(24) functions.px-to-rem(16);
+
+    &__title {
+      width: 100%;
+      height: functions.px-to-rem(23);
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__items {
+      gap: functions.px-to-rem(8);
+      width: 100%;
+      height: functions.px-to-rem(144);
+      margin-top: functions.px-to-rem(24);
+
+      &:empty {
+        display: none;
+      }
+    }
+
+    &__item {
+      gap: functions.px-to-rem(32);
+      width: 100%;
+      padding-right: functions.px-to-rem(2);
+      padding-left: 0;
+    }
+
+    &__details {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+    }
+
+    &__name {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+    }
+  }
+}
