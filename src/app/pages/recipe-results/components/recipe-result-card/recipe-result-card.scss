@@ -122,6 +122,74 @@
   }
 }
 
+@media (max-width: 767px) {
+  :host {
+    width: 100%;
+    height: functions.px-to-rem(294);
+  }
+
+  .recipe-card {
+    gap: functions.px-to-rem(32);
+    width: 100%;
+    height: functions.px-to-rem(294);
+    padding: functions.px-to-rem(32) functions.px-to-rem(24);
+
+    &__content {
+      width: min(100%, functions.px-to-rem(299));
+      height: functions.px-to-rem(146);
+    }
+
+    &__number {
+      height: functions.px-to-rem(30);
+    }
+
+    &__label {
+      height: functions.px-to-rem(30);
+      font-size: functions.px-to-rem(24);
+      line-height: functions.px-to-rem(30);
+    }
+
+    &__details {
+      height: functions.px-to-rem(100);
+    }
+
+    &__title {
+      height: functions.px-to-rem(60);
+      font-size: functions.px-to-rem(24);
+      line-height: functions.px-to-rem(30);
+    }
+
+    &__cooking-time {
+      width: 100%;
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__button {
+      width: functions.px-to-rem(68);
+      height: functions.px-to-rem(52);
+      font-size: functions.px-to-rem(16);
+      line-height: functions.px-to-rem(20);
+    }
+  }
+}
+
+@media (max-width: 349px) {
+  :host,
+  .recipe-card {
+    height: auto;
+    min-height: functions.px-to-rem(294);
+  }
+
+  .recipe-card {
+    &__content,
+    &__details,
+    &__title {
+      height: auto;
+      min-height: functions.px-to-rem(60);
+    }
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .recipe-card,
   .recipe-card__button {

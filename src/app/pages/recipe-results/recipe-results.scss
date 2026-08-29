@@ -142,6 +142,106 @@
   }
 }
 
+.recipe-results__title-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .recipe-results {
+    width: calc(100% - functions.px-to-rem(35));
+    max-width: functions.px-to-rem(340);
+    min-height: 0;
+    margin-top: functions.px-to-rem(40);
+    margin-bottom: functions.px-to-rem(40);
+
+    &__intro {
+      flex-direction: column;
+      gap: functions.px-to-rem(16);
+      height: functions.px-to-rem(320);
+      padding: 0;
+    }
+
+    &__intro-copy {
+      display: contents;
+    }
+
+    &__title {
+      order: 1;
+      height: functions.px-to-rem(40);
+      font-size: functions.px-to-rem(32);
+      line-height: functions.px-to-rem(40);
+    }
+
+    &__title-desktop {
+      display: none;
+    }
+
+    &__title-mobile {
+      display: inline;
+    }
+
+    &__visual {
+      order: 2;
+      flex-basis: functions.px-to-rem(131);
+      width: 100%;
+      height: functions.px-to-rem(131);
+    }
+
+    &__visual-image {
+      width: calc(100% + functions.px-to-rem(4));
+      height: functions.px-to-rem(229);
+      object-fit: cover;
+      transform: translateY(functions.px-to-rem(-40));
+    }
+
+    &__description {
+      order: 3;
+      width: 100%;
+      height: functions.px-to-rem(69);
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__preferences {
+      order: 4;
+    }
+
+    &__recipes {
+      display: flex;
+      flex-direction: column;
+      gap: functions.px-to-rem(16);
+      width: 100%;
+      height: functions.px-to-rem(914);
+      margin-top: functions.px-to-rem(48);
+    }
+
+    &__generation-cta {
+      width: functions.px-to-rem(237);
+      height: functions.px-to-rem(52);
+      margin: functions.px-to-rem(40) auto 0;
+      padding: 0;
+    }
+
+    &__generate-link {
+      width: functions.px-to-rem(237);
+      padding: functions.px-to-rem(4) functions.px-to-rem(16);
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__generate-icon {
+      width: functions.px-to-rem(20);
+      height: functions.px-to-rem(14);
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: 349px) {
+  .recipe-results__recipes {
+    height: auto;
+  }
+}
 @media (hover: hover) and (pointer: fine) {
   .recipe-results__generate-link:hover {
     background-color: rgba(variables.$cream-hover, 0.2);

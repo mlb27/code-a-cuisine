@@ -61,6 +61,24 @@
   }
 }
 
+@media (max-width: 767px) {
+  .recipe-loading {
+    width: calc(100% - functions.px-to-rem(35));
+    max-width: functions.px-to-rem(340);
+    margin-top: functions.px-to-rem(40);
+
+    &__content {
+      height: functions.px-to-rem(640);
+      padding-top: functions.px-to-rem(129);
+    }
+
+    &__title {
+      height: functions.px-to-rem(41);
+      font-size: functions.px-to-rem(36);
+      line-height: functions.px-to-rem(41);
+    }
+  }
+}
 @keyframes loading-dots {
   0%,
   14%,

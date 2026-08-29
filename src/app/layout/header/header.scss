@@ -92,6 +92,11 @@
       height: functions.px-to-rem(52);
     }
 
+    &[data-background-theme='dark'][data-compact='true'] {
+      height: functions.px-to-rem(44);
+      padding-bottom: 0;
+    }
+
     &[data-background-theme='light'][data-has-back-link='true'] {
       height: functions.px-to-rem(80);
     }
