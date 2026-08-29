@@ -1,0 +1,183 @@
+import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+
+import {
+  Ingredient,
+  IngredientDraft,
+  IngredientSaveResult,
+  INGREDIENT_UNIT_OPTIONS,
+  IngredientUnit,
+} from '../models/ingredient';
+
+const INGREDIENT_STORAGE_KEY: string = 'code-a-cuisine-generator-ingredients';
+
+/** Manages the ingredient state shared by the recipe-generator steps. */
+@Injectable({
+  providedIn: 'root',
+})
+export class RecipeGeneratorService {
+  private readonly ingredientsState: WritableSignal<Ingredient[]> = signal(this.loadIngredients());
+  private readonly editingIngredientId: WritableSignal<number | null> = signal(null);
+  private nextIngredientId: number = this.getNextIngredientId();
+
+  public readonly ingredients: Signal<Ingredient[]> = this.ingredientsState.asReadonly();
+  public readonly hasIngredients: Signal<boolean> = computed(
+    (): boolean => this.ingredientsState().length > 0,
+  );
+  public readonly editingIngredient: Signal<Ingredient | null> = computed((): Ingredient | null => {
+    const ingredientId: number | null = this.editingIngredientId();
+    return this.findIngredient(ingredientId);
+  });
+
+  /** Adds a new ingredient or updates the currently edited entry. */
+  public saveIngredient(draft: IngredientDraft): IngredientSaveResult {
+    const normalizedDraft: IngredientDraft = this.normalizeDraft(draft);
+    const ingredientId: number | null = this.editingIngredientId();
+
+    if (!this.isDraftValid(normalizedDraft)) return 'invalid';
+    if (this.hasDuplicateName(normalizedDraft.name, ingredientId)) return 'duplicate';
+
+    ingredientId === null
+      ? this.addIngredient(normalizedDraft)
+      : this.updateIngredient(ingredientId, normalizedDraft);
+    this.cancelEditing();
+    return ingredientId === null ? 'added' : 'updated';
+  }
+
+  /** Selects one ingredient so its values can be edited. */
+  public startEditing(ingredientId: number): void {
+    if (
+      this.ingredientsState().some(
+        (ingredient: Ingredient): boolean => ingredient.id === ingredientId,
+      )
+    ) {
+      this.editingIngredientId.set(ingredientId);
+    }
+  }
+
+  /** Clears the active ingredient editing state. */
+  public cancelEditing(): void {
+    this.editingIngredientId.set(null);
+  }
+
+  /** Removes one ingredient from the current generator session. */
+  public removeIngredient(ingredientId: number): void {
+    const ingredients: Ingredient[] = this.ingredientsState().filter(
+      (ingredient: Ingredient): boolean => ingredient.id !== ingredientId,
+    );
+
+    this.setIngredients(ingredients);
+    if (this.editingIngredientId() === ingredientId) this.cancelEditing();
+  }
+
+  /** Adds one validated ingredient with a new session-local ID. */
+  private addIngredient(draft: IngredientDraft): void {
+    const ingredient: Ingredient = { ...draft, id: this.nextIngredientId++ };
+    this.setIngredients([...this.ingredientsState(), ingredient]);
+  }
+
+  /** Replaces the values of one existing ingredient. */
+  private updateIngredient(ingredientId: number, draft: IngredientDraft): void {
+    const ingredients: Ingredient[] = this.ingredientsState().map(
+      (ingredient: Ingredient): Ingredient =>
+        ingredient.id === ingredientId ? { ...draft, id: ingredientId } : ingredient,
+    );
+    this.setIngredients(ingredients);
+  }
+
+  /** Normalizes text and numeric values before they enter the state. */
+  private normalizeDraft(draft: IngredientDraft): IngredientDraft {
+    return {
+      amount: Number.isFinite(draft.amount) ? draft.amount : 0,
+      name: draft.name.trim().replace(/\s+/g, ' '),
+      unit: draft.unit,
+    };
+  }
+
+  /** Returns whether a submitted draft has a valid shape. */
+  private isDraftValid(draft: IngredientDraft): boolean {
+    return draft.name.length > 0 && draft.amount > 0 && this.isIngredientUnit(draft.unit);
+  }
+
+  /** Returns whether another ingredient already uses the submitted name. */
+  private hasDuplicateName(name: string, excludedId: number | null): boolean {
+    const normalizedName: string = name.toLocaleLowerCase();
+    return this.ingredientsState().some(
+      (ingredient: Ingredient): boolean =>
+        ingredient.id !== excludedId && ingredient.name.toLocaleLowerCase() === normalizedName,
+    );
+  }
+
+  /** Finds one ingredient or returns null when no editing ID is selected. */
+  private findIngredient(ingredientId: number | null): Ingredient | null {
+    if (ingredientId === null) return null;
+    return (
+      this.ingredientsState().find(
+        (ingredient: Ingredient): boolean => ingredient.id === ingredientId,
+      ) ?? null
+    );
+  }
+
+  /** Updates the state and its session-storage representation together. */
+  private setIngredients(ingredients: Ingredient[]): void {
+    this.ingredientsState.set(ingredients);
+    this.persistIngredients(ingredients);
+  }
+
+  /** Restores validated ingredients from the current browser session. */
+  private loadIngredients(): Ingredient[] {
+    try {
+      const storedValue: string | null = this.getStorage()?.getItem(INGREDIENT_STORAGE_KEY) ?? null;
+      return storedValue ? this.parseIngredients(storedValue) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  /** Parses a stored JSON value and discards malformed entries. */
+  private parseIngredients(storedValue: string): Ingredient[] {
+    const parsedValue: unknown = JSON.parse(storedValue);
+    return Array.isArray(parsedValue)
+      ? parsedValue.filter((value: unknown): value is Ingredient => this.isIngredient(value))
+      : [];
+  }
+
+  /** Stores the current ingredients when session storage is available. */
+  private persistIngredients(ingredients: Ingredient[]): void {
+    try {
+      this.getStorage()?.setItem(INGREDIENT_STORAGE_KEY, JSON.stringify(ingredients));
+    } catch {
+      return;
+    }
+  }
+
+  /** Checks whether a restored value is a valid ingredient. */
+  private isIngredient(value: unknown): value is Ingredient {
+    if (typeof value !== 'object' || value === null) return false;
+    const ingredient: Partial<Ingredient> = value as Partial<Ingredient>;
+    return (
+      Number.isInteger(ingredient.id) &&
+      typeof ingredient.name === 'string' &&
+      typeof ingredient.amount === 'number' &&
+      ingredient.amount > 0 &&
+      this.isIngredientUnit(ingredient.unit)
+    );
+  }
+
+  /** Checks whether a value is one of the supported ingredient units. */
+  private isIngredientUnit(value: unknown): value is IngredientUnit {
+    return INGREDIENT_UNIT_OPTIONS.some((option): boolean => option.value === value);
+  }
+
+  /** Creates the next numeric ID after all restored ingredients. */
+  private getNextIngredientId(): number {
+    const ingredientIds: number[] = this.ingredientsState().map(
+      (ingredient: Ingredient): number => ingredient.id,
+    );
+    return Math.max(0, ...ingredientIds) + 1;
+  }
+
+  /** Returns session storage when the current environment supports it. */
+  private getStorage(): Storage | null {
+    return typeof globalThis.sessionStorage === 'undefined' ? null : globalThis.sessionStorage;
+  }
+}
