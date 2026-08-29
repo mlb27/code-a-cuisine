@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 /** Displays a selectable recipe preference and an optional hint. */
 @Component({
@@ -7,6 +7,13 @@ import { Component, Input } from '@angular/core';
   styleUrl: './preference-tag.scss',
 })
 export class PreferenceTag {
-  @Input({ required: true }) label = '';
-  @Input() hint = '';
+  public readonly hint = input('');
+  public readonly label = input.required<string>();
+  public readonly selected = input(false);
+  public readonly selectionChange = output<void>();
+
+  /** Notifies the parent that this preference was selected. */
+  protected select(): void {
+    this.selectionChange.emit();
+  }
 }

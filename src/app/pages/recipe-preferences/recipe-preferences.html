@@ -44,7 +44,9 @@
               <app-preference-tag
                 [label]="option.label"
                 [hint]="option.hint ?? ''"
+                [selected]="cookingTime() === option.value"
                 [style.width.px]="option.width"
+                (selectionChange)="updateCookingTime(option.value)"
               />
             }
           </div>

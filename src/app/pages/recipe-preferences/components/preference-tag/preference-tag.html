@@ -1,7 +1,15 @@
 <div class="preference-tag">
-  <button class="preference-tag__button" type="button">{{ label }}</button>
+  <button
+    class="preference-tag__button"
+    type="button"
+    [class.preference-tag__button--selected]="selected()"
+    [attr.aria-pressed]="selected()"
+    (click)="select()"
+  >
+    {{ label() }}
+  </button>
 
-  @if (hint) {
-    <span class="preference-tag__hint">{{ hint }}</span>
+  @if (hint()) {
+    <span class="preference-tag__hint">{{ hint() }}</span>
   }
 </div>

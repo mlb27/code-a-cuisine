@@ -28,6 +28,11 @@
       background-color 300ms ease-out,
       color 300ms ease-out;
 
+    &--selected {
+      background-color: variables.$primary-green;
+      color: variables.$cream;
+    }
+
     &:focus-visible {
       outline: functions.px-to-rem(3) solid variables.$middle-green;
       outline-offset: functions.px-to-rem(2);
@@ -45,8 +50,13 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .preference-tag__button:hover {
+  .preference-tag__button:hover:not(.preference-tag__button--selected) {
     background-color: variables.$cream-hover;
+  }
+
+  .preference-tag__button--selected:hover {
+    background-color: variables.$button-green-hover;
+    color: variables.$white;
   }
 }
 

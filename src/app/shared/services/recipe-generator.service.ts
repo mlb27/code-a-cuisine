@@ -7,8 +7,13 @@ import {
   INGREDIENT_UNIT_OPTIONS,
   IngredientUnit,
 } from '../models/ingredient';
-import { RECIPE_PORTIONS } from '../models/recipe-preferences';
+import {
+  COOKING_TIME_CATEGORIES,
+  CookingTimeCategory,
+  RECIPE_PORTIONS,
+} from '../models/recipe-preferences';
 
+const COOKING_TIME_STORAGE_KEY: string = 'code-a-cuisine-generator-cooking-time';
 const INGREDIENT_STORAGE_KEY: string = 'code-a-cuisine-generator-ingredients';
 const PORTION_STORAGE_KEY: string = 'code-a-cuisine-generator-portions';
 
@@ -17,11 +22,16 @@ const PORTION_STORAGE_KEY: string = 'code-a-cuisine-generator-portions';
   providedIn: 'root',
 })
 export class RecipeGeneratorService {
+  private readonly cookingTimeState: WritableSignal<CookingTimeCategory | null> = signal(
+    this.loadCookingTime(),
+  );
   private readonly ingredientsState: WritableSignal<Ingredient[]> = signal(this.loadIngredients());
   private readonly portionCountState: WritableSignal<number> = signal(this.loadPortionCount());
   private readonly editingIngredientId: WritableSignal<number | null> = signal(null);
   private nextIngredientId: number = this.getNextIngredientId();
 
+  public readonly cookingTime: Signal<CookingTimeCategory | null> =
+    this.cookingTimeState.asReadonly();
   public readonly ingredients: Signal<Ingredient[]> = this.ingredientsState.asReadonly();
   public readonly portionCount: Signal<number> = this.portionCountState.asReadonly();
   public readonly hasIngredients: Signal<boolean> = computed(
@@ -61,6 +71,13 @@ export class RecipeGeneratorService {
   /** Clears the active ingredient editing state. */
   public cancelEditing(): void {
     this.editingIngredientId.set(null);
+  }
+
+  /** Stores the cooking-time category for the current generator session. */
+  public setCookingTime(cookingTime: CookingTimeCategory): void {
+    if (!this.isCookingTimeCategory(cookingTime)) return;
+    this.cookingTimeState.set(cookingTime);
+    this.persistCookingTime(cookingTime);
   }
 
   /** Stores a valid portion count for the current generator session. */
@@ -159,6 +176,33 @@ export class RecipeGeneratorService {
     } catch {
       return;
     }
+  }
+
+  /** Restores a validated cooking-time category from session storage. */
+  private loadCookingTime(): CookingTimeCategory | null {
+    try {
+      const storedValue: string | null =
+        this.getStorage()?.getItem(COOKING_TIME_STORAGE_KEY) ?? null;
+      return this.isCookingTimeCategory(storedValue) ? storedValue : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Stores the selected cooking-time category when session storage is available. */
+  private persistCookingTime(cookingTime: CookingTimeCategory): void {
+    try {
+      this.getStorage()?.setItem(COOKING_TIME_STORAGE_KEY, cookingTime);
+    } catch {
+      return;
+    }
+  }
+
+  /** Checks whether a value is one of the supported cooking-time categories. */
+  private isCookingTimeCategory(value: unknown): value is CookingTimeCategory {
+    return COOKING_TIME_CATEGORIES.some(
+      (category: CookingTimeCategory): boolean => category === value,
+    );
   }
 
   /** Restores the selected portion count or returns the configured default. */
