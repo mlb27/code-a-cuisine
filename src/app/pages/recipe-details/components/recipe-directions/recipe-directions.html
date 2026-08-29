@@ -1,12 +1,18 @@
 <section class="recipe-directions" aria-labelledby="directions-title">
   <div class="recipe-directions__heading">
-    <img
-      class="recipe-directions__heading-image"
-      src="img/recipe-details/directions-heading.png"
-      alt=""
-      width="1152"
-      height="134"
-    />
+    <picture class="recipe-directions__heading-picture">
+      <source
+        media="(max-width: 767px)"
+        srcset="img/recipe-details/mobile-directions-heading.png"
+      />
+      <img
+        class="recipe-directions__heading-image"
+        src="img/recipe-details/directions-heading.png"
+        alt=""
+        width="1152"
+        height="134"
+      />
+    </picture>
     <h2 id="directions-title" class="recipe-directions__title">Directions</h2>
   </div>
 
@@ -35,4 +41,8 @@
       </article>
     }
   </div>
+  <button class="recipe-directions__toggle" type="button">
+    <span>Hide directions</span>
+    <span class="recipe-directions__toggle-icon" aria-hidden="true"></span>
+  </button>
 </section>

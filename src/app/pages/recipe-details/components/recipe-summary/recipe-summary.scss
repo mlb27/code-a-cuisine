@@ -186,3 +186,104 @@
     }
   }
 }
+@media (max-width: 767px) {
+  :host {
+    height: functions.px-to-rem(372);
+  }
+
+  .recipe-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: functions.px-to-rem(48);
+    padding: functions.px-to-rem(24);
+
+    &__main {
+      flex-basis: functions.px-to-rem(135);
+      width: 100%;
+      height: functions.px-to-rem(135);
+    }
+
+    &__cooking-time {
+      width: 100%;
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__title {
+      height: functions.px-to-rem(60);
+      margin-top: functions.px-to-rem(8);
+      font-size: functions.px-to-rem(24);
+      line-height: functions.px-to-rem(30);
+    }
+
+    &__cooks {
+      gap: functions.px-to-rem(16);
+      margin-top: functions.px-to-rem(16);
+    }
+
+    &__cook-count {
+      display: none;
+    }
+
+    &__cook {
+      padding: functions.px-to-rem(2) functions.px-to-rem(4);
+      border-radius: functions.px-to-rem(6);
+
+      &:has(.recipe-summary__cook-icon--first) {
+        background-color: #d7dfd7;
+      }
+
+      &:has(.recipe-summary__cook-icon--second) {
+        background-color: #ffd6aa;
+      }
+    }
+
+    &__metadata {
+      flex-basis: functions.px-to-rem(141);
+      width: 100%;
+      height: functions.px-to-rem(141);
+    }
+
+    &__nutrition {
+      order: 1;
+      padding-left: 0;
+    }
+
+    &__tags {
+      order: 2;
+      gap: functions.px-to-rem(8);
+    }
+
+    &__nutrition-list {
+      gap: functions.px-to-rem(24);
+      height: functions.px-to-rem(54);
+    }
+
+    &__nutrition-item {
+      height: functions.px-to-rem(54);
+
+      dt,
+      dd {
+        height: functions.px-to-rem(23);
+        font-size: functions.px-to-rem(18);
+        font-weight: 600;
+        line-height: functions.px-to-rem(23);
+      }
+    }
+  }
+}
+
+@media (max-width: 349px) {
+  :host,
+  .recipe-summary,
+  .recipe-summary__main,
+  .recipe-summary__title,
+  .recipe-summary__metadata {
+    height: auto;
+  }
+
+  .recipe-summary {
+    min-height: functions.px-to-rem(372);
+  }
+}

@@ -1,12 +1,18 @@
 <section class="recipe-ingredients" aria-labelledby="ingredients-title">
   <div class="recipe-ingredients__heading">
-    <img
-      class="recipe-ingredients__heading-image"
-      src="img/recipe-details/ingredients-heading.png"
-      alt=""
-      width="1152"
-      height="148"
-    />
+    <picture class="recipe-ingredients__heading-picture">
+      <source
+        media="(max-width: 767px)"
+        srcset="img/recipe-details/mobile-ingredients-heading.png"
+      />
+      <img
+        class="recipe-ingredients__heading-image"
+        src="img/recipe-details/ingredients-heading.png"
+        alt=""
+        width="1152"
+        height="148"
+      />
+    </picture>
     <h2 id="ingredients-title" class="recipe-ingredients__title">Ingredients</h2>
   </div>
 
@@ -38,4 +44,8 @@
       </ul>
     </section>
   </div>
+  <button class="recipe-ingredients__toggle" type="button">
+    <span>Hide ingredients</span>
+    <span class="recipe-ingredients__toggle-icon" aria-hidden="true"></span>
+  </button>
 </section>

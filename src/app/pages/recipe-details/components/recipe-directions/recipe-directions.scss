@@ -17,6 +17,12 @@
     height: functions.px-to-rem(133);
   }
 
+  &__heading-picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
   &__heading-image {
     position: absolute;
     inset: 0;
@@ -118,5 +124,124 @@
     font-size: functions.px-to-rem(18);
     font-weight: 500;
     line-height: functions.px-to-rem(23);
+  }
+}
+.recipe-directions__toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  :host {
+    height: functions.px-to-rem(847);
+  }
+
+  .recipe-directions {
+    &__heading {
+      height: functions.px-to-rem(90);
+    }
+
+    &__heading-image {
+      height: functions.px-to-rem(90);
+    }
+
+    &__title {
+      top: functions.px-to-rem(30);
+      height: functions.px-to-rem(30);
+      font-size: functions.px-to-rem(24);
+      line-height: functions.px-to-rem(30);
+    }
+
+    &__steps {
+      display: flex;
+      flex-direction: column;
+      gap: functions.px-to-rem(32);
+      width: 100%;
+      height: functions.px-to-rem(675);
+      margin: functions.px-to-rem(24) 0 0;
+    }
+
+    &__step {
+      width: 100%;
+
+      &:nth-child(1) {
+        height: functions.px-to-rem(128);
+      }
+
+      &:nth-child(2) {
+        height: functions.px-to-rem(148);
+      }
+
+      &:nth-child(3) {
+        height: functions.px-to-rem(163);
+      }
+
+      &:nth-child(4) {
+        height: functions.px-to-rem(140);
+      }
+    }
+
+    &__step-heading {
+      min-width: 0;
+    }
+
+    &__step-number {
+      font-weight: 600;
+    }
+
+    &__step-title {
+      height: functions.px-to-rem(23);
+      font-size: functions.px-to-rem(18);
+      font-weight: 600;
+      line-height: functions.px-to-rem(23);
+      white-space: nowrap;
+    }
+
+    &__description {
+      margin-top: functions.px-to-rem(16);
+      font-size: functions.px-to-rem(16);
+      line-height: functions.px-to-rem(20);
+    }
+
+    &__step:nth-child(n + 3) &__description {
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: functions.px-to-rem(8);
+      width: functions.px-to-rem(177);
+      height: functions.px-to-rem(34);
+      margin: functions.px-to-rem(24) auto 0;
+      padding: functions.px-to-rem(7) functions.px-to-rem(16);
+      border: 0;
+      background-color: transparent;
+      color: variables.$primary-green;
+      font-family: 'Quicksand', sans-serif;
+      font-size: functions.px-to-rem(16);
+      font-weight: 500;
+      line-height: functions.px-to-rem(20);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    &__toggle-icon {
+      width: 0;
+      height: 0;
+      border-right: functions.px-to-rem(7) solid transparent;
+      border-bottom: functions.px-to-rem(8) solid currentColor;
+      border-left: functions.px-to-rem(7) solid transparent;
+    }
+  }
+}
+
+@media (max-width: 349px) {
+  :host,
+  .recipe-directions,
+  .recipe-directions__steps,
+  .recipe-directions__step {
+    height: auto;
   }
 }
