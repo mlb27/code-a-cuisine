@@ -64,6 +64,10 @@
     gap: functions.px-to-rem(32);
   }
 
+  &__workspace--empty {
+    justify-content: center;
+  }
+
   &__next-button {
     align-self: flex-end;
     display: flex;
@@ -97,6 +101,28 @@
   .recipe-generator__next-button:hover {
     background-color: variables.$button-green-hover;
     color: variables.$white;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .recipe-generator {
+    width: calc(100% - functions.px-to-rem(64));
+    margin-top: functions.px-to-rem(48);
+
+    &__title,
+    &__description {
+      width: 100%;
+      height: auto;
+    }
+
+    &__workspace {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    &__next-button {
+      align-self: center;
+    }
   }
 }
 
@@ -150,10 +176,6 @@
       padding: functions.px-to-rem(4) functions.px-to-rem(16);
       font-size: functions.px-to-rem(16);
       line-height: functions.px-to-rem(20);
-    }
-
-    &__form:not(:has(.ingredient-list__item)) &__next-button {
-      display: none;
     }
   }
 }

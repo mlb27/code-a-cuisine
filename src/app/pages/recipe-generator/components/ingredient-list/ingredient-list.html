@@ -1,13 +1,16 @@
 <section class="ingredient-list" aria-labelledby="ingredient-list-heading">
-  <h2 id="ingredient-list-heading" class="ingredient-list__title">List of your Ingredients</h2>
+  <h2 id="ingredient-list-heading" class="ingredient-list__title">List of your ingredients</h2>
 
   <ul class="ingredient-list__items">
-    @for (ingredient of ingredients; track ingredient.name) {
-      <li class="ingredient-list__item">
+    @for (ingredient of ingredients(); track ingredient.id) {
+      <li
+        class="ingredient-list__item"
+        [class.ingredient-list__item--editing]="editingIngredient()?.id === ingredient.id"
+      >
         <span class="ingredient-list__details">
           <span class="ingredient-list__quantity">
-            <span class="ingredient-list__bullet" aria-hidden="true">•</span>
-            <span class="ingredient-list__amount">{{ ingredient.amount }}</span>
+            <span class="ingredient-list__bullet" aria-hidden="true">&bull;</span>
+            <span class="ingredient-list__amount">{{ formatAmount(ingredient) }}</span>
           </span>
 
           <span class="ingredient-list__name">{{ ingredient.name }}</span>
@@ -17,7 +20,8 @@
           <button
             class="ingredient-list__action"
             type="button"
-            [attr.aria-label]="ingredient.editLabel"
+            [attr.aria-label]="'Edit ' + ingredient.name"
+            (click)="editIngredient(ingredient.id)"
           >
             <svg
               class="ingredient-list__edit-icon"
@@ -35,7 +39,8 @@
           <button
             class="ingredient-list__action"
             type="button"
-            [attr.aria-label]="ingredient.deleteLabel"
+            [attr.aria-label]="'Delete ' + ingredient.name"
+            (click)="deleteIngredient(ingredient.id)"
           >
             <svg
               class="ingredient-list__delete-icon"

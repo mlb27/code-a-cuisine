@@ -6,17 +6,27 @@
 
     <div class="recipe-generator__step">
       <p class="recipe-generator__description">
-        Got random stuff in your kitchen? Pop it in—we've got the perfect recipe waiting.
+        Got random stuff in your kitchen? Pop it in - we've got the perfect recipe waiting.
       </p>
 
-      <form class="recipe-generator__form">
-        <div class="recipe-generator__workspace">
+      <div class="recipe-generator__form">
+        <div
+          class="recipe-generator__workspace"
+          [class.recipe-generator__workspace--empty]="!hasIngredients()"
+        >
           <app-ingredient-input />
-          <app-ingredient-list />
+
+          @if (hasIngredients()) {
+            <app-ingredient-list />
+          }
         </div>
 
-        <a class="recipe-generator__next-button" routerLink="/generator/preferences">Next step</a>
-      </form>
+        @if (hasIngredients()) {
+          <a class="recipe-generator__next-button" routerLink="/generator/preferences">
+            Next step
+          </a>
+        }
+      </div>
     </div>
   </section>
 </main>

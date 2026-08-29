@@ -1,13 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, inject, Signal } from '@angular/core';
 
-interface IngredientListEntry {
-  amount: string;
-  name: string;
-  editLabel: string;
-  deleteLabel: string;
-}
+import {
+  Ingredient,
+  INGREDIENT_UNIT_OPTIONS,
+  IngredientUnit,
+  IngredientUnitOption,
+} from '../../../../shared/models/ingredient';
+import { RecipeGeneratorService } from '../../../../shared/services/recipe-generator.service';
 
-/** Displays the ingredients currently selected for recipe generation. */
+/** Displays and manages the ingredients selected for recipe generation. */
 @Component({
   selector: 'app-ingredient-list',
   imports: [],
@@ -15,30 +16,32 @@ interface IngredientListEntry {
   styleUrl: './ingredient-list.scss',
 })
 export class IngredientList {
-  protected readonly ingredients: readonly IngredientListEntry[] = [
-    {
-      amount: '100g',
-      name: 'Pasta',
-      editLabel: 'Edit Pasta',
-      deleteLabel: 'Delete Pasta',
-    },
-    {
-      amount: '100g',
-      name: 'Baby spinach',
-      editLabel: 'Edit Baby spinach',
-      deleteLabel: 'Delete Baby spinach',
-    },
-    {
-      amount: '150g',
-      name: 'Cherry tomatoes',
-      editLabel: 'Edit Cherry tomatoes',
-      deleteLabel: 'Delete Cherry tomatoes',
-    },
-    {
-      amount: '1 pc',
-      name: 'Egg',
-      editLabel: 'Edit Egg',
-      deleteLabel: 'Delete Egg',
-    },
-  ];
+  private readonly recipeGeneratorService = inject(RecipeGeneratorService);
+
+  protected readonly editingIngredient: Signal<Ingredient | null> =
+    this.recipeGeneratorService.editingIngredient;
+  protected readonly ingredients: Signal<Ingredient[]> = this.recipeGeneratorService.ingredients;
+
+  /** Selects one list entry for editing in the ingredient form. */
+  protected editIngredient(ingredientId: number): void {
+    this.recipeGeneratorService.startEditing(ingredientId);
+  }
+
+  /** Removes one ingredient from the current generator session. */
+  protected deleteIngredient(ingredientId: number): void {
+    this.recipeGeneratorService.removeIngredient(ingredientId);
+  }
+
+  /** Formats one numeric amount with its abbreviated unit. */
+  protected formatAmount(ingredient: Ingredient): string {
+    return `${ingredient.amount}${this.getUnitAbbreviation(ingredient.unit)}`;
+  }
+
+  /** Returns the short label belonging to one ingredient unit. */
+  private getUnitAbbreviation(unit: IngredientUnit): string {
+    const unitOption: IngredientUnitOption | undefined = INGREDIENT_UNIT_OPTIONS.find(
+      (option: IngredientUnitOption): boolean => option.value === unit,
+    );
+    return unitOption?.abbreviation ?? unit;
+  }
 }

@@ -34,6 +34,8 @@
     height: functions.px-to-rem(138);
     margin: functions.px-to-rem(24) 0 0;
     padding: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
     list-style: none;
   }
 
@@ -44,6 +46,11 @@
     width: functions.px-to-rem(430);
     height: functions.px-to-rem(30);
     padding: functions.px-to-rem(2) functions.px-to-rem(4);
+    border-radius: functions.px-to-rem(4);
+
+    &--editing {
+      background-color: rgba(variables.$cream, 0.75);
+    }
   }
 
   &__details {
@@ -83,6 +90,7 @@
     width: functions.px-to-rem(209);
     height: functions.px-to-rem(26);
     overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 

@@ -9,6 +9,7 @@
 }
 
 .ingredient-input {
+  position: relative;
   display: flex;
   gap: functions.px-to-rem(32);
   width: 100%;
@@ -153,6 +154,22 @@
     pointer-events: none;
   }
 
+  &__text-field[aria-invalid='true'],
+  &__amount-field[aria-invalid='true'] {
+    box-shadow: inset 0 0 0 functions.px-to-rem(2) variables.$middle-green;
+  }
+
+  &__feedback {
+    position: absolute;
+    bottom: functions.px-to-rem(7);
+    left: functions.px-to-rem(33);
+    right: functions.px-to-rem(33);
+    margin: 0;
+    color: variables.$dark-green;
+    font-size: functions.px-to-rem(14);
+    font-weight: 600;
+    line-height: functions.px-to-rem(18);
+  }
   &__add-button {
     display: flex;
     flex: 0 0 functions.px-to-rem(36);
@@ -223,6 +240,12 @@
 
     &__serving-controls {
       margin-top: functions.px-to-rem(16);
+    }
+
+    &__feedback {
+      bottom: functions.px-to-rem(4);
+      left: functions.px-to-rem(20);
+      right: functions.px-to-rem(20);
     }
 
     &__amount-field::placeholder {
