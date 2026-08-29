@@ -41,6 +41,11 @@
     cursor: pointer;
     transition: background-color 300ms ease-out;
 
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
     &:focus-visible {
       outline: functions.px-to-rem(3) solid variables.$middle-green;
       outline-offset: functions.px-to-rem(2);
@@ -79,7 +84,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .preference-counter__button:hover {
+  .preference-counter__button:hover:not(:disabled) {
     background-color: rgba(variables.$primary-green, 0.2);
   }
 }

@@ -9,8 +9,12 @@
         <app-preference-counter
           class="recipe-preferences__counter recipe-preferences__counter--portions"
           heading="How many portions do you need?"
-          itemLabel="Portions"
-          [value]="2"
+          itemLabel="Portion"
+          pluralLabel="Portions"
+          [maximum]="maximumPortionCount"
+          [minimum]="minimumPortionCount"
+          [value]="portionCount()"
+          (valueChange)="updatePortionCount($event)"
         />
 
         <app-preference-counter

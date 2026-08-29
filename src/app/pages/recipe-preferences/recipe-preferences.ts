@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, Signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Header } from '../../layout/header/header';
+import { RECIPE_PORTIONS } from '../../shared/models/recipe-preferences';
+import { RecipeGeneratorService } from '../../shared/services/recipe-generator.service';
 import { PreferenceCounter } from './components/preference-counter/preference-counter';
 import { PreferenceTag } from './components/preference-tag/preference-tag';
 
@@ -19,6 +21,11 @@ interface PreferenceOption {
   styleUrl: './recipe-preferences.scss',
 })
 export class RecipePreferences {
+  private readonly recipeGeneratorService = inject(RecipeGeneratorService);
+
+  protected readonly maximumPortionCount: number = RECIPE_PORTIONS.maximum;
+  protected readonly minimumPortionCount: number = RECIPE_PORTIONS.minimum;
+  protected readonly portionCount: Signal<number> = this.recipeGeneratorService.portionCount;
   protected readonly cookingTimeOptions: PreferenceOption[] = [
     { label: 'Quick', width: 83, hint: 'up to 20 min' },
     { label: 'Medium', width: 102, hint: '25-40 min' },
@@ -40,4 +47,9 @@ export class RecipePreferences {
     { label: 'Keto', width: 68 },
     { label: 'No preferences', width: 169 },
   ];
+
+  /** Updates the portion count used for the current recipe request. */
+  protected updatePortionCount(portionCount: number): void {
+    this.recipeGeneratorService.setPortionCount(portionCount);
+  }
 }

@@ -7,8 +7,10 @@ import {
   INGREDIENT_UNIT_OPTIONS,
   IngredientUnit,
 } from '../models/ingredient';
+import { RECIPE_PORTIONS } from '../models/recipe-preferences';
 
 const INGREDIENT_STORAGE_KEY: string = 'code-a-cuisine-generator-ingredients';
+const PORTION_STORAGE_KEY: string = 'code-a-cuisine-generator-portions';
 
 /** Manages the ingredient state shared by the recipe-generator steps. */
 @Injectable({
@@ -16,10 +18,12 @@ const INGREDIENT_STORAGE_KEY: string = 'code-a-cuisine-generator-ingredients';
 })
 export class RecipeGeneratorService {
   private readonly ingredientsState: WritableSignal<Ingredient[]> = signal(this.loadIngredients());
+  private readonly portionCountState: WritableSignal<number> = signal(this.loadPortionCount());
   private readonly editingIngredientId: WritableSignal<number | null> = signal(null);
   private nextIngredientId: number = this.getNextIngredientId();
 
   public readonly ingredients: Signal<Ingredient[]> = this.ingredientsState.asReadonly();
+  public readonly portionCount: Signal<number> = this.portionCountState.asReadonly();
   public readonly hasIngredients: Signal<boolean> = computed(
     (): boolean => this.ingredientsState().length > 0,
   );
@@ -57,6 +61,13 @@ export class RecipeGeneratorService {
   /** Clears the active ingredient editing state. */
   public cancelEditing(): void {
     this.editingIngredientId.set(null);
+  }
+
+  /** Stores a valid portion count for the current generator session. */
+  public setPortionCount(portionCount: number): void {
+    if (!this.isValidPortionCount(portionCount)) return;
+    this.portionCountState.set(portionCount);
+    this.persistPortionCount(portionCount);
   }
 
   /** Removes one ingredient from the current generator session. */
@@ -148,6 +159,35 @@ export class RecipeGeneratorService {
     } catch {
       return;
     }
+  }
+
+  /** Restores the selected portion count or returns the configured default. */
+  private loadPortionCount(): number {
+    try {
+      const storedValue: string | null = this.getStorage()?.getItem(PORTION_STORAGE_KEY) ?? null;
+      const portionCount: number = Number(storedValue);
+      return this.isValidPortionCount(portionCount) ? portionCount : RECIPE_PORTIONS.default;
+    } catch {
+      return RECIPE_PORTIONS.default;
+    }
+  }
+
+  /** Stores the selected portion count when session storage is available. */
+  private persistPortionCount(portionCount: number): void {
+    try {
+      this.getStorage()?.setItem(PORTION_STORAGE_KEY, String(portionCount));
+    } catch {
+      return;
+    }
+  }
+
+  /** Checks whether a portion count is an integer inside the supported range. */
+  private isValidPortionCount(portionCount: number): boolean {
+    return (
+      Number.isInteger(portionCount) &&
+      portionCount >= RECIPE_PORTIONS.minimum &&
+      portionCount <= RECIPE_PORTIONS.maximum
+    );
   }
 
   /** Checks whether a restored value is a valid ingredient. */

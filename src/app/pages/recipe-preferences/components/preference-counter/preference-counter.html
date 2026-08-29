@@ -1,11 +1,13 @@
 <section class="preference-counter">
-  <h2 class="preference-counter__heading">{{ heading }}</h2>
+  <h2 class="preference-counter__heading">{{ heading() }}</h2>
 
   <div class="preference-counter__controls">
     <button
       class="preference-counter__button"
       type="button"
-      [attr.aria-label]="'Decrease ' + itemLabel"
+      [attr.aria-label]="'Decrease ' + itemLabel()"
+      [disabled]="!canDecrement()"
+      (click)="decrement()"
     >
       <svg class="preference-counter__icon" viewBox="0 0 20 20" aria-hidden="true">
         <rect x="1.1" y="1.1" width="17.8" height="17.8" rx="1.1" />
@@ -13,13 +15,21 @@
       </svg>
     </button>
 
-    <span class="preference-counter__value">{{ value }}</span>
-    <span class="preference-counter__label">{{ itemLabel }}</span>
+    <output
+      class="preference-counter__value"
+      aria-live="polite"
+      [attr.aria-label]="value() + ' ' + displayedLabel()"
+    >
+      {{ value() }}
+    </output>
+    <span class="preference-counter__label" aria-hidden="true">{{ displayedLabel() }}</span>
 
     <button
       class="preference-counter__button"
       type="button"
-      [attr.aria-label]="'Increase ' + itemLabel"
+      [attr.aria-label]="'Increase ' + itemLabel()"
+      [disabled]="!canIncrement()"
+      (click)="increment()"
     >
       <svg class="preference-counter__icon" viewBox="0 0 20 20" aria-hidden="true">
         <rect x="1.1" y="1.1" width="17.8" height="17.8" rx="1.1" />
