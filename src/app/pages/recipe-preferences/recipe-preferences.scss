@@ -160,6 +160,117 @@
   }
 }
 
+@media (max-width: 767px) {
+  .recipe-preferences {
+    gap: functions.px-to-rem(40);
+    width: calc(100% - functions.px-to-rem(35));
+    max-width: functions.px-to-rem(340);
+    margin-top: functions.px-to-rem(40);
+    margin-bottom: functions.px-to-rem(40);
+
+    &__content {
+      gap: functions.px-to-rem(24);
+    }
+
+    &__title {
+      width: min(100%, functions.px-to-rem(291));
+      height: functions.px-to-rem(30);
+      margin: 0;
+      font-size: functions.px-to-rem(24);
+      line-height: functions.px-to-rem(30);
+      text-align: left;
+    }
+
+    &__form {
+      gap: functions.px-to-rem(32);
+    }
+
+    &__counters {
+      flex-direction: column;
+      gap: functions.px-to-rem(24);
+      height: functions.px-to-rem(144);
+      padding: 0;
+    }
+
+    &__counter {
+      &--portions {
+        width: min(100%, functions.px-to-rem(290));
+      }
+
+      &--people {
+        width: min(100%, functions.px-to-rem(263));
+      }
+    }
+
+    &__preference-card {
+      align-items: center;
+      height: functions.px-to-rem(544);
+      padding: functions.px-to-rem(32) functions.px-to-rem(24);
+    }
+
+    &__group {
+      &--cooking {
+        width: functions.px-to-rem(311);
+        height: functions.px-to-rem(104);
+      }
+
+      &--cuisine {
+        width: functions.px-to-rem(300);
+        height: functions.px-to-rem(170);
+      }
+
+      &--diet {
+        width: functions.px-to-rem(300);
+        height: functions.px-to-rem(126);
+      }
+    }
+
+    &__group-heading {
+      font-weight: 600;
+    }
+
+    &__options {
+      flex-wrap: wrap;
+      gap: functions.px-to-rem(16);
+
+      &--cooking {
+        flex-wrap: nowrap;
+        gap: functions.px-to-rem(8);
+      }
+    }
+
+    &__generate-button {
+      width: functions.px-to-rem(155);
+      height: functions.px-to-rem(52);
+      padding: functions.px-to-rem(4) functions.px-to-rem(16);
+      font-size: functions.px-to-rem(16);
+      line-height: functions.px-to-rem(20);
+    }
+  }
+}
+
+@media (max-width: 349px) {
+  .recipe-preferences {
+    &__preference-card {
+      align-items: stretch;
+      height: auto;
+    }
+
+    &__group {
+      width: 100%;
+      height: auto;
+    }
+
+    &__options {
+      height: auto;
+
+      &--cooking {
+        flex-wrap: wrap;
+      }
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .recipe-preferences__generate-button {
     transition: none;

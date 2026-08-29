@@ -50,6 +50,12 @@
   }
 }
 
+@media (max-width: 767px) {
+  .preference-tag__button {
+    width: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .preference-tag__button {
     transition: none;

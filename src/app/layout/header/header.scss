@@ -105,6 +105,16 @@
       top: functions.px-to-rem(60);
       left: functions.px-to-rem(16);
       height: functions.px-to-rem(20);
+
+      span {
+        position: absolute;
+        width: functions.px-to-rem(1);
+        height: functions.px-to-rem(1);
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
     }
   }
 }
