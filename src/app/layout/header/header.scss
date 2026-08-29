@@ -81,3 +81,30 @@
     stroke-width: 2;
   }
 }
+
+@media (max-width: 767px) {
+  .app-header {
+    height: functions.px-to-rem(52);
+    padding: functions.px-to-rem(12) functions.px-to-rem(16) functions.px-to-rem(8);
+
+    &[data-background-theme='light'],
+    &[data-compact='true'] {
+      height: functions.px-to-rem(52);
+    }
+
+    &[data-background-theme='light'][data-has-back-link='true'] {
+      height: functions.px-to-rem(80);
+    }
+
+    &__home-link {
+      width: functions.px-to-rem(95);
+      height: functions.px-to-rem(32);
+    }
+
+    &__back-link {
+      top: functions.px-to-rem(60);
+      left: functions.px-to-rem(16);
+      height: functions.px-to-rem(20);
+    }
+  }
+}
