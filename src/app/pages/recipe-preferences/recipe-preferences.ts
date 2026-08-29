@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { Header } from '../../layout/header/header';
 import {
+  COOKING_PEOPLE,
   CookingTimeCategory,
   CuisineStyle,
   DietPreference,
@@ -40,8 +41,12 @@ interface DietOption extends PreferenceOption {
 export class RecipePreferences {
   private readonly recipeGeneratorService = inject(RecipeGeneratorService);
 
+  protected readonly maximumCookingPeopleCount: number = COOKING_PEOPLE.maximum;
+  protected readonly minimumCookingPeopleCount: number = COOKING_PEOPLE.minimum;
   protected readonly maximumPortionCount: number = RECIPE_PORTIONS.maximum;
   protected readonly minimumPortionCount: number = RECIPE_PORTIONS.minimum;
+  protected readonly cookingPeopleCount: Signal<number> =
+    this.recipeGeneratorService.cookingPeopleCount;
   protected readonly cookingTime: Signal<CookingTimeCategory | null> =
     this.recipeGeneratorService.cookingTime;
   protected readonly cuisineStyle: Signal<CuisineStyle | null> =
@@ -70,6 +75,11 @@ export class RecipePreferences {
     { label: 'Keto', value: 'keto', width: 68 },
     { label: 'No preferences', value: 'unrestricted', width: 169 },
   ];
+
+  /** Updates how many people will share the generated cooking tasks. */
+  protected updateCookingPeopleCount(cookingPeopleCount: number): void {
+    this.recipeGeneratorService.setCookingPeopleCount(cookingPeopleCount);
+  }
 
   /** Updates the cooking-time category used for the current recipe request. */
   protected updateCookingTime(cookingTime: CookingTimeCategory): void {

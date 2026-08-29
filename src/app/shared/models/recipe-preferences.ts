@@ -5,6 +5,13 @@ export const RECIPE_PORTIONS = {
   minimum: 1,
 } as const;
 
+/** Valid range and default value for people cooking together. */
+export const COOKING_PEOPLE = {
+  default: 1,
+  maximum: 3,
+  minimum: 1,
+} as const;
+
 /** Cooking-time categories supported by recipe generation. */
 export const COOKING_TIME_CATEGORIES = ['quick', 'medium', 'complex'] as const;
 

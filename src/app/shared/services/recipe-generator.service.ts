@@ -8,6 +8,7 @@ import {
   IngredientUnit,
 } from '../models/ingredient';
 import {
+  COOKING_PEOPLE,
   COOKING_TIME_CATEGORIES,
   CookingTimeCategory,
   CUISINE_STYLES,
@@ -17,6 +18,7 @@ import {
   RECIPE_PORTIONS,
 } from '../models/recipe-preferences';
 
+const COOKING_PEOPLE_STORAGE_KEY: string = 'code-a-cuisine-generator-cooking-people';
 const COOKING_TIME_STORAGE_KEY: string = 'code-a-cuisine-generator-cooking-time';
 const CUISINE_STYLE_STORAGE_KEY: string = 'code-a-cuisine-generator-cuisine-style';
 const DIET_PREFERENCE_STORAGE_KEY: string = 'code-a-cuisine-generator-diet-preference';
@@ -28,6 +30,9 @@ const PORTION_STORAGE_KEY: string = 'code-a-cuisine-generator-portions';
   providedIn: 'root',
 })
 export class RecipeGeneratorService {
+  private readonly cookingPeopleCountState: WritableSignal<number> = signal(
+    this.loadCookingPeopleCount(),
+  );
   private readonly cookingTimeState: WritableSignal<CookingTimeCategory | null> = signal(
     this.loadCookingTime(),
   );
@@ -42,6 +47,7 @@ export class RecipeGeneratorService {
   private readonly editingIngredientId: WritableSignal<number | null> = signal(null);
   private nextIngredientId: number = this.getNextIngredientId();
 
+  public readonly cookingPeopleCount: Signal<number> = this.cookingPeopleCountState.asReadonly();
   public readonly cookingTime: Signal<CookingTimeCategory | null> =
     this.cookingTimeState.asReadonly();
   public readonly cuisineStyle: Signal<CuisineStyle | null> = this.cuisineStyleState.asReadonly();
@@ -86,6 +92,13 @@ export class RecipeGeneratorService {
   /** Clears the active ingredient editing state. */
   public cancelEditing(): void {
     this.editingIngredientId.set(null);
+  }
+
+  /** Stores a valid number of people cooking during the current session. */
+  public setCookingPeopleCount(cookingPeopleCount: number): void {
+    if (!this.isValidCookingPeopleCount(cookingPeopleCount)) return;
+    this.cookingPeopleCountState.set(cookingPeopleCount);
+    this.persistCookingPeopleCount(cookingPeopleCount);
   }
 
   /** Stores the cooking-time category for the current generator session. */
@@ -205,6 +218,38 @@ export class RecipeGeneratorService {
     } catch {
       return;
     }
+  }
+
+  /** Restores the number of people cooking or returns the configured default. */
+  private loadCookingPeopleCount(): number {
+    try {
+      const storedValue: string | null =
+        this.getStorage()?.getItem(COOKING_PEOPLE_STORAGE_KEY) ?? null;
+      const cookingPeopleCount: number = Number(storedValue);
+      return this.isValidCookingPeopleCount(cookingPeopleCount)
+        ? cookingPeopleCount
+        : COOKING_PEOPLE.default;
+    } catch {
+      return COOKING_PEOPLE.default;
+    }
+  }
+
+  /** Stores the number of people cooking when session storage is available. */
+  private persistCookingPeopleCount(cookingPeopleCount: number): void {
+    try {
+      this.getStorage()?.setItem(COOKING_PEOPLE_STORAGE_KEY, String(cookingPeopleCount));
+    } catch {
+      return;
+    }
+  }
+
+  /** Checks whether a cooking-person count is an integer inside the supported range. */
+  private isValidCookingPeopleCount(cookingPeopleCount: number): boolean {
+    return (
+      Number.isInteger(cookingPeopleCount) &&
+      cookingPeopleCount >= COOKING_PEOPLE.minimum &&
+      cookingPeopleCount <= COOKING_PEOPLE.maximum
+    );
   }
 
   /** Restores a validated cooking-time category from session storage. */

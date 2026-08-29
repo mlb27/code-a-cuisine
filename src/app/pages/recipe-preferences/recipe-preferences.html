@@ -21,7 +21,11 @@
           class="recipe-preferences__counter recipe-preferences__counter--people"
           heading="How many are cooking?"
           itemLabel="Person"
-          [value]="1"
+          pluralLabel="People"
+          [maximum]="maximumCookingPeopleCount"
+          [minimum]="minimumCookingPeopleCount"
+          [value]="cookingPeopleCount()"
+          (valueChange)="updateCookingPeopleCount($event)"
         />
       </div>
 
