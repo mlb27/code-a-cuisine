@@ -26,6 +26,12 @@
     max-width: none;
   }
 
+  &__mobile-visual {
+    display: none;
+    position: absolute;
+    max-width: none;
+  }
+
   &__main-cta {
     position: absolute;
     top: functions.px-to-rem(104);
@@ -167,5 +173,111 @@
   .home-hero__primary-button,
   .home-hero__secondary-button {
     transition: none;
+  }
+}
+@media (max-width: 767px) {
+  .home-hero {
+    min-height: max(functions.px-to-rem(760), calc(100svh - functions.px-to-rem(52)));
+
+    &__visuals {
+      display: block;
+    }
+
+    &__visual {
+      display: none;
+    }
+
+    &__mobile-visual {
+      display: block;
+
+      &--chicken {
+        top: functions.px-to-rem(-31);
+        left: max(functions.px-to-rem(234), calc(100% - functions.px-to-rem(141)));
+        width: functions.px-to-rem(141);
+        height: functions.px-to-rem(304);
+      }
+
+      &--salmon {
+        top: functions.px-to-rem(235);
+        left: max(functions.px-to-rem(233), calc(100% - functions.px-to-rem(142)));
+        width: functions.px-to-rem(142);
+        height: functions.px-to-rem(311);
+      }
+
+      &--steak {
+        top: functions.px-to-rem(518);
+        left: max(functions.px-to-rem(216.6), calc(100% - functions.px-to-rem(158.4)));
+        width: functions.px-to-rem(158.4);
+        height: functions.px-to-rem(266.77);
+      }
+    }
+
+    &__main-cta {
+      top: functions.px-to-rem(44);
+      left: functions.px-to-rem(16);
+      gap: functions.px-to-rem(40);
+      width: functions.px-to-rem(240);
+      height: functions.px-to-rem(304);
+    }
+
+    &__text {
+      display: flex;
+      flex-direction: column;
+      gap: functions.px-to-rem(8);
+      width: functions.px-to-rem(240);
+      height: functions.px-to-rem(212);
+    }
+
+    &__eyebrow {
+      width: functions.px-to-rem(203);
+      height: functions.px-to-rem(60);
+      font-size: functions.px-to-rem(24);
+      line-height: functions.px-to-rem(30);
+    }
+
+    &__title {
+      width: functions.px-to-rem(222);
+      height: functions.px-to-rem(144);
+      font-size: functions.px-to-rem(64);
+      line-height: functions.px-to-rem(72);
+    }
+
+    &__primary-button {
+      width: functions.px-to-rem(119);
+      height: functions.px-to-rem(52);
+      padding: functions.px-to-rem(4) functions.px-to-rem(16);
+      font-size: functions.px-to-rem(16);
+      line-height: functions.px-to-rem(20);
+    }
+
+    &__secondary-cta {
+      top: auto;
+      bottom: functions.px-to-rem(38);
+      left: functions.px-to-rem(16);
+      flex-direction: column;
+      gap: functions.px-to-rem(16);
+      width: functions.px-to-rem(197);
+      height: functions.px-to-rem(120);
+    }
+
+    &__secondary-title {
+      width: functions.px-to-rem(164);
+      height: functions.px-to-rem(52);
+      font-size: functions.px-to-rem(24);
+      line-height: functions.px-to-rem(29);
+    }
+
+    &__secondary-button {
+      width: functions.px-to-rem(197);
+      height: functions.px-to-rem(52);
+      padding: functions.px-to-rem(4) functions.px-to-rem(16);
+      font-size: functions.px-to-rem(18);
+      line-height: functions.px-to-rem(23);
+    }
+
+    &__secondary-icon {
+      width: functions.px-to-rem(20);
+      height: functions.px-to-rem(16);
+    }
   }
 }
