@@ -1,0 +1,547 @@
+{
+  "name": "Generate and store recipe suggestions",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-recipe",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        320
+      ],
+      "id": "ce21b723-d8ab-44d3-8964-9915121ae753",
+      "name": "Webhook",
+      "webhookId": "77d0c6dc-ea4b-408f-b484-361e998b8017"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2592,
+        -16
+      ],
+      "id": "0f8d4b06-d19b-4afd-9de9-db10fafd8f47",
+      "name": "Return generated recipes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const MAX_INGREDIENTS = 30;\nconst MAX_INGREDIENT_AMOUNT = 100000;\nconst MAX_INGREDIENT_NAME_LENGTH = 50;\n\nconst ALLOWED_COOKING_TIMES = [\"quick\", \"medium\", \"complex\"];\nconst ALLOWED_CUISINES = [\n  \"german\",\n  \"italian\",\n  \"indian\",\n  \"japanese\",\n  \"gourmet\",\n  \"fusion\",\n];\nconst ALLOWED_DIETS = [\"vegetarian\", \"vegan\", \"keto\", \"unrestricted\"];\nconst ALLOWED_UNITS = [\"gram\", \"liter\", \"piece\"];\n\nconst input = $input.first().json;\nconst bodyIsObject =\n  typeof input.body === \"object\" &&\n  input.body !== null &&\n  !Array.isArray(input.body);\n\nconst request = bodyIsObject ? input.body : {};\nconst validationErrors = [];\n\nif (!bodyIsObject) {\n  validationErrors.push(\"Request body must be a JSON object.\");\n}\n\nvalidateInteger(request.portionCount, 1, 12, \"Portion count\");\nvalidateInteger(request.cookingPeopleCount, 1, 3, \"Cooking people count\");\nvalidateOption(request.cookingTime, ALLOWED_COOKING_TIMES, \"Cooking time\");\nvalidateOption(request.cuisineStyle, ALLOWED_CUISINES, \"Cuisine style\");\nvalidateOption(request.dietPreference, ALLOWED_DIETS, \"Diet preference\");\nvalidateIngredients(request.ingredients);\n\nconst isValid = validationErrors.length === 0;\nconst validatedRequest = isValid\n  ? {\n      cookingPeopleCount: request.cookingPeopleCount,\n      cookingTime: request.cookingTime,\n      cuisineStyle: request.cuisineStyle,\n      dietPreference: request.dietPreference,\n      ingredients: request.ingredients.map(({ amount, name, unit }) => ({\n        amount,\n        name: name.trim(),\n        unit,\n      })),\n      portionCount: request.portionCount,\n    }\n  : null;\n\nreturn [\n  {\n    json: {\n      clientIp: getClientIp(input.headers),\n      isValid,\n      request: validatedRequest,\n      validationErrors,\n    },\n  },\n];\n\nfunction validateInteger(value, minimum, maximum, label) {\n  if (!Number.isInteger(value) || value < minimum || value > maximum) {\n    validationErrors.push(\n      `${label} must be between ${minimum} and ${maximum}.`,\n    );\n  }\n}\n\nfunction validateOption(value, allowedValues, label) {\n  if (!allowedValues.includes(value)) {\n    validationErrors.push(`${label} is invalid.`);\n  }\n}\n\nfunction validateIngredients(ingredients) {\n  if (!Array.isArray(ingredients) || ingredients.length === 0) {\n    validationErrors.push(\"At least one ingredient is required.\");\n    return;\n  }\n\n  if (ingredients.length > MAX_INGREDIENTS) {\n    validationErrors.push(\n      `No more than ${MAX_INGREDIENTS} ingredients are allowed.`,\n    );\n  }\n\n  ingredients.forEach(validateIngredient);\n}\n\nfunction validateIngredient(ingredient, index) {\n  if (\n    typeof ingredient !== \"object\" ||\n    ingredient === null ||\n    Array.isArray(ingredient)\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} is invalid.`);\n    return;\n  }\n\n  validateIngredientName(ingredient.name, index);\n  validateIngredientAmount(ingredient.amount, index);\n\n  if (!ALLOWED_UNITS.includes(ingredient.unit)) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid unit.`);\n  }\n}\n\nfunction validateIngredientName(name, index) {\n  if (\n    typeof name !== \"string\" ||\n    name.trim().length === 0 ||\n    name.trim().length > MAX_INGREDIENT_NAME_LENGTH\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid name.`);\n  }\n}\n\nfunction validateIngredientAmount(amount, index) {\n  if (\n    typeof amount !== \"number\" ||\n    !Number.isFinite(amount) ||\n    amount < 0.01 ||\n    amount > MAX_INGREDIENT_AMOUNT\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid amount.`);\n  }\n}\n\nfunction getClientIp(headers = {}) {\n  const forwardedIp = headers[\"x-forwarded-for\"];\n\n  if (typeof forwardedIp === \"string\" && forwardedIp.length > 0) {\n    return forwardedIp.split(\",\")[0].trim();\n  }\n\n  const realIp = headers[\"x-real-ip\"];\n  return typeof realIp === \"string\" && realIp.length > 0\n    ? realIp.trim()\n    : \"127.0.0.1\";\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        320
+      ],
+      "id": "203487da-9440-415f-be45-adb0a26cf590",
+      "name": "Validate recipe request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ca570be8-f225-4c0e-9f98-bd418221619a",
+              "leftValue": "={{ $json.isValid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        320
+      ],
+      "id": "1ed86b6e-6472-4cf2-8b8e-4bde2a44ff1f",
+      "name": "Is request valid?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  success: false,\n  code: 'INVALID_REQUEST',\n  message: 'The recipe request contains invalid data.',\n  validationErrors: $json.validationErrors\n} }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        416
+      ],
+      "id": "e382a6b4-d1cf-48fe-9bfa-f141399b0a74",
+      "name": "Return validation error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oehlaiclgsbpanmvhmtu.supabase.co/rest/v1/rpc/consume_generation_quota",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  p_ip_address: $json.clientIp\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        224
+      ],
+      "id": "8d2e02a3-7ad1-4ec6-a2da-1bcd1bbac6e6",
+      "name": "Consume generation quota",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JC4MSAvPxn40CcR3",
+          "name": "Supabase n8n secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "58bd0d86-1384-4ce1-b8c3-4fa0955f7fe8",
+              "leftValue": "={{ $json.allowed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        224
+      ],
+      "id": "61ef76b6-545b-4fac-b08f-b1ac246d35f0",
+      "name": "Is quota available?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  success: false,\n  code: $json.rejection_code,\n  message:\n    $json.rejection_code === 'IP_DAILY_LIMIT_REACHED'\n      ? 'You have reached your daily limit of 3 recipe generations.'\n      : $json.rejection_code === 'SYSTEM_DAILY_LIMIT_REACHED'\n        ? 'The daily recipe generation limit has been reached. Please try again tomorrow.'\n        : 'Your IP address could not be validated.',\n  remainingGenerations: {\n    ip: $json.remaining_for_ip,\n    systemWide: $json.remaining_system_wide\n  }\n} }}",
+        "options": {
+          "responseCode": "={{ $json.rejection_code === 'INVALID_IP_ADDRESS' ? 400 : 429 }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1184,
+        368
+      ],
+      "id": "3dc5a7bb-1f46-4077-899a-a8bb645456a9",
+      "name": "Return quota error"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Generate exactly three recipe suggestions for this validated request:\\n\\n\" + JSON.stringify($('Validate recipe request').first().json.request, null, 2) }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the recipe generation engine for Code à Cuisine.  Return only structured data matching the connected output schema. Do not include markdown, explanations, comments, or text outside the required structure.  Generate exactly three clearly distinct recipe suggestions in English.  Rules: - Follow the requested cuisine style, diet preference, cooking time category, portion count, and number of cooks exactly. - Use at least 70% of the distinct provided ingredients in every recipe. - Calculate usedIngredientPercentage accurately from the distinct provided ingredients used. - Put used provided ingredients into availableIngredients. - Add no more than three additional basic ingredients per recipe and list them only under additionalIngredients. - Scale all ingredient quantities for the requested portion count. - Make the three recipes meaningfully different in title, preparation method, and flavor. - Keep cookingTimeMinutes realistic and consistent with the selected category:   quick: up to 20 minutes   medium: 21 to 45 minutes   complex: more than 45 minutes - Write chronological, beginner-friendly preparation steps. - assignedCook must be between 1 and the requested cookingPeopleCount. - Distribute work sensibly when multiple cooks are requested. - Set canRunInParallel to true only when the step can safely run alongside another step. - Provide realistic estimated nutrition values per portion and for the entire recipe. - Total nutrition values must approximately equal the per-portion values multiplied by portionCount. - Protein, carbohydrate, and fat percentages should be plausible and total approximately 100%. - Never violate the selected diet preference. - Use only values permitted by the output schema. - Every ingredient mentioned in a summary or preparation step must appear in either availableIngredients or additionalIngredients. Do not silently assume oil, salt, pepper, spices, or seasonings. Water is the only exception and does not need to be listed. - cookingTimeMinutes must represent the realistic total elapsed cooking time after considering parallel work, not merely the duration of the longest individual step."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1120,
+        -32
+      ],
+      "id": "d20cdfad-6439-460a-8a13-fe4340d14e17",
+      "name": "Generate recipe suggestions"
+    },
+    {
+      "parameters": {
+        "model": "frob/deepseek-v4-flash-0731:284b-a13b-ud-q4_k_xl",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1128,
+        200
+      ],
+      "id": "df1a4592-5db5-48d0-a803-0f795eaf1023",
+      "name": "DeepSeek recipe model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "uEaNn4MxmeGnCL54",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const generatedOutput = $input.first().json.output;\nconst request = $('Validate recipe request').first().json.request;\nconst recipes = generatedOutput?.recipes;\nconst validationErrors = [];\n\nfunction normalizeName(value) {\n  return String(value ?? '').trim().toLowerCase();\n}\n\nfunction addError(recipeIndex, message) {\n  validationErrors.push(`Recipe ${recipeIndex + 1}: ${message}`);\n}\n\nfunction isFiniteNumber(value) {\n  return typeof value === 'number' && Number.isFinite(value);\n}\n\nif (!Array.isArray(recipes) || recipes.length !== 3) {\n  validationErrors.push('The AI must return exactly three recipes.');\n} else {\n  const providedNames = [\n    ...new Set(request.ingredients.map(ingredient => normalizeName(ingredient.name))),\n  ];\n\n  const providedNameSet = new Set(providedNames);\n  const usedTitles = new Set();\n\n  const timeLimits = {\n    quick: { min: 1, max: 20 },\n    medium: { min: 21, max: 45 },\n    complex: { min: 46, max: Number.POSITIVE_INFINITY },\n  };\n\n  recipes.forEach((recipe, recipeIndex) => {\n    const normalizedTitle = normalizeName(recipe.title);\n\n    if (!normalizedTitle) {\n      addError(recipeIndex, 'The title is missing.');\n    } else if (usedTitles.has(normalizedTitle)) {\n      addError(recipeIndex, 'The title is not unique.');\n    }\n\n    usedTitles.add(normalizedTitle);\n\n    if (recipe.cuisineStyle !== request.cuisineStyle) {\n      addError(recipeIndex, 'The cuisine style does not match the request.');\n    }\n\n    if (recipe.dietPreference !== request.dietPreference) {\n      addError(recipeIndex, 'The diet preference does not match the request.');\n    }\n\n    if (recipe.cookingTimeCategory !== request.cookingTime) {\n      addError(recipeIndex, 'The cooking time category does not match the request.');\n    }\n\n    if (recipe.portionCount !== request.portionCount) {\n      addError(recipeIndex, 'The portion count does not match the request.');\n    }\n\n    if (recipe.cookingPeopleCount !== request.cookingPeopleCount) {\n      addError(recipeIndex, 'The number of cooks does not match the request.');\n    }\n\n    const selectedTimeLimit = timeLimits[request.cookingTime];\n\n    if (\n      !isFiniteNumber(recipe.cookingTimeMinutes) ||\n      recipe.cookingTimeMinutes < selectedTimeLimit.min ||\n      recipe.cookingTimeMinutes > selectedTimeLimit.max\n    ) {\n      addError(recipeIndex, 'The cooking duration does not match its category.');\n    }\n\n    const availableIngredients = Array.isArray(recipe.availableIngredients)\n      ? recipe.availableIngredients\n      : [];\n\n    const additionalIngredients = Array.isArray(recipe.additionalIngredients)\n      ? recipe.additionalIngredients\n      : [];\n\n    const availableNames = new Set(\n      availableIngredients\n        .map(ingredient => normalizeName(ingredient.name))\n        .filter(Boolean),\n    );\n\n    const usedProvidedIngredients = providedNames.filter(name =>\n      availableNames.has(name),\n    );\n\n    const calculatedPercentage = Math.round(\n      (usedProvidedIngredients.length / providedNames.length) * 100,\n    );\n\n    if (calculatedPercentage < 70) {\n      addError(\n        recipeIndex,\n        `Only ${calculatedPercentage}% of the provided ingredients are used.`,\n      );\n    }\n\n    if (recipe.usedIngredientPercentage !== calculatedPercentage) {\n      addError(\n        recipeIndex,\n        `The reported ingredient percentage should be ${calculatedPercentage}%.`,\n      );\n    }\n\n    const unknownAvailableIngredients = [...availableNames].filter(\n      name => !providedNameSet.has(name),\n    );\n\n    if (unknownAvailableIngredients.length > 0) {\n      addError(\n        recipeIndex,\n        'Additional ingredients were incorrectly listed as available ingredients.',\n      );\n    }\n\n    if (additionalIngredients.length > 3) {\n      addError(recipeIndex, 'More than three additional ingredients are used.');\n    }\n\n    const duplicatedAdditionalIngredients = additionalIngredients\n      .map(ingredient => normalizeName(ingredient.name))\n      .filter(name => providedNameSet.has(name));\n\n    if (duplicatedAdditionalIngredients.length > 0) {\n      addError(\n        recipeIndex,\n        'A provided ingredient was incorrectly listed as an additional ingredient.',\n      );\n    }\n\n    const steps = Array.isArray(recipe.steps) ? recipe.steps : [];\n    const assignedCooks = new Set();\n\n    steps.forEach((step, stepIndex) => {\n      if (step.number !== stepIndex + 1) {\n        addError(recipeIndex, 'The preparation steps are not numbered sequentially.');\n      }\n\n      if (\n        !Number.isInteger(step.assignedCook) ||\n        step.assignedCook < 1 ||\n        step.assignedCook > request.cookingPeopleCount\n      ) {\n        addError(recipeIndex, `Step ${stepIndex + 1} has an invalid cook assignment.`);\n      } else {\n        assignedCooks.add(step.assignedCook);\n      }\n\n      if (!isFiniteNumber(step.durationMinutes) || step.durationMinutes < 1) {\n        addError(recipeIndex, `Step ${stepIndex + 1} has an invalid duration.`);\n      }\n    });\n\n    if (\n      request.cookingPeopleCount > 1 &&\n      assignedCooks.size !== request.cookingPeopleCount\n    ) {\n      addError(recipeIndex, 'The work is not distributed across all requested cooks.');\n    }\n\n    const perPortion = recipe.nutritionPerPortion;\n    const total = recipe.nutritionTotal;\n\n    if (!perPortion || !total) {\n      addError(recipeIndex, 'Nutrition information is incomplete.');\n      return;\n    }\n\n    const percentageKeys = [\n      'proteinPercentage',\n      'carbohydratesPercentage',\n      'fatPercentage',\n    ];\n\n    const percentageSum = percentageKeys.reduce(\n      (sum, key) => sum + Number(perPortion[key]),\n      0,\n    );\n\n    if (!Number.isFinite(percentageSum) || Math.abs(percentageSum - 100) > 2) {\n      addError(recipeIndex, 'The macro percentages do not total approximately 100%.');\n    }\n\n    const scalableNutritionKeys = [\n      'caloriesKcal',\n      'proteinGrams',\n      'carbohydratesGrams',\n      'fatGrams',\n    ];\n\n    scalableNutritionKeys.forEach(key => {\n      const expectedTotal = Number(perPortion[key]) * request.portionCount;\n      const actualTotal = Number(total[key]);\n      const tolerance = Math.max(2, expectedTotal * 0.05);\n\n      if (\n        !Number.isFinite(expectedTotal) ||\n        !Number.isFinite(actualTotal) ||\n        Math.abs(actualTotal - expectedTotal) > tolerance\n      ) {\n        addError(recipeIndex, `${key} is inconsistent with the portion count.`);\n      }\n    });\n\n    percentageKeys.forEach(key => {\n      if (Math.abs(Number(perPortion[key]) - Number(total[key])) > 1) {\n        addError(recipeIndex, `${key} differs between per-portion and total values.`);\n      }\n    });\n  });\n}\n\nreturn [\n  {\n    json: {\n      isValid: validationErrors.length === 0,\n      request,\n      recipes: Array.isArray(recipes) ? recipes : [],\n      validationErrors,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        80
+      ],
+      "id": "b3c3744d-a922-48b0-8c4e-a09fe109fb9b",
+      "name": "Validate generated recipes"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "05e30e03-f541-47bc-b0ed-2cf05624de6b",
+              "leftValue": "={{ $json.isValid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1696,
+        80
+      ],
+      "id": "cfb35643-6d2c-424c-bf6d-a0507b4ef4d7",
+      "name": "Are generated recipes valid?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const recipes = $input.first().json.recipes;\nconst generationId = String($execution.id);\n\nif (!Array.isArray(recipes) || recipes.length !== 3) {\n  throw new Error('Exactly three validated recipes are required for storage.');\n}\n\nconst rows = recipes.map(recipe => ({\n  generation_id: generationId,\n  title: recipe.title,\n  summary: recipe.summary,\n  cuisine_style: recipe.cuisineStyle,\n  diet_preference: recipe.dietPreference,\n  cooking_time_category: recipe.cookingTimeCategory,\n  cooking_time_minutes: recipe.cookingTimeMinutes,\n  portion_count: recipe.portionCount,\n  cooking_people_count: recipe.cookingPeopleCount,\n  used_ingredient_percentage: recipe.usedIngredientPercentage,\n  available_ingredients: recipe.availableIngredients,\n  additional_ingredients: recipe.additionalIngredients,\n  nutrition_per_portion: recipe.nutritionPerPortion,\n  nutrition_total: recipe.nutritionTotal,\n  steps: recipe.steps,\n}));\n\nreturn [\n  {\n    json: {\n      generationId,\n      rows,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -16
+      ],
+      "id": "df5bb7cf-36e1-42a1-b6dc-e4a5ec71632d",
+      "name": "Prepare recipes for storage"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  success: false,\n  code: 'INVALID_GENERATED_RECIPES',\n  message: 'The generated recipes did not meet the required quality rules.',\n  validationErrors: $json.validationErrors\n} }}",
+        "options": {
+          "responseCode": 502
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1920,
+        176
+      ],
+      "id": "bab97443-beef-4683-a901-21542c09b273",
+      "name": "Return generation error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oehlaiclgsbpanmvhmtu.supabase.co/rest/v1/recipes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.rows }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2144,
+        -16
+      ],
+      "id": "cfc94f32-51e0-4b80-bbdf-3105c606da9d",
+      "name": "Save generated recipes",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JC4MSAvPxn40CcR3",
+          "name": "Supabase n8n secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const savedRecipes = $input\n  .all()\n  .flatMap(item => (Array.isArray(item.json) ? item.json : [item.json]));\n\nif (savedRecipes.length !== 3) {\n  throw new Error('Exactly three saved recipes are required for the response.');\n}\n\nconst quota = $('Consume generation quota').first().json;\n\nconst recipes = savedRecipes.map(recipe => ({\n  id: recipe.id,\n  generationId: recipe.generation_id,\n  createdAt: recipe.created_at,\n  title: recipe.title,\n  summary: recipe.summary,\n  cuisineStyle: recipe.cuisine_style,\n  dietPreference: recipe.diet_preference,\n  cookingTimeCategory: recipe.cooking_time_category,\n  cookingTimeMinutes: recipe.cooking_time_minutes,\n  portionCount: recipe.portion_count,\n  cookingPeopleCount: recipe.cooking_people_count,\n  usedIngredientPercentage: recipe.used_ingredient_percentage,\n  availableIngredients: recipe.available_ingredients,\n  additionalIngredients: recipe.additional_ingredients,\n  nutritionPerPortion: recipe.nutrition_per_portion,\n  nutritionTotal: recipe.nutrition_total,\n  steps: recipe.steps,\n  imageUrl: recipe.image_url,\n  likesCount: recipe.likes_count,\n  isPublic: recipe.is_public,\n}));\n\nreturn [\n  {\n    json: {\n      success: true,\n      generationId: recipes[0].generationId,\n      remainingGenerations: {\n        ip: quota.remaining_for_ip,\n        systemWide: quota.remaining_system_wide,\n      },\n      recipes,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2368,
+        -16
+      ],
+      "id": "aebf15c9-c21b-4604-869a-42512e9a8098",
+      "name": "Prepare generation response"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\"recipes\"],\n  \"properties\": {\n    \"recipes\": {\n      \"type\": \"array\",\n      \"minItems\": 3,\n      \"maxItems\": 3,\n      \"items\": {\n        \"type\": \"object\",\n        \"additionalProperties\": false,\n        \"required\": [\n          \"title\",\n          \"summary\",\n          \"cuisineStyle\",\n          \"dietPreference\",\n          \"cookingTimeCategory\",\n          \"cookingTimeMinutes\",\n          \"portionCount\",\n          \"cookingPeopleCount\",\n          \"usedIngredientPercentage\",\n          \"availableIngredients\",\n          \"additionalIngredients\",\n          \"nutritionPerPortion\",\n          \"nutritionTotal\",\n          \"steps\"\n        ],\n        \"properties\": {\n          \"title\": {\n            \"type\": \"string\",\n            \"minLength\": 3,\n            \"maxLength\": 100\n          },\n          \"summary\": {\n            \"type\": \"string\",\n            \"minLength\": 10,\n            \"maxLength\": 300\n          },\n          \"cuisineStyle\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"german\",\n              \"italian\",\n              \"indian\",\n              \"japanese\",\n              \"gourmet\",\n              \"fusion\"\n            ]\n          },\n          \"dietPreference\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"vegetarian\",\n              \"vegan\",\n              \"keto\",\n              \"unrestricted\"\n            ]\n          },\n          \"cookingTimeCategory\": {\n            \"type\": \"string\",\n            \"enum\": [\"quick\", \"medium\", \"complex\"]\n          },\n          \"cookingTimeMinutes\": {\n            \"type\": \"integer\",\n            \"minimum\": 1,\n            \"maximum\": 180\n          },\n          \"portionCount\": {\n            \"type\": \"integer\",\n            \"minimum\": 1,\n            \"maximum\": 12\n          },\n          \"cookingPeopleCount\": {\n            \"type\": \"integer\",\n            \"minimum\": 1,\n            \"maximum\": 3\n          },\n          \"usedIngredientPercentage\": {\n            \"type\": \"number\",\n            \"minimum\": 70,\n            \"maximum\": 100\n          },\n          \"availableIngredients\": {\n            \"type\": \"array\",\n            \"minItems\": 1,\n            \"items\": {\n              \"type\": \"object\",\n              \"additionalProperties\": false,\n              \"required\": [\"name\", \"amount\", \"unit\"],\n              \"properties\": {\n                \"name\": {\n                  \"type\": \"string\",\n                  \"minLength\": 1,\n                  \"maxLength\": 50\n                },\n                \"amount\": {\n                  \"type\": \"number\",\n                  \"exclusiveMinimum\": 0\n                },\n                \"unit\": {\n                  \"type\": \"string\",\n                  \"enum\": [\n                    \"gram\",\n                    \"kilogram\",\n                    \"milliliter\",\n                    \"liter\",\n                    \"piece\",\n                    \"teaspoon\",\n                    \"tablespoon\",\n                    \"pinch\",\n                    \"clove\"\n                  ]\n                }\n              }\n            }\n          },\n          \"additionalIngredients\": {\n            \"type\": \"array\",\n            \"maxItems\": 3,\n            \"items\": {\n              \"type\": \"object\",\n              \"additionalProperties\": false,\n              \"required\": [\"name\", \"amount\", \"unit\"],\n              \"properties\": {\n                \"name\": {\n                  \"type\": \"string\",\n                  \"minLength\": 1,\n                  \"maxLength\": 50\n                },\n                \"amount\": {\n                  \"type\": \"number\",\n                  \"exclusiveMinimum\": 0\n                },\n                \"unit\": {\n                  \"type\": \"string\",\n                  \"enum\": [\n                    \"gram\",\n                    \"kilogram\",\n                    \"milliliter\",\n                    \"liter\",\n                    \"piece\",\n                    \"teaspoon\",\n                    \"tablespoon\",\n                    \"pinch\",\n                    \"clove\"\n                  ]\n                }\n              }\n            }\n          },\n          \"nutritionPerPortion\": {\n            \"type\": \"object\",\n            \"additionalProperties\": false,\n            \"required\": [\n              \"caloriesKcal\",\n              \"proteinGrams\",\n              \"proteinPercentage\",\n              \"carbohydratesGrams\",\n              \"carbohydratesPercentage\",\n              \"fatGrams\",\n              \"fatPercentage\"\n            ],\n            \"properties\": {\n              \"caloriesKcal\": {\n                \"type\": \"number\",\n                \"minimum\": 0\n              },\n              \"proteinGrams\": {\n                \"type\": \"number\",\n                \"minimum\": 0\n              },\n              \"proteinPercentage\": {\n                \"type\": \"number\",\n                \"minimum\": 0,\n                \"maximum\": 100\n              },\n              \"carbohydratesGrams\": {\n                \"type\": \"number\",\n                \"minimum\": 0\n              },\n              \"carbohydratesPercentage\": {\n                \"type\": \"number\",\n                \"minimum\": 0,\n                \"maximum\": 100\n              },\n              \"fatGrams\": {\n                \"type\": \"number\",\n                \"minimum\": 0\n              },\n              \"fatPercentage\": {\n                \"type\": \"number\",\n                \"minimum\": 0,\n                \"maximum\": 100\n              }\n            }\n          },\n          \"nutritionTotal\": {\n            \"type\": \"object\",\n            \"additionalProperties\": false,\n            \"required\": [\n              \"caloriesKcal\",\n              \"proteinGrams\",\n              \"proteinPercentage\",\n              \"carbohydratesGrams\",\n              \"carbohydratesPercentage\",\n              \"fatGrams\",\n              \"fatPercentage\"\n            ],\n            \"properties\": {\n              \"caloriesKcal\": {\n                \"type\": \"number\",\n                \"minimum\": 0\n              },\n              \"proteinGrams\": {\n                \"type\": \"number\",\n                \"minimum\": 0\n              },\n              \"proteinPercentage\": {\n                \"type\": \"number\",\n                \"minimum\": 0,\n                \"maximum\": 100\n              },\n              \"carbohydratesGrams\": {\n                \"type\": \"number\",\n                \"minimum\": 0\n              },\n              \"carbohydratesPercentage\": {\n                \"type\": \"number\",\n                \"minimum\": 0,\n                \"maximum\": 100\n              },\n              \"fatGrams\": {\n                \"type\": \"number\",\n                \"minimum\": 0\n              },\n              \"fatPercentage\": {\n                \"type\": \"number\",\n                \"minimum\": 0,\n                \"maximum\": 100\n              }\n            }\n          },\n          \"steps\": {\n            \"type\": \"array\",\n            \"minItems\": 3,\n            \"maxItems\": 12,\n            \"items\": {\n              \"type\": \"object\",\n              \"additionalProperties\": false,\n              \"required\": [\n                \"number\",\n                \"title\",\n                \"description\",\n                \"assignedCook\",\n                \"durationMinutes\",\n                \"canRunInParallel\"\n              ],\n              \"properties\": {\n                \"number\": {\n                  \"type\": \"integer\",\n                  \"minimum\": 1,\n                  \"maximum\": 12\n                },\n                \"title\": {\n                  \"type\": \"string\",\n                  \"minLength\": 3,\n                  \"maxLength\": 80\n                },\n                \"description\": {\n                  \"type\": \"string\",\n                  \"minLength\": 10,\n                  \"maxLength\": 600\n                },\n                \"assignedCook\": {\n                  \"type\": \"integer\",\n                  \"minimum\": 1,\n                  \"maximum\": 3\n                },\n                \"durationMinutes\": {\n                  \"type\": \"integer\",\n                  \"minimum\": 1,\n                  \"maximum\": 180\n                },\n                \"canRunInParallel\": {\n                  \"type\": \"boolean\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1256,
+        200
+      ],
+      "id": "423aa1f9-12d1-449d-bca0-7e23781d6461",
+      "name": "Parse recipe suggestions"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate recipe request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return generated recipes": {
+      "main": [
+        []
+      ]
+    },
+    "Validate recipe request": {
+      "main": [
+        [
+          {
+            "node": "Is request valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is request valid?": {
+      "main": [
+        [
+          {
+            "node": "Consume generation quota",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return validation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consume generation quota": {
+      "main": [
+        [
+          {
+            "node": "Is quota available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is quota available?": {
+      "main": [
+        [
+          {
+            "node": "Generate recipe suggestions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return quota error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek recipe model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate recipe suggestions",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate recipe suggestions": {
+      "main": [
+        [
+          {
+            "node": "Validate generated recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate generated recipes": {
+      "main": [
+        [
+          {
+            "node": "Are generated recipes valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Are generated recipes valid?": {
+      "main": [
+        [
+          {
+            "node": "Prepare recipes for storage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare recipes for storage": {
+      "main": [
+        [
+          {
+            "node": "Save generated recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save generated recipes": {
+      "main": [
+        [
+          {
+            "node": "Prepare generation response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare generation response": {
+      "main": [
+        [
+          {
+            "node": "Return generated recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse recipe suggestions": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate recipe suggestions",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b94f2bce-3032-4fa3-880c-17c0643d1d4b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9f819cdace379d8afeba11bd299f64cd92748f28354faa13c8ea20f924aac48f"
+  },
+  "nodeGroups": [],
+  "id": "ettKfWWms2qC970v",
+  "tags": []
+}
