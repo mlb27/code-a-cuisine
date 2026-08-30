@@ -124,8 +124,14 @@
     }
   }
 
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: functions.px-to-rem(8);
+  }
+
   &__generate-button {
-    align-self: center;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,6 +156,13 @@
       outline: functions.px-to-rem(3) solid variables.$primary-green;
       outline-offset: functions.px-to-rem(3);
     }
+  }
+
+  &__feedback {
+    margin: 0;
+    font-size: functions.px-to-rem(14);
+    line-height: functions.px-to-rem(18);
+    text-align: center;
   }
 }
 

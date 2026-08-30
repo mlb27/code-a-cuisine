@@ -1,4 +1,4 @@
-import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 
 import {
   Ingredient,
@@ -7,6 +7,7 @@ import {
   INGREDIENT_UNIT_OPTIONS,
   IngredientUnit,
 } from '../models/ingredient';
+import { RecipeGenerationRequest } from '../models/recipe-generation-request';
 import {
   COOKING_PEOPLE,
   COOKING_TIME_CATEGORIES,
@@ -17,6 +18,7 @@ import {
   DietPreference,
   RECIPE_PORTIONS,
 } from '../models/recipe-preferences';
+import { SessionStorageService } from './session-storage.service';
 
 const COOKING_PEOPLE_STORAGE_KEY: string = 'code-a-cuisine-generator-cooking-people';
 const COOKING_TIME_STORAGE_KEY: string = 'code-a-cuisine-generator-cooking-time';
@@ -30,6 +32,7 @@ const PORTION_STORAGE_KEY: string = 'code-a-cuisine-generator-portions';
   providedIn: 'root',
 })
 export class RecipeGeneratorService {
+  private readonly storageService = inject(SessionStorageService);
   private readonly cookingPeopleCountState: WritableSignal<number> = signal(
     this.loadCookingPeopleCount(),
   );
@@ -57,6 +60,12 @@ export class RecipeGeneratorService {
   public readonly portionCount: Signal<number> = this.portionCountState.asReadonly();
   public readonly hasIngredients: Signal<boolean> = computed(
     (): boolean => this.ingredientsState().length > 0,
+  );
+  public readonly generationRequest: Signal<RecipeGenerationRequest | null> = computed(
+    (): RecipeGenerationRequest | null => this.createGenerationRequest(),
+  );
+  public readonly canGenerate: Signal<boolean> = computed(
+    (): boolean => this.generationRequest() !== null,
   );
   public readonly editingIngredient: Signal<Ingredient | null> = computed((): Ingredient | null => {
     const ingredientId: number | null = this.editingIngredientId();
@@ -139,6 +148,33 @@ export class RecipeGeneratorService {
     if (this.editingIngredientId() === ingredientId) this.cancelEditing();
   }
 
+  /** Creates the validated workflow payload when every required value is available. */
+  private createGenerationRequest(): RecipeGenerationRequest | null {
+    const cookingTime: CookingTimeCategory | null = this.cookingTimeState();
+    const cuisineStyle: CuisineStyle | null = this.cuisineStyleState();
+    const dietPreference: DietPreference | null = this.dietPreferenceState();
+    const ingredients: IngredientDraft[] = this.getRequestIngredients();
+
+    if (!cookingTime || !cuisineStyle || !dietPreference || ingredients.length === 0) return null;
+    return {
+      cookingPeopleCount: this.cookingPeopleCountState(),
+      cookingTime,
+      cuisineStyle,
+      dietPreference,
+      ingredients,
+      portionCount: this.portionCountState(),
+    };
+  }
+
+  /** Removes UI-only ingredient IDs before data is sent to the workflow. */
+  private getRequestIngredients(): IngredientDraft[] {
+    return this.ingredientsState().map(({ amount, name, unit }: Ingredient): IngredientDraft => ({
+      amount,
+      name,
+      unit,
+    }));
+  }
+
   /** Adds one validated ingredient with a new session-local ID. */
   private addIngredient(draft: IngredientDraft): void {
     const ingredient: Ingredient = { ...draft, id: this.nextIngredientId++ };
@@ -196,7 +232,7 @@ export class RecipeGeneratorService {
   /** Restores validated ingredients from the current browser session. */
   private loadIngredients(): Ingredient[] {
     try {
-      const storedValue: string | null = this.getStorage()?.getItem(INGREDIENT_STORAGE_KEY) ?? null;
+      const storedValue: string | null = this.storageService.get(INGREDIENT_STORAGE_KEY);
       return storedValue ? this.parseIngredients(storedValue) : [];
     } catch {
       return [];
@@ -213,34 +249,21 @@ export class RecipeGeneratorService {
 
   /** Stores the current ingredients when session storage is available. */
   private persistIngredients(ingredients: Ingredient[]): void {
-    try {
-      this.getStorage()?.setItem(INGREDIENT_STORAGE_KEY, JSON.stringify(ingredients));
-    } catch {
-      return;
-    }
+    this.storageService.set(INGREDIENT_STORAGE_KEY, JSON.stringify(ingredients));
   }
 
   /** Restores the number of people cooking or returns the configured default. */
   private loadCookingPeopleCount(): number {
-    try {
-      const storedValue: string | null =
-        this.getStorage()?.getItem(COOKING_PEOPLE_STORAGE_KEY) ?? null;
-      const cookingPeopleCount: number = Number(storedValue);
-      return this.isValidCookingPeopleCount(cookingPeopleCount)
-        ? cookingPeopleCount
-        : COOKING_PEOPLE.default;
-    } catch {
-      return COOKING_PEOPLE.default;
-    }
+    const storedValue: string | null = this.storageService.get(COOKING_PEOPLE_STORAGE_KEY);
+    const cookingPeopleCount: number = Number(storedValue);
+    return this.isValidCookingPeopleCount(cookingPeopleCount)
+      ? cookingPeopleCount
+      : COOKING_PEOPLE.default;
   }
 
   /** Stores the number of people cooking when session storage is available. */
   private persistCookingPeopleCount(cookingPeopleCount: number): void {
-    try {
-      this.getStorage()?.setItem(COOKING_PEOPLE_STORAGE_KEY, String(cookingPeopleCount));
-    } catch {
-      return;
-    }
+    this.storageService.set(COOKING_PEOPLE_STORAGE_KEY, String(cookingPeopleCount));
   }
 
   /** Checks whether a cooking-person count is an integer inside the supported range. */
@@ -254,22 +277,13 @@ export class RecipeGeneratorService {
 
   /** Restores a validated cooking-time category from session storage. */
   private loadCookingTime(): CookingTimeCategory | null {
-    try {
-      const storedValue: string | null =
-        this.getStorage()?.getItem(COOKING_TIME_STORAGE_KEY) ?? null;
-      return this.isCookingTimeCategory(storedValue) ? storedValue : null;
-    } catch {
-      return null;
-    }
+    const storedValue: string | null = this.storageService.get(COOKING_TIME_STORAGE_KEY);
+    return this.isCookingTimeCategory(storedValue) ? storedValue : null;
   }
 
   /** Stores the selected cooking-time category when session storage is available. */
   private persistCookingTime(cookingTime: CookingTimeCategory): void {
-    try {
-      this.getStorage()?.setItem(COOKING_TIME_STORAGE_KEY, cookingTime);
-    } catch {
-      return;
-    }
+    this.storageService.set(COOKING_TIME_STORAGE_KEY, cookingTime);
   }
 
   /** Checks whether a value is one of the supported cooking-time categories. */
@@ -281,22 +295,13 @@ export class RecipeGeneratorService {
 
   /** Restores a validated cuisine style from session storage. */
   private loadCuisineStyle(): CuisineStyle | null {
-    try {
-      const storedValue: string | null =
-        this.getStorage()?.getItem(CUISINE_STYLE_STORAGE_KEY) ?? null;
-      return this.isCuisineStyle(storedValue) ? storedValue : null;
-    } catch {
-      return null;
-    }
+    const storedValue: string | null = this.storageService.get(CUISINE_STYLE_STORAGE_KEY);
+    return this.isCuisineStyle(storedValue) ? storedValue : null;
   }
 
   /** Stores the selected cuisine style when session storage is available. */
   private persistCuisineStyle(cuisineStyle: CuisineStyle): void {
-    try {
-      this.getStorage()?.setItem(CUISINE_STYLE_STORAGE_KEY, cuisineStyle);
-    } catch {
-      return;
-    }
+    this.storageService.set(CUISINE_STYLE_STORAGE_KEY, cuisineStyle);
   }
 
   /** Checks whether a value is one of the supported cuisine styles. */
@@ -306,22 +311,13 @@ export class RecipeGeneratorService {
 
   /** Restores a validated diet preference from session storage. */
   private loadDietPreference(): DietPreference | null {
-    try {
-      const storedValue: string | null =
-        this.getStorage()?.getItem(DIET_PREFERENCE_STORAGE_KEY) ?? null;
-      return this.isDietPreference(storedValue) ? storedValue : null;
-    } catch {
-      return null;
-    }
+    const storedValue: string | null = this.storageService.get(DIET_PREFERENCE_STORAGE_KEY);
+    return this.isDietPreference(storedValue) ? storedValue : null;
   }
 
   /** Stores the selected diet preference when session storage is available. */
   private persistDietPreference(dietPreference: DietPreference): void {
-    try {
-      this.getStorage()?.setItem(DIET_PREFERENCE_STORAGE_KEY, dietPreference);
-    } catch {
-      return;
-    }
+    this.storageService.set(DIET_PREFERENCE_STORAGE_KEY, dietPreference);
   }
 
   /** Checks whether a value is one of the supported diet preferences. */
@@ -333,22 +329,14 @@ export class RecipeGeneratorService {
 
   /** Restores the selected portion count or returns the configured default. */
   private loadPortionCount(): number {
-    try {
-      const storedValue: string | null = this.getStorage()?.getItem(PORTION_STORAGE_KEY) ?? null;
-      const portionCount: number = Number(storedValue);
-      return this.isValidPortionCount(portionCount) ? portionCount : RECIPE_PORTIONS.default;
-    } catch {
-      return RECIPE_PORTIONS.default;
-    }
+    const storedValue: string | null = this.storageService.get(PORTION_STORAGE_KEY);
+    const portionCount: number = Number(storedValue);
+    return this.isValidPortionCount(portionCount) ? portionCount : RECIPE_PORTIONS.default;
   }
 
   /** Stores the selected portion count when session storage is available. */
   private persistPortionCount(portionCount: number): void {
-    try {
-      this.getStorage()?.setItem(PORTION_STORAGE_KEY, String(portionCount));
-    } catch {
-      return;
-    }
+    this.storageService.set(PORTION_STORAGE_KEY, String(portionCount));
   }
 
   /** Checks whether a portion count is an integer inside the supported range. */
@@ -384,10 +372,5 @@ export class RecipeGeneratorService {
       (ingredient: Ingredient): number => ingredient.id,
     );
     return Math.max(0, ...ingredientIds) + 1;
-  }
-
-  /** Returns session storage when the current environment supports it. */
-  private getStorage(): Storage | null {
-    return typeof globalThis.sessionStorage === 'undefined' ? null : globalThis.sessionStorage;
   }
 }

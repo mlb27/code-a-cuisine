@@ -111,7 +111,20 @@
     </form>
   </section>
 
-  <a class="recipe-preferences__generate-button" routerLink="/generator/loading">
-    Generate a recipe
-  </a>
+  <div class="recipe-preferences__actions">
+    <button
+      class="recipe-preferences__generate-button"
+      type="button"
+      [attr.aria-describedby]="generationFeedback() ? 'generation-feedback' : null"
+      (click)="generateRecipe()"
+    >
+      Generate a recipe
+    </button>
+
+    @if (generationFeedback(); as feedback) {
+      <p id="generation-feedback" class="recipe-preferences__feedback" role="alert">
+        {{ feedback }}
+      </p>
+    }
+  </div>
 </main>

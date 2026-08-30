@@ -8,6 +8,10 @@ import { RecipeGenerator } from './pages/recipe-generator/recipe-generator';
 import { RecipeLoading } from './pages/recipe-loading/recipe-loading';
 import { RecipePreferences } from './pages/recipe-preferences/recipe-preferences';
 import { RecipeResults } from './pages/recipe-results/recipe-results';
+import {
+  generationRequestRequiredGuard,
+  ingredientsRequiredGuard,
+} from './shared/guards/recipe-generator.guard';
 
 export const routes: Routes = [
   {
@@ -22,10 +26,12 @@ export const routes: Routes = [
   {
     path: 'generator/preferences',
     component: RecipePreferences,
+    canActivate: [ingredientsRequiredGuard],
   },
   {
     path: 'generator/loading',
     component: RecipeLoading,
+    canActivate: [generationRequestRequiredGuard],
   },
   {
     path: 'results',

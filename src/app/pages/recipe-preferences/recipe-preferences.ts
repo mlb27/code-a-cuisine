@@ -1,5 +1,5 @@
-import { Component, inject, Signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, inject, Signal, signal, WritableSignal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Header } from '../../layout/header/header';
 import {
@@ -34,12 +34,14 @@ interface DietOption extends PreferenceOption {
 /** Displays the second step of the recipe generator. */
 @Component({
   selector: 'app-recipe-preferences',
-  imports: [Header, PreferenceCounter, PreferenceTag, RouterLink],
+  imports: [Header, PreferenceCounter, PreferenceTag],
   templateUrl: './recipe-preferences.html',
   styleUrl: './recipe-preferences.scss',
 })
 export class RecipePreferences {
   private readonly recipeGeneratorService = inject(RecipeGeneratorService);
+  private readonly router = inject(Router);
+  private readonly generateAttempted: WritableSignal<boolean> = signal(false);
 
   protected readonly maximumCookingPeopleCount: number = COOKING_PEOPLE.maximum;
   protected readonly minimumCookingPeopleCount: number = COOKING_PEOPLE.minimum;
@@ -54,6 +56,9 @@ export class RecipePreferences {
   protected readonly dietPreference: Signal<DietPreference | null> =
     this.recipeGeneratorService.dietPreference;
   protected readonly portionCount: Signal<number> = this.recipeGeneratorService.portionCount;
+  protected readonly generationFeedback: Signal<string | null> = computed((): string | null =>
+    this.getGenerationFeedback(),
+  );
   protected readonly cookingTimeOptions: CookingTimeOption[] = [
     { label: 'Quick', value: 'quick', width: 83, hint: 'up to 20 min' },
     { label: 'Medium', value: 'medium', width: 102, hint: '20-45 min' },
@@ -99,5 +104,28 @@ export class RecipePreferences {
   /** Updates the portion count used for the current recipe request. */
   protected updatePortionCount(portionCount: number): void {
     this.recipeGeneratorService.setPortionCount(portionCount);
+  }
+
+  /** Opens the loading view only when the generator request is complete. */
+  protected generateRecipe(): void {
+    this.generateAttempted.set(true);
+    if (!this.recipeGeneratorService.canGenerate()) return;
+    void this.router.navigateByUrl('/generator/loading');
+  }
+
+  /** Returns feedback listing values still required for recipe generation. */
+  private getGenerationFeedback(): string | null {
+    if (!this.generateAttempted() || this.recipeGeneratorService.canGenerate()) return null;
+    return `Please complete: ${this.getMissingFields().join(', ')}.`;
+  }
+
+  /** Collects the user-facing names of incomplete generator fields. */
+  private getMissingFields(): string[] {
+    const fields: string[] = [];
+    if (!this.recipeGeneratorService.hasIngredients()) fields.push('at least one ingredient');
+    if (!this.cookingTime()) fields.push('cooking time');
+    if (!this.cuisineStyle()) fields.push('cuisine');
+    if (!this.dietPreference()) fields.push('diet preference');
+    return fields;
   }
 }
