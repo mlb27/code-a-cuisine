@@ -61,6 +61,79 @@
   }
 }
 
+.recipe-loading {
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: functions.px-to-rem(20);
+    width: 100%;
+    padding: functions.px-to-rem(32);
+    border-radius: functions.px-to-rem(20);
+    background-color: variables.$cream;
+    color: variables.$dark-green;
+    text-align: center;
+  }
+
+  &__error-title,
+  &__error-message,
+  &__error-list {
+    margin: 0;
+  }
+
+  &__error-title {
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(28);
+    line-height: functions.px-to-rem(35);
+  }
+
+  &__error-message,
+  &__error-list {
+    font-size: functions.px-to-rem(16);
+    line-height: functions.px-to-rem(22);
+  }
+
+  &__error-list {
+    padding-left: functions.px-to-rem(20);
+    text-align: left;
+  }
+
+  &__error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: functions.px-to-rem(12);
+  }
+
+  &__error-button {
+    min-width: functions.px-to-rem(150);
+    min-height: functions.px-to-rem(48);
+    padding: functions.px-to-rem(10) functions.px-to-rem(18);
+    border: functions.px-to-rem(2) solid variables.$primary-green;
+    background-color: variables.$primary-green;
+    color: variables.$cream;
+    font: inherit;
+    cursor: pointer;
+
+    &--secondary {
+      background-color: transparent;
+      color: variables.$primary-green;
+    }
+
+    &:focus-visible {
+      outline: functions.px-to-rem(3) solid variables.$button-green;
+      outline-offset: functions.px-to-rem(3);
+    }
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .recipe-loading__error-button:hover {
+    border-color: variables.$button-green-hover;
+    background-color: variables.$button-green-hover;
+    color: variables.$white;
+  }
+}
 @media (max-width: 767px) {
   .recipe-loading {
     width: calc(100% - functions.px-to-rem(35));

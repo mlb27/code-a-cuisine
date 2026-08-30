@@ -9,6 +9,8 @@ import { RecipeLoading } from './pages/recipe-loading/recipe-loading';
 import { RecipePreferences } from './pages/recipe-preferences/recipe-preferences';
 import { RecipeResults } from './pages/recipe-results/recipe-results';
 import {
+  generatedRecipeRequiredGuard,
+  generatedRecipesRequiredGuard,
   generationRequestRequiredGuard,
   ingredientsRequiredGuard,
 } from './shared/guards/recipe-generator.guard';
@@ -36,10 +38,12 @@ export const routes: Routes = [
   {
     path: 'results',
     component: RecipeResults,
+    canActivate: [generatedRecipesRequiredGuard],
   },
   {
-    path: 'recipe',
+    path: 'recipe/:recipeId',
     component: RecipeDetails,
+    canActivate: [generatedRecipeRequiredGuard],
   },
   {
     path: 'cookbook',

@@ -23,6 +23,14 @@ export class SessionStorageService {
     }
   }
 
+  /** Removes one session value when storage is available. */
+  public remove(key: string): void {
+    try {
+      this.getStorage()?.removeItem(key);
+    } catch {
+      return;
+    }
+  }
   /** Returns session storage when the current environment supports it. */
   private getStorage(): Storage | null {
     return typeof globalThis.sessionStorage === 'undefined' ? null : globalThis.sessionStorage;

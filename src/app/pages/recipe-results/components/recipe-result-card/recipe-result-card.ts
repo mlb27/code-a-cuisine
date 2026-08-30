@@ -9,6 +9,7 @@ import { RouterLink } from '@angular/router';
   styleUrl: './recipe-result-card.scss',
 })
 export class RecipeResultCard {
+  @Input({ required: true }) recipeId = '';
   @Input({ required: true }) recipeNumber = 0;
   @Input({ required: true }) title = '';
   @Input({ required: true }) cookingTime = '';

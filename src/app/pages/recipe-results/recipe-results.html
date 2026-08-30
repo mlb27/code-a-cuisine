@@ -14,8 +14,10 @@
       </p>
 
       <ul class="recipe-results__preferences" aria-label="Selected preferences">
-        <li class="recipe-results__preference">Italian</li>
-        <li class="recipe-results__preference">Quick</li>
+        @for (preferenceLabel of preferenceLabels(); track preferenceLabel) {
+          <li class="recipe-results__preference">{{ preferenceLabel }}</li>
+        }
+        <li class="recipe-results__preference">{{ remainingGenerationLabel() }}</li>
       </ul>
     </div>
 
@@ -31,11 +33,12 @@
   </section>
 
   <section class="recipe-results__recipes" aria-label="Generated recipes">
-    @for (recipe of recipeSuggestions; track recipe.number) {
+    @for (recipe of recipes(); track recipe.id; let recipeIndex = $index) {
       <app-recipe-result-card
-        [recipeNumber]="recipe.number"
+        [recipeId]="recipe.id"
+        [recipeNumber]="recipeIndex + 1"
         [title]="recipe.title"
-        [cookingTime]="recipe.cookingTime"
+        [cookingTime]="recipe.cookingTimeMinutes + 'min'"
       />
     }
   </section>

@@ -1,14 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, Signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Header } from '../../layout/header/header';
+import { GeneratedRecipe } from '../../shared/models/generated-recipe';
+import { RecipeGenerationService } from '../../shared/services/recipe-generation.service';
 import { RecipeResultCard } from './components/recipe-result-card/recipe-result-card';
-
-interface RecipeSuggestion {
-  number: number;
-  title: string;
-  cookingTime: string;
-}
 
 /** Displays the generated recipe suggestions. */
 @Component({
@@ -18,21 +14,27 @@ interface RecipeSuggestion {
   styleUrl: './recipe-results.scss',
 })
 export class RecipeResults {
-  protected readonly recipeSuggestions: RecipeSuggestion[] = [
-    {
-      number: 1,
-      title: 'Pasta with spinach and cherry tomatoes',
-      cookingTime: '20min',
-    },
-    {
-      number: 2,
-      title: 'Creamy garlic shrimp pasta',
-      cookingTime: '22min',
-    },
-    {
-      number: 3,
-      title: 'Pasta alla Trapanese (Sicilian Tomato Pesto)',
-      cookingTime: '20min',
-    },
-  ];
+  private readonly recipeGenerationService = inject(RecipeGenerationService);
+
+  protected readonly recipes: Signal<GeneratedRecipe[]> = this.recipeGenerationService.recipes;
+  protected readonly preferenceLabels: Signal<string[]> = computed((): string[] => {
+    const firstRecipe: GeneratedRecipe | undefined = this.recipes()[0];
+    return firstRecipe
+      ? [
+          this.toDisplayLabel(firstRecipe.cuisineStyle),
+          this.toDisplayLabel(firstRecipe.cookingTimeCategory),
+        ]
+      : [];
+  });
+  protected readonly remainingGenerationLabel: Signal<string> = computed((): string => {
+    const remainingGenerations: number =
+      this.recipeGenerationService.response()?.remainingGenerations.ip ?? 0;
+    const generationLabel: string = remainingGenerations === 1 ? 'generation' : 'generations';
+    return remainingGenerations + ' ' + generationLabel + ' left today';
+  });
+
+  /** Converts an API enum value into a user-facing label. */
+  private toDisplayLabel(value: string): string {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
 }
