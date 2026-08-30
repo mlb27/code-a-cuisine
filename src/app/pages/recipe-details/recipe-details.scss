@@ -22,7 +22,7 @@
     flex-direction: column;
     gap: functions.px-to-rem(48);
     width: 100%;
-    height: functions.px-to-rem(1322);
+    min-height: functions.px-to-rem(1322);
     padding: functions.px-to-rem(36) functions.px-to-rem(44);
     border: functions.px-to-rem(4) solid variables.$cream;
     border-radius: functions.px-to-rem(20);
@@ -30,9 +30,9 @@
   }
 
   &__sections {
-    flex: 0 0 functions.px-to-rem(853);
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    height: functions.px-to-rem(853);
   }
 
   &__meal-feedback {

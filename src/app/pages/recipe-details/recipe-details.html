@@ -2,11 +2,11 @@
 
 <main class="recipe-details">
   <article class="recipe-details__card" aria-labelledby="recipe-title">
-    <app-recipe-summary />
+    <app-recipe-summary [recipe]="recipe" />
 
     <div class="recipe-details__sections">
-      <app-recipe-ingredients />
-      <app-recipe-directions />
+      <app-recipe-ingredients [recipe]="recipe" />
+      <app-recipe-directions [recipe]="recipe" />
     </div>
 
     <div class="recipe-details__meal-feedback">

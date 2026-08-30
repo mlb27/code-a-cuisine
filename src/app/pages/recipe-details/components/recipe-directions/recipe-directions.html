@@ -1,4 +1,8 @@
-<section class="recipe-directions" aria-labelledby="directions-title">
+<section
+  class="recipe-directions"
+  [class.recipe-directions--collapsed]="!directionsVisible()"
+  aria-labelledby="directions-title"
+>
   <div class="recipe-directions__heading">
     <picture class="recipe-directions__heading-picture">
       <source
@@ -16,33 +20,55 @@
     <h2 id="directions-title" class="recipe-directions__title">Directions</h2>
   </div>
 
-  <div class="recipe-directions__steps">
-    @for (step of steps; track step.number) {
-      <article class="recipe-directions__step">
-        <header class="recipe-directions__step-header">
-          <div class="recipe-directions__step-heading">
-            <span class="recipe-directions__step-number">{{ step.number }}.</span>
-            <h3 class="recipe-directions__step-title">{{ step.title }}</h3>
-          </div>
+  @if (directionsVisible()) {
+    <div id="directions-content" class="recipe-directions__steps">
+      @for (step of recipe().steps; track step.number) {
+        <article class="recipe-directions__step">
+          <header class="recipe-directions__step-header">
+            <div class="recipe-directions__step-heading">
+              <span class="recipe-directions__step-number">{{ step.number }}.</span>
+              <h3 class="recipe-directions__step-title">{{ step.title }}</h3>
+            </div>
 
-          <span class="recipe-directions__chef">
-            <img
-              class="recipe-directions__chef-icon"
-              [src]="step.chefIcon"
-              alt=""
-              [width]="step.chefIconWidth"
-              height="22"
-            />
-            <span>{{ step.chef }}</span>
-          </span>
-        </header>
+            <span
+              class="recipe-directions__chef"
+              [class.recipe-directions__chef--even]="step.assignedCook % 2 === 0"
+            >
+              <img
+                class="recipe-directions__chef-icon"
+                [src]="getCookIcon(step.assignedCook)"
+                alt=""
+                [width]="getCookIconWidth(step.assignedCook)"
+                height="22"
+              />
+              <span>Chef {{ step.assignedCook }}</span>
+            </span>
+          </header>
 
-        <p class="recipe-directions__description">{{ step.description }}</p>
-      </article>
-    }
-  </div>
-  <button class="recipe-directions__toggle" type="button">
-    <span>Hide directions</span>
-    <span class="recipe-directions__toggle-icon" aria-hidden="true"></span>
+          <p class="recipe-directions__step-meta">
+            <span>{{ step.durationMinutes }} min</span>
+            @if (step.canRunInParallel) {
+              <span class="recipe-directions__parallel">Parallel step</span>
+            }
+          </p>
+          <p class="recipe-directions__description">{{ step.description }}</p>
+        </article>
+      }
+    </div>
+  }
+
+  <button
+    class="recipe-directions__toggle"
+    type="button"
+    [attr.aria-expanded]="directionsVisible()"
+    aria-controls="directions-content"
+    (click)="toggleDirections()"
+  >
+    <span>{{ directionsVisible() ? 'Hide directions' : 'Show directions' }}</span>
+    <span
+      class="recipe-directions__toggle-icon"
+      [class.recipe-directions__toggle-icon--collapsed]="!directionsVisible()"
+      aria-hidden="true"
+    ></span>
   </button>
 </section>

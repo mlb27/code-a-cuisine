@@ -6,71 +6,84 @@
           d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8.01 8.01 0 0 1-8 8Zm1-13h-2v6l5.25 3.15 1-1.64L13 12Z"
         />
       </svg>
-      <span>Cooking time: 20 min</span>
+      <span>Cooking time: {{ recipe().cookingTimeMinutes }} min</span>
     </div>
 
-    <h1 id="recipe-title" class="recipe-summary__title">Pasta with spinach and cherry tomatoes</h1>
+    <h1 id="recipe-title" class="recipe-summary__title">{{ recipe().title }}</h1>
 
     <div class="recipe-summary__cooks">
-      <span class="recipe-summary__cook-count">Cooking persons: 2</span>
-
-      <span class="recipe-summary__cook">
-        <img
-          class="recipe-summary__cook-icon recipe-summary__cook-icon--first"
-          src="img/recipe-details/chef-one.png"
-          alt=""
-          width="28"
-          height="22"
-        />
-        <span>Chef 1</span>
+      <span class="recipe-summary__cook-count">
+        Cooking persons: {{ recipe().cookingPeopleCount }}
       </span>
 
-      <span class="recipe-summary__cook">
-        <img
-          class="recipe-summary__cook-icon recipe-summary__cook-icon--second"
-          src="img/recipe-details/chef-two.png"
-          alt=""
-          width="25"
-          height="22"
-        />
-        <span>Chef 2</span>
-      </span>
+      @for (cookNumber of getCookNumbers(); track cookNumber) {
+        <span
+          class="recipe-summary__cook"
+          [class.recipe-summary__cook--even]="cookNumber % 2 === 0"
+        >
+          <img
+            class="recipe-summary__cook-icon"
+            [src]="getCookIcon(cookNumber)"
+            alt=""
+            [width]="getCookIconWidth(cookNumber)"
+            height="22"
+          />
+          <span>Chef {{ cookNumber }}</span>
+        </span>
+      }
     </div>
   </div>
 
   <div class="recipe-summary__metadata">
     <ul class="recipe-summary__tags" aria-label="Recipe characteristics">
-      <li class="recipe-summary__tag">Vegetarian</li>
-      <li class="recipe-summary__tag">Quick</li>
+      <li class="recipe-summary__tag">{{ toDisplayLabel(recipe().dietPreference) }}</li>
+      <li class="recipe-summary__tag">{{ toDisplayLabel(recipe().cookingTimeCategory) }}</li>
       <li class="recipe-summary__favorite">
         <svg class="recipe-summary__heart" viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="M16.5 3c-1.74 0-3.41 1.01-4.5 2.09C10.91 4.01 9.24 3 7.5 3A5.46 5.46 0 0 0 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5A5.46 5.46 0 0 0 16.5 3Zm-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5A3.43 3.43 0 0 1 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87A3.91 3.91 0 0 1 16.5 5 3.43 3.43 0 0 1 20 8.5c0 2.89-3.14 5.74-7.9 10.05Z"
           />
         </svg>
-        <span>66</span>
+        <span>{{ recipe().likesCount }}</span>
       </li>
     </ul>
 
     <section class="recipe-summary__nutrition" aria-labelledby="nutrition-title">
-      <h2 id="nutrition-title" class="recipe-summary__nutrition-title">Nutritional information</h2>
+      <h2 id="nutrition-title" class="recipe-summary__nutrition-title">
+        Nutritional information
+        <small>per portion / total</small>
+      </h2>
 
       <dl class="recipe-summary__nutrition-list">
         <div class="recipe-summary__nutrition-item">
           <dt>Energy</dt>
-          <dd>630 kcal</dd>
+          <dd>
+            {{ recipe().nutritionPerPortion.caloriesKcal }} /
+            {{ recipe().nutritionTotal.caloriesKcal }} kcal
+          </dd>
         </div>
         <div class="recipe-summary__nutrition-item">
           <dt>Protein</dt>
-          <dd>18g</dd>
+          <dd>
+            {{ recipe().nutritionPerPortion.proteinGrams }} /
+            {{ recipe().nutritionTotal.proteinGrams }}g
+            <small>{{ recipe().nutritionPerPortion.proteinPercentage }}%</small>
+          </dd>
         </div>
         <div class="recipe-summary__nutrition-item">
           <dt>Fat</dt>
-          <dd>24g</dd>
+          <dd>
+            {{ recipe().nutritionPerPortion.fatGrams }} / {{ recipe().nutritionTotal.fatGrams }}g
+            <small>{{ recipe().nutritionPerPortion.fatPercentage }}%</small>
+          </dd>
         </div>
         <div class="recipe-summary__nutrition-item">
           <dt>Carbs</dt>
-          <dd>58g</dd>
+          <dd>
+            {{ recipe().nutritionPerPortion.carbohydratesGrams }} /
+            {{ recipe().nutritionTotal.carbohydratesGrams }}g
+            <small>{{ recipe().nutritionPerPortion.carbohydratesPercentage }}%</small>
+          </dd>
         </div>
       </dl>
     </section>

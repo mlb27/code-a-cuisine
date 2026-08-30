@@ -14,17 +14,15 @@
     .recipe-details .recipe-details__card {
       gap: functions.px-to-rem(40);
       width: 100%;
-      height: functions.px-to-rem(1870);
+      min-height: 0;
       padding: functions.px-to-rem(8) functions.px-to-rem(6) functions.px-to-rem(28);
     }
 
     .recipe-details .recipe-details__sections {
       display: flex;
-      flex: 0 0 functions.px-to-rem(1307);
       flex-direction: column;
       gap: functions.px-to-rem(40);
       width: min(100%, functions.px-to-rem(320));
-      height: functions.px-to-rem(1307);
       margin: 0 auto;
     }
 
@@ -96,18 +94,8 @@
 
 @media (max-width: 349px) {
   app-recipe-details {
-    .recipe-details .recipe-details__card,
-    .recipe-details .recipe-details__sections,
     .recipe-details .recipe-details__meal-feedback {
       height: auto;
-    }
-
-    .recipe-details .recipe-details__card {
-      min-height: functions.px-to-rem(1870);
-    }
-
-    .recipe-details .recipe-details__sections {
-      flex-basis: auto;
     }
 
     .recipe-details .recipe-details__feedback-copy.recipe-details__feedback-copy {
