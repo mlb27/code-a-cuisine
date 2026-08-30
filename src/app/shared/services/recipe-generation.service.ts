@@ -1,12 +1,16 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 
-import { RECIPE_GENERATION_WEBHOOK_URL } from '../config/recipe-api.config';
+import {
+  RECIPE_GENERATION_WEBHOOK_URL,
+  RECIPE_LOOKUP_WEBHOOK_URL,
+} from '../config/recipe-api.config';
 import {
   GeneratedRecipe,
   RecipeGenerationFailure,
   RecipeGenerationResponse,
+  RecipeLookupResponse,
 } from '../models/generated-recipe';
 import { RecipeGenerationRequest } from '../models/recipe-generation-request';
 import { SessionStorageService } from './session-storage.service';
@@ -21,9 +25,11 @@ export class RecipeGenerationService {
   private readonly httpClient = inject(HttpClient);
   private readonly sessionStorageService = inject(SessionStorageService);
   private readonly webhookUrl = inject(RECIPE_GENERATION_WEBHOOK_URL);
+  private readonly lookupWebhookUrl = inject(RECIPE_LOOKUP_WEBHOOK_URL);
   private readonly responseState: WritableSignal<RecipeGenerationResponse | null> = signal(
     this.loadResponse(),
   );
+  private readonly restoredRecipeState: WritableSignal<GeneratedRecipe | null> = signal(null);
 
   public readonly response: Signal<RecipeGenerationResponse | null> =
     this.responseState.asReadonly();
@@ -42,11 +48,47 @@ export class RecipeGenerationService {
       .pipe(tap((response: RecipeGenerationResponse): void => this.storeResponse(response)));
   }
 
+  /** Restores one complete generation from persistent recipe storage. */
+  public loadGeneration(generationId: string): Observable<RecipeGenerationResponse> {
+    const currentResponse: RecipeGenerationResponse | null = this.responseState();
+    if (currentResponse?.generationId === generationId && this.hasRecipes()) {
+      return of(currentResponse);
+    }
+
+    return this.httpClient
+      .get<RecipeGenerationResponse>(this.lookupWebhookUrl, {
+        params: { generationId },
+      })
+      .pipe(tap((response: RecipeGenerationResponse): void => this.storeResponse(response)));
+  }
+
+  /** Restores one public recipe from persistent recipe storage. */
+  public loadRecipe(recipeId: string): Observable<GeneratedRecipe> {
+    const cachedRecipe: GeneratedRecipe | null = this.getRecipeById(recipeId);
+    if (cachedRecipe) return of(cachedRecipe);
+
+    return this.httpClient
+      .get<RecipeLookupResponse>(this.lookupWebhookUrl, {
+        params: { recipeId },
+      })
+      .pipe(
+        map((response: RecipeLookupResponse): GeneratedRecipe => {
+          if (response.success !== true || !this.isGeneratedRecipe(response.recipe)) {
+            throw new Error('The recipe workflow returned an invalid recipe.');
+          }
+
+          this.restoredRecipeState.set(response.recipe);
+          return response.recipe;
+        }),
+      );
+  }
+
   /** Returns one generated recipe from the current session. */
   public getRecipeById(recipeId: string | null): GeneratedRecipe | null {
     if (!recipeId) return null;
     return (
-      this.recipes().find((recipe: GeneratedRecipe): boolean => recipe.id === recipeId) ?? null
+      this.recipes().find((recipe: GeneratedRecipe): boolean => recipe.id === recipeId) ??
+      (this.restoredRecipeState()?.id === recipeId ? this.restoredRecipeState() : null)
     );
   }
 
@@ -122,10 +164,14 @@ export class RecipeGenerationService {
       typeof response.generationId === 'string' &&
       Array.isArray(response.recipes) &&
       response.recipes.length === 3 &&
-      response.recipes.every(
-        (recipe: GeneratedRecipe): boolean =>
-          typeof recipe.id === 'string' && typeof recipe.title === 'string',
-      )
+      response.recipes.every((recipe: GeneratedRecipe): boolean => this.isGeneratedRecipe(recipe))
     );
+  }
+
+  /** Checks the minimum recipe shape required by results and detail pages. */
+  private isGeneratedRecipe(value: unknown): value is GeneratedRecipe {
+    if (typeof value !== 'object' || value === null) return false;
+    const recipe: Partial<GeneratedRecipe> = value as Partial<GeneratedRecipe>;
+    return typeof recipe.id === 'string' && typeof recipe.title === 'string';
   }
 }

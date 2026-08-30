@@ -26,12 +26,15 @@ export class RecipeResults {
         ]
       : [];
   });
-  protected readonly remainingGenerationLabel: Signal<string> = computed((): string => {
-    const remainingGenerations: number =
-      this.recipeGenerationService.response()?.remainingGenerations.ip ?? 0;
-    const generationLabel: string = remainingGenerations === 1 ? 'generation' : 'generations';
-    return remainingGenerations + ' ' + generationLabel + ' left today';
-  });
+  protected readonly remainingGenerationLabel: Signal<string | null> = computed(
+    (): string | null => {
+      const remainingGenerations: number | undefined =
+        this.recipeGenerationService.response()?.remainingGenerations?.ip;
+      if (remainingGenerations === undefined) return null;
+      const generationLabel: string = remainingGenerations === 1 ? 'generation' : 'generations';
+      return remainingGenerations + ' ' + generationLabel + ' left today';
+    },
+  );
 
   /** Converts an API enum value into a user-facing label. */
   private toDisplayLabel(value: string): string {

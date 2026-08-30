@@ -5,7 +5,9 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import {
   RECIPE_GENERATION_WEBHOOK_URL,
+  RECIPE_LOOKUP_WEBHOOK_URL,
   recipeGenerationWebhookUrl,
+  recipeLookupWebhookUrl,
 } from './shared/config/recipe-api.config';
 
 export const appConfig: ApplicationConfig = {
@@ -16,6 +18,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: RECIPE_GENERATION_WEBHOOK_URL,
       useValue: recipeGenerationWebhookUrl,
+    },
+    {
+      provide: RECIPE_LOOKUP_WEBHOOK_URL,
+      useValue: recipeLookupWebhookUrl,
     },
   ],
 };

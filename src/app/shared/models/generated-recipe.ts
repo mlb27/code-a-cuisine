@@ -67,7 +67,13 @@ export interface RemainingGenerations {
 export interface RecipeGenerationResponse {
   generationId: string;
   recipes: GeneratedRecipe[];
-  remainingGenerations: RemainingGenerations;
+  remainingGenerations?: RemainingGenerations;
+  success: true;
+}
+
+/** Successful response returned when one stored recipe is requested by ID. */
+export interface RecipeLookupResponse {
+  recipe: GeneratedRecipe;
   success: true;
 }
 

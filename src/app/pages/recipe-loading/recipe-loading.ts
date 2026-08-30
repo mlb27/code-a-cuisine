@@ -12,7 +12,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
 import { Header } from '../../layout/header/header';
-import { RecipeGenerationFailure } from '../../shared/models/generated-recipe';
+import {
+  RecipeGenerationFailure,
+  RecipeGenerationResponse,
+} from '../../shared/models/generated-recipe';
 import { RecipeGenerationRequest } from '../../shared/models/recipe-generation-request';
 import { RecipeGenerationService } from '../../shared/services/recipe-generation.service';
 import { RecipeGeneratorService } from '../../shared/services/recipe-generator.service';
@@ -71,8 +74,8 @@ export class RecipeLoading implements OnInit {
       .generateRecipes(request)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (): void => {
-          void this.router.navigateByUrl('/results');
+        next: (response: RecipeGenerationResponse): void => {
+          void this.router.navigate(['/results', response.generationId]);
         },
         error: (error: unknown): void => {
           this.failureState.set(this.recipeGenerationService.getFailure(error));

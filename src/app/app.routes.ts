@@ -13,6 +13,7 @@ import {
   generatedRecipesRequiredGuard,
   generationRequestRequiredGuard,
   ingredientsRequiredGuard,
+  latestGeneratedResultsGuard,
 } from './shared/guards/recipe-generator.guard';
 
 export const routes: Routes = [
@@ -36,9 +37,14 @@ export const routes: Routes = [
     canActivate: [generationRequestRequiredGuard],
   },
   {
-    path: 'results',
+    path: 'results/:generationId',
     component: RecipeResults,
     canActivate: [generatedRecipesRequiredGuard],
+  },
+  {
+    path: 'results',
+    component: RecipeResults,
+    canActivate: [latestGeneratedResultsGuard],
   },
   {
     path: 'recipe/:recipeId',

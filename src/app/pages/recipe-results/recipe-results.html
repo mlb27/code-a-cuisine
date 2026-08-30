@@ -17,7 +17,9 @@
         @for (preferenceLabel of preferenceLabels(); track preferenceLabel) {
           <li class="recipe-results__preference">{{ preferenceLabel }}</li>
         }
-        <li class="recipe-results__preference">{{ remainingGenerationLabel() }}</li>
+        @if (remainingGenerationLabel(); as generationLabel) {
+          <li class="recipe-results__preference">{{ generationLabel }}</li>
+        }
       </ul>
     </div>
 
