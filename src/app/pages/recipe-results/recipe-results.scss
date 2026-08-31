@@ -89,7 +89,6 @@
     grid-auto-rows: 1fr;
     gap: functions.px-to-rem(24);
     width: functions.px-to-rem(1281);
-    min-height: functions.px-to-rem(338);
     margin: functions.px-to-rem(88) auto 0;
   }
 
@@ -264,13 +263,11 @@
       flex-direction: column;
       gap: functions.px-to-rem(16);
       width: 100%;
-      min-height: functions.px-to-rem(914);
       margin-top: functions.px-to-rem(48);
     }
 
     &__generation-cta {
       width: functions.px-to-rem(237);
-      height: functions.px-to-rem(52);
       margin: functions.px-to-rem(40) auto 0;
       padding: 0;
     }
