@@ -187,7 +187,7 @@
 
     &__title {
       width: min(100%, functions.px-to-rem(291));
-      height: functions.px-to-rem(30);
+      height: auto;
       margin: 0;
       font-size: functions.px-to-rem(24);
       line-height: functions.px-to-rem(30);
