@@ -51,6 +51,7 @@
 
   &__column {
     flex: 0 0 functions.px-to-rem(338);
+    min-width: 0;
     min-height: functions.px-to-rem(174);
 
     &--extra {
@@ -84,6 +85,7 @@
 
     li {
       padding-left: functions.px-to-rem(2);
+      overflow-wrap: anywhere;
     }
 
     li::marker {
@@ -94,6 +96,7 @@
   &__quantity {
     display: inline-block;
     width: functions.px-to-rem(100);
+    white-space: nowrap;
   }
 
   &__list--extra &__quantity {
@@ -127,12 +130,12 @@
     }
 
     &__column {
-      flex: 0 0 functions.px-to-rem(119);
+      flex: 0 0 auto;
       width: functions.px-to-rem(264);
       min-height: functions.px-to-rem(119);
 
       &--extra {
-        flex-basis: functions.px-to-rem(99);
+        flex-basis: auto;
         width: functions.px-to-rem(312);
         min-height: functions.px-to-rem(99);
       }
