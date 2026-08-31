@@ -99,6 +99,30 @@
     margin-top: functions.px-to-rem(16);
   }
 
+  &__recipe-state {
+    display: flex;
+    align-items: center;
+    gap: functions.px-to-rem(12);
+    min-height: functions.px-to-rem(48);
+    margin: 0;
+    color: variables.$dark-green;
+    font-size: functions.px-to-rem(16);
+    font-weight: 500;
+
+    button {
+      min-height: functions.px-to-rem(40);
+      padding: functions.px-to-rem(8) functions.px-to-rem(16);
+      border: functions.px-to-rem(2) solid variables.$primary-green;
+      background-color: transparent;
+      color: variables.$primary-green;
+      cursor: pointer;
+    }
+  }
+
+  &__recipe-state--error {
+    color: variables.$primary-green;
+  }
+
   &__cuisines {
     display: grid;
     grid-template-columns: repeat(3, functions.px-to-rem(400));

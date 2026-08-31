@@ -1,15 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { Header } from '../../layout/header/header';
+import { GeneratedRecipe } from '../../shared/models/generated-recipe';
+import { RecipeLibraryService } from '../../shared/services/recipe-library.service';
 import { CuisineCard } from './components/cuisine-card/cuisine-card';
 import { MostLikedRecipeCard } from './components/most-liked-recipe-card/most-liked-recipe-card';
-
-interface MostLikedRecipe {
-  title: string;
-  cookingTime: string;
-  likes: number;
-}
 
 interface Cuisine {
   name: string;
@@ -26,34 +23,12 @@ interface Cuisine {
   templateUrl: './cookbook.html',
   styleUrl: './cookbook.scss',
 })
-export class Cookbook {
-  protected readonly mostLikedRecipes: MostLikedRecipe[] = [
-    {
-      title: 'Pasta with spinach and cherry tomatoes',
-      cookingTime: '20min',
-      likes: 66,
-    },
-    {
-      title: 'Low Carb Vegan No-Bake Paleo Bars',
-      cookingTime: '35min',
-      likes: 57,
-    },
-    {
-      title: 'Schnitzel with fries',
-      cookingTime: '35min',
-      likes: 93,
-    },
-    {
-      title: 'Pasta with spinach and cherry tomatoes',
-      cookingTime: '20min',
-      likes: 66,
-    },
-    {
-      title: 'Low Carb Vegan No-Bake Paleo Bars',
-      cookingTime: '35min',
-      likes: 57,
-    },
-  ];
+export class Cookbook implements OnInit {
+  private readonly recipeLibraryService = inject(RecipeLibraryService);
+
+  protected readonly mostLikedRecipes: WritableSignal<GeneratedRecipe[]> = signal([]);
+  protected readonly isLoading: WritableSignal<boolean> = signal(true);
+  protected readonly loadError: WritableSignal<string | null> = signal(null);
 
   protected readonly cuisines: Cuisine[] = [
     {
@@ -99,4 +74,31 @@ export class Cookbook {
       imageAlt: 'A modern fusion cuisine tasting plate',
     },
   ];
+
+  /** Loads the most-liked public recipes when the cookbook opens. */
+  public ngOnInit(): void {
+    this.loadMostLikedRecipes();
+  }
+
+  /** Repeats the public recipe request after a recoverable error. */
+  protected retryMostLikedRecipes(): void {
+    this.loadMostLikedRecipes();
+  }
+
+  /** Requests up to five recipes ordered by their persisted heart count. */
+  private loadMostLikedRecipes(): void {
+    this.isLoading.set(true);
+    this.loadError.set(null);
+
+    this.recipeLibraryService
+      .loadRecipes({ page: 1, pageSize: 5, sort: 'likes' })
+      .pipe(finalize((): void => this.isLoading.set(false)))
+      .subscribe({
+        next: (response): void => this.mostLikedRecipes.set(response.recipes),
+        error: (): void => {
+          this.mostLikedRecipes.set([]);
+          this.loadError.set('The most-liked recipes could not be loaded.');
+        },
+      });
+  }
 }

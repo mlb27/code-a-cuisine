@@ -1,4 +1,4 @@
-<app-header backgroundTheme="light" backLabel="Back" backLink="/recipe" />
+<app-header backgroundTheme="light" backLabel="Back" backLink="/" />
 
 <main class="cookbook">
   <div class="cookbook__content">
@@ -20,12 +20,24 @@
         </div>
 
         <div class="cookbook__most-liked-track">
-          @for (recipe of mostLikedRecipes; track $index) {
-            <app-most-liked-recipe-card
-              [title]="recipe.title"
-              [cookingTime]="recipe.cookingTime"
-              [likes]="recipe.likes"
-            />
+          @if (isLoading()) {
+            <p class="cookbook__recipe-state" role="status">Loading recipes ...</p>
+          } @else if (loadError(); as errorMessage) {
+            <div class="cookbook__recipe-state cookbook__recipe-state--error" role="alert">
+              <span>{{ errorMessage }}</span>
+              <button type="button" (click)="retryMostLikedRecipes()">Try again</button>
+            </div>
+          } @else if (mostLikedRecipes().length === 0) {
+            <p class="cookbook__recipe-state">No recipes have been generated yet.</p>
+          } @else {
+            @for (recipe of mostLikedRecipes(); track recipe.id) {
+              <app-most-liked-recipe-card
+                [recipeId]="recipe.id"
+                [title]="recipe.title"
+                [cookingTime]="recipe.cookingTimeMinutes + 'min'"
+                [likes]="recipe.likesCount"
+              />
+            }
           }
         </div>
       </section>

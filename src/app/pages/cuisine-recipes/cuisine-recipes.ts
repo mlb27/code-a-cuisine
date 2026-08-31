@@ -1,20 +1,23 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import {
+  computed,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { distinctUntilChanged, map } from 'rxjs';
 
 import { Header } from '../../layout/header/header';
+import { GeneratedRecipe } from '../../shared/models/generated-recipe';
+import { CUISINE_STYLES, CuisineStyle } from '../../shared/models/recipe-preferences';
+import { RecipeLibraryService } from '../../shared/services/recipe-library.service';
 import { CuisinePagination } from './components/cuisine-pagination/cuisine-pagination';
 import { CuisineRecipeCard } from './components/cuisine-recipe-card/cuisine-recipe-card';
-
-interface RecipeTemplate {
-  title: string;
-  cookingTime: string;
-  likes: number;
-  tags: string[];
-}
-
-interface CuisineRecipe extends RecipeTemplate {
-  number: number;
-}
 
 interface CuisineDetails {
   name: string;
@@ -34,10 +37,26 @@ interface CuisineDetails {
   templateUrl: './cuisine-recipes.html',
   styleUrl: './cuisine-recipes.scss',
 })
-export class CuisineRecipes {
-  protected readonly cuisine: CuisineDetails;
+export class CuisineRecipes implements OnInit {
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly recipeLibraryService = inject(RecipeLibraryService);
+  private readonly router = inject(Router);
+  private readonly pageSize = 20;
 
-  private readonly cuisines: Record<string, CuisineDetails> = {
+  protected readonly cuisine: CuisineDetails;
+  protected readonly cuisineStyle: CuisineStyle;
+  protected readonly currentPage: WritableSignal<number> = signal(1);
+  protected readonly totalPages: WritableSignal<number> = signal(0);
+  protected readonly recipes: WritableSignal<GeneratedRecipe[]> = signal([]);
+  protected readonly isLoading: WritableSignal<boolean> = signal(true);
+  protected readonly loadError: WritableSignal<string | null> = signal(null);
+  protected readonly returnLink: Signal<string> = computed((): string => {
+    const pageQuery: string = this.currentPage() > 1 ? `?page=${this.currentPage()}` : '';
+    return `/cookbook/${this.cuisineStyle}${pageQuery}`;
+  });
+
+  private readonly cuisines: Record<CuisineStyle, CuisineDetails> = {
     fusion: {
       name: 'Fusion',
       bannerSource: 'img/cuisine-recipes/fusion-cuisine-banner.png',
@@ -100,34 +119,102 @@ export class CuisineRecipes {
     },
   };
 
-  private readonly recipeTemplates: RecipeTemplate[] = [
-    {
-      title: 'Pasta with spinach and cherry tomatoes',
-      cookingTime: '20min',
-      likes: 66,
-      tags: ['Vegetarian', 'Quick'],
-    },
-    {
-      title: 'Creamy garlic shrimp pasta',
-      cookingTime: '22min',
-      likes: 32,
-      tags: ['Quick'],
-    },
-    {
-      title: 'Funghi salami pizza',
-      cookingTime: '16min',
-      likes: 42,
-      tags: ['Quick'],
-    },
-  ];
+  constructor() {
+    const cuisineSlug: string =
+      this.activatedRoute.snapshot.paramMap.get('cuisine')?.toLowerCase() ?? 'italian';
+    this.cuisineStyle = this.isCuisineStyle(cuisineSlug) ? cuisineSlug : 'italian';
+    this.cuisine = this.cuisines[this.cuisineStyle];
+  }
 
-  protected readonly recipes: CuisineRecipe[] = Array.from({ length: 15 }, (_, index) => ({
-    ...this.recipeTemplates[index % this.recipeTemplates.length],
-    number: index + 1,
-  }));
+  /** Loads recipe pages whenever the shareable page query changes. */
+  public ngOnInit(): void {
+    this.activatedRoute.queryParamMap
+      .pipe(
+        map((queryParameters): number => this.parsePage(queryParameters.get('page'))),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((page: number): void => {
+        this.currentPage.set(page);
+        this.loadRecipePage(page);
+      });
+  }
 
-  constructor(route: ActivatedRoute) {
-    const cuisineSlug = route.snapshot.paramMap.get('cuisine')?.toLowerCase() ?? 'italian';
-    this.cuisine = this.cuisines[cuisineSlug] ?? this.cuisines['italian'];
+  /** Updates the shareable page query and loads the selected recipe page. */
+  protected selectPage(page: number): void {
+    if (page === this.currentPage() || page < 1 || page > this.totalPages()) return;
+    void this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { page: page === 1 ? null : page },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  /** Repeats the current cuisine request after a recoverable error. */
+  protected retryRecipePage(): void {
+    this.loadRecipePage(this.currentPage());
+  }
+
+  /** Returns one continuous recipe number across all pages. */
+  protected getRecipeNumber(index: number): number {
+    return (this.currentPage() - 1) * this.pageSize + index + 1;
+  }
+
+  /** Converts stored enum values into the tags shown on a recipe card. */
+  protected getRecipeTags(recipe: GeneratedRecipe): string[] {
+    const tags: string[] = [this.toDisplayLabel(recipe.cookingTimeCategory)];
+    if (recipe.dietPreference !== 'unrestricted') {
+      tags.unshift(this.toDisplayLabel(recipe.dietPreference));
+    }
+    return tags;
+  }
+
+  /** Requests one public page for the active cuisine. */
+  private loadRecipePage(page: number): void {
+    this.isLoading.set(true);
+    this.loadError.set(null);
+
+    this.recipeLibraryService
+      .loadRecipes({ cuisineStyle: this.cuisineStyle, page, pageSize: this.pageSize })
+      .subscribe({
+        next: (response): void => {
+          if (response.pagination.totalPages > 0 && page > response.pagination.totalPages) {
+            const lastPage: number = response.pagination.totalPages;
+            void this.router.navigate([], {
+              relativeTo: this.activatedRoute,
+              queryParams: { page: lastPage === 1 ? null : lastPage },
+              queryParamsHandling: 'merge',
+              replaceUrl: true,
+            });
+            return;
+          }
+
+          this.recipes.set(response.recipes);
+          this.totalPages.set(response.pagination.totalPages);
+          this.isLoading.set(false);
+        },
+        error: (): void => {
+          this.recipes.set([]);
+          this.totalPages.set(0);
+          this.loadError.set('The recipes could not be loaded.');
+          this.isLoading.set(false);
+        },
+      });
+  }
+
+  /** Parses a positive route page and falls back to the first page. */
+  private parsePage(value: string | null): number {
+    const page: number = Number(value);
+    return Number.isInteger(page) && page > 0 ? page : 1;
+  }
+
+  /** Checks whether one route value is a supported cuisine style. */
+  private isCuisineStyle(value: string): value is CuisineStyle {
+    return CUISINE_STYLES.some((cuisineStyle: CuisineStyle): boolean => cuisineStyle === value);
+  }
+
+  /** Converts one API enum value into a user-facing label. */
+  private toDisplayLabel(value: string): string {
+    return value.charAt(0).toUpperCase() + value.slice(1);
   }
 }

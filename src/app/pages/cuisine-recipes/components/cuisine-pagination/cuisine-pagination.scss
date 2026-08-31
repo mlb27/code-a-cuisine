@@ -3,7 +3,8 @@
 
 :host {
   display: block;
-  width: functions.px-to-rem(263);
+  width: fit-content;
+  max-width: 100%;
   height: functions.px-to-rem(27);
 }
 
@@ -18,7 +19,7 @@
     display: flex;
     align-items: center;
     gap: functions.px-to-rem(10);
-    width: functions.px-to-rem(163);
+    width: auto;
     height: functions.px-to-rem(27);
   }
 
@@ -52,6 +53,11 @@
     &[aria-current='page'] {
       background-color: variables.$loader-green;
     }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
   }
 
   &__ellipsis {
@@ -61,14 +67,8 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .pagination__button:hover:not([aria-current='page']) {
+  .pagination__button:hover:not([aria-current='page']):not(:disabled) {
     background-color: rgba(variables.$loader-green, 0.4);
-  }
-}
-
-@media (max-width: 767px) {
-  .pagination__button[aria-current='page'] {
-    background-color: transparent;
   }
 }
 @media (prefers-reduced-motion: reduce) {

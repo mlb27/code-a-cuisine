@@ -1,20 +1,39 @@
 <nav class="pagination" aria-label="Recipe pages">
-  <button class="pagination__button" type="button" aria-label="Previous page">&lt;</button>
+  <button
+    class="pagination__button"
+    type="button"
+    aria-label="Previous page"
+    [disabled]="currentPage === 1"
+    (click)="selectPage(currentPage - 1)"
+  >
+    &lt;
+  </button>
 
   <div class="pagination__pages">
-    @for (page of visiblePages; track page) {
-      <button
-        class="pagination__button"
-        type="button"
-        [attr.aria-current]="page === 1 ? 'page' : null"
-      >
-        {{ page }}
-      </button>
+    @for (entry of visibleEntries; track $index) {
+      @if (entry === 'ellipsis') {
+        <span class="pagination__ellipsis" aria-hidden="true">. . .</span>
+      } @else {
+        <button
+          class="pagination__button"
+          type="button"
+          [attr.aria-current]="entry === currentPage ? 'page' : null"
+          [attr.aria-label]="'Page ' + entry"
+          (click)="selectPage(entry)"
+        >
+          {{ entry }}
+        </button>
+      }
     }
-
-    <span class="pagination__ellipsis" aria-hidden="true">. . .</span>
-    <button class="pagination__button" type="button">8</button>
   </div>
 
-  <button class="pagination__button" type="button" aria-label="Next page">&gt;</button>
+  <button
+    class="pagination__button"
+    type="button"
+    aria-label="Next page"
+    [disabled]="currentPage === totalPages"
+    (click)="selectPage(currentPage + 1)"
+  >
+    &gt;
+  </button>
 </nav>

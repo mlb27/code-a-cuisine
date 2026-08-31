@@ -12,7 +12,7 @@
 
 .cuisine-recipes {
   width: functions.px-to-rem(1143);
-  height: functions.px-to-rem(1433);
+  min-height: functions.px-to-rem(1433);
   margin: functions.px-to-rem(40) auto functions.px-to-rem(94);
 
   &__action-bar {
@@ -84,8 +84,35 @@
     flex-direction: column;
     gap: functions.px-to-rem(8);
     width: functions.px-to-rem(900);
-    height: functions.px-to-rem(1102);
+    min-height: functions.px-to-rem(1102);
     margin: functions.px-to-rem(64) auto 0;
+  }
+
+  &__state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: functions.px-to-rem(16);
+    width: 100%;
+    min-height: functions.px-to-rem(120);
+    margin: 0;
+    color: variables.$dark-green;
+    font-size: functions.px-to-rem(20);
+    font-weight: 500;
+    text-align: center;
+
+    button {
+      min-height: functions.px-to-rem(44);
+      padding: functions.px-to-rem(8) functions.px-to-rem(16);
+      border: functions.px-to-rem(2) solid variables.$primary-green;
+      background-color: transparent;
+      color: variables.$primary-green;
+      cursor: pointer;
+    }
+  }
+
+  &__state--error {
+    color: variables.$primary-green;
   }
 
   &__pagination {
@@ -112,7 +139,7 @@
     order: 1;
     width: calc(100% - functions.px-to-rem(35));
     max-width: functions.px-to-rem(340);
-    height: functions.px-to-rem(1579);
+    min-height: 0;
     margin: functions.px-to-rem(40) auto 0;
 
     &__hero {
@@ -137,17 +164,13 @@
 
     &__list {
       width: 100%;
-      height: functions.px-to-rem(1378);
+      min-height: 0;
       margin: functions.px-to-rem(40) 0 0;
       gap: functions.px-to-rem(32);
     }
 
     &__list app-cuisine-recipe-card:nth-child(3n + 1) {
       height: functions.px-to-rem(140);
-    }
-
-    &__list app-cuisine-recipe-card:nth-child(n + 10) {
-      display: none;
     }
 
     &__list app-cuisine-recipe-card:nth-child(even) {
@@ -157,6 +180,12 @@
 
     &__pagination {
       margin: functions.px-to-rem(40) auto 0;
+    }
+
+    &__state {
+      flex-direction: column;
+      min-height: functions.px-to-rem(160);
+      font-size: functions.px-to-rem(18);
     }
 
     &__action-bar {
@@ -187,10 +216,8 @@
 
 @media (max-width: 349px) {
   .cuisine-recipes {
-    height: auto;
-
     &__list {
-      height: auto;
+      min-height: 0;
     }
 
     &__list app-cuisine-recipe-card:nth-child(3n + 1) {

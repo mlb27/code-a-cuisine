@@ -1,4 +1,8 @@
-<a class="recipe-card" routerLink="/recipe">
+<a
+  class="recipe-card"
+  [routerLink]="['/recipe', recipeId]"
+  [queryParams]="{ returnTo: returnLink }"
+>
   <div class="recipe-card__details">
     <span class="recipe-card__number">{{ recipeNumber }}.</span>
 

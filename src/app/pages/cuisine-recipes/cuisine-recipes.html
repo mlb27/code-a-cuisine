@@ -23,17 +23,43 @@
     <h1 [style.top.px]="cuisine.headingTop">{{ cuisine.name }} cuisine</h1>
   </section>
 
-  <section class="cuisine-recipes__list" [attr.aria-label]="cuisine.name + ' recipes'">
-    @for (recipe of recipes; track recipe.number) {
-      <app-cuisine-recipe-card
-        [recipeNumber]="recipe.number"
-        [title]="recipe.title"
-        [cookingTime]="recipe.cookingTime"
-        [likes]="recipe.likes"
-        [tags]="recipe.tags"
-      />
+  <section
+    class="cuisine-recipes__list"
+    [attr.aria-label]="cuisine.name + ' recipes'"
+    [attr.aria-busy]="isLoading()"
+  >
+    @if (isLoading()) {
+      <p class="cuisine-recipes__state" role="status">Loading recipes ...</p>
+    } @else if (loadError(); as errorMessage) {
+      <div class="cuisine-recipes__state cuisine-recipes__state--error" role="alert">
+        <span>{{ errorMessage }}</span>
+        <button type="button" (click)="retryRecipePage()">Try again</button>
+      </div>
+    } @else if (recipes().length === 0) {
+      <p class="cuisine-recipes__state">
+        No {{ cuisine.name.toLowerCase() }} recipes have been generated yet.
+      </p>
+    } @else {
+      @for (recipe of recipes(); track recipe.id; let recipeIndex = $index) {
+        <app-cuisine-recipe-card
+          [recipeId]="recipe.id"
+          [recipeNumber]="getRecipeNumber(recipeIndex)"
+          [title]="recipe.title"
+          [cookingTime]="recipe.cookingTimeMinutes + 'min'"
+          [likes]="recipe.likesCount"
+          [tags]="getRecipeTags(recipe)"
+          [returnLink]="returnLink()"
+        />
+      }
     }
   </section>
 
-  <app-cuisine-pagination class="cuisine-recipes__pagination" />
+  @if (totalPages() > 1) {
+    <app-cuisine-pagination
+      class="cuisine-recipes__pagination"
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      (pageChange)="selectPage($event)"
+    />
+  }
 </main>

@@ -1,4 +1,8 @@
-<a class="recipe-card" routerLink="/recipe">
+<a
+  class="recipe-card"
+  [routerLink]="['/recipe', recipeId]"
+  [queryParams]="{ returnTo: '/cookbook' }"
+>
   <div class="recipe-card__copy">
     <div class="recipe-card__time">
       <svg class="recipe-card__time-icon" viewBox="0 0 20 20" aria-hidden="true">
