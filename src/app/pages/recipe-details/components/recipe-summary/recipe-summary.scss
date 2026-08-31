@@ -48,7 +48,6 @@
   }
 
   &__title {
-    width: 100%;
     min-height: functions.px-to-rem(130);
     margin: functions.px-to-rem(8) 0 0;
     color: variables.$middle-green;
@@ -81,7 +80,6 @@
   &__cook-icon {
     flex: 0 0 auto;
     height: functions.px-to-rem(22);
-    object-fit: contain;
   }
 
   &__metadata {
@@ -94,9 +92,10 @@
 
   &__tags {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: functions.px-to-rem(16);
-    height: functions.px-to-rem(32);
+    min-height: functions.px-to-rem(32);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -105,12 +104,12 @@
   &__tag,
   &__favorite {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: center;
     height: functions.px-to-rem(32);
     border-radius: functions.px-to-rem(30);
     background-color: rgba(variables.$primary-green, 0.2);
-    color: variables.$dark-green;
     font-weight: 500;
   }
 
