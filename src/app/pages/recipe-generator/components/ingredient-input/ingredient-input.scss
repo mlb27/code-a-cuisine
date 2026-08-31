@@ -46,7 +46,6 @@
     display: block;
     height: functions.px-to-rem(20);
     color: variables.$dark-green;
-    font-family: 'Quicksand', sans-serif;
     font-size: functions.px-to-rem(20);
     font-weight: 500;
     line-height: functions.px-to-rem(20);
@@ -63,7 +62,6 @@
     outline: 0;
     background-color: variables.$cream;
     color: variables.$dark-green;
-    font-family: 'Quicksand', sans-serif;
     font-size: functions.px-to-rem(16);
     font-weight: 500;
     line-height: functions.px-to-rem(20);
@@ -96,7 +94,6 @@
     border: 0;
     outline: 0;
     color: variables.$dark-green;
-    font-family: 'Quicksand', sans-serif;
     font-size: functions.px-to-rem(18);
     font-weight: 500;
     line-height: functions.px-to-rem(23);
@@ -121,23 +118,23 @@
   }
 
   &__unit-field {
-    position: relative;
-    z-index: 1;
     width: 100%;
     height: 100%;
-    padding: functions.px-to-rem(8) functions.px-to-rem(22) functions.px-to-rem(8)
-      functions.px-to-rem(8);
+    padding: functions.px-to-rem(6) functions.px-to-rem(16) functions.px-to-rem(6)
+      functions.px-to-rem(12);
     border: 0;
     border-radius: inherit;
     outline: 0;
     background-color: transparent;
-    color: variables.$dark-green;
-    font-family: 'Quicksand', sans-serif;
-    font-size: functions.px-to-rem(16);
+    color: transparent;
     font-weight: 500;
     line-height: functions.px-to-rem(20);
     appearance: none;
     cursor: pointer;
+
+    option {
+      color: variables.$dark-green;
+    }
 
     &:focus-visible {
       outline: functions.px-to-rem(2) solid variables.$middle-green;
@@ -145,11 +142,19 @@
     }
   }
 
+  &__unit-value {
+    position: absolute;
+    top: functions.px-to-rem(8);
+    left: functions.px-to-rem(12);
+    color: variables.$dark-green;
+    font-weight: 500;
+    pointer-events: none;
+  }
+
   &__unit-icon {
     position: absolute;
     top: functions.px-to-rem(15.5);
-    right: functions.px-to-rem(3);
-    z-index: 2;
+    right: functions.px-to-rem(5);
     fill: variables.$dark-green;
     pointer-events: none;
   }
