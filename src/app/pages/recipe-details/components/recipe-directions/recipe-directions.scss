@@ -61,18 +61,19 @@
 
   &__step-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: functions.px-to-rem(16);
     width: 100%;
-    height: functions.px-to-rem(32);
+    min-height: functions.px-to-rem(32);
   }
 
   &__step-heading {
     display: flex;
     flex: 1;
-    align-items: center;
+    align-items: flex-start;
     gap: functions.px-to-rem(8);
-    height: functions.px-to-rem(32);
+    min-width: 0;
+    min-height: functions.px-to-rem(32);
   }
 
   &__step-number {
@@ -90,11 +91,12 @@
   }
 
   &__step-title {
-    height: functions.px-to-rem(30);
+    min-width: 0;
     margin: 0;
     font-size: functions.px-to-rem(24);
     font-weight: 500;
     line-height: functions.px-to-rem(30);
+    overflow-wrap: anywhere;
   }
 
   &__chef {
@@ -164,20 +166,14 @@
       width: 100%;
     }
 
-    &__step-heading {
-      min-width: 0;
-    }
-
     &__step-number {
       font-weight: 600;
     }
 
     &__step-title {
-      height: functions.px-to-rem(23);
       font-size: functions.px-to-rem(18);
       font-weight: 600;
       line-height: functions.px-to-rem(23);
-      white-space: nowrap;
     }
 
     &__description {
