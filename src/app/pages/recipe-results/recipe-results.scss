@@ -290,6 +290,14 @@
   }
 }
 
+@media (max-width: 329px) {
+  .recipe-results {
+    &__visual {
+      margin-top: functions.px-to-rem(35);
+    }
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .recipe-results__generate-link:hover {
     background-color: rgba(variables.$cream-hover, 0.2);
