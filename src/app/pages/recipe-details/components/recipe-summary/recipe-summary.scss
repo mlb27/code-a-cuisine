@@ -147,7 +147,8 @@
   }
 
   &__nutrition-list {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(functions.px-to-rem(80), 1fr));
     gap: functions.px-to-rem(24);
     min-height: functions.px-to-rem(56);
     margin: 0;
@@ -156,6 +157,7 @@
   &__nutrition-item {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     min-height: functions.px-to-rem(56);
 
     dt,
@@ -249,7 +251,7 @@
 
       dt,
       dd {
-        height: functions.px-to-rem(23);
+        min-height: functions.px-to-rem(23);
         font-size: functions.px-to-rem(18);
         font-weight: 600;
         line-height: functions.px-to-rem(23);
@@ -287,7 +289,7 @@
 
 .recipe-summary__nutrition-item dd {
   font-size: functions.px-to-rem(16);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 
   small {
     font-size: functions.px-to-rem(14);
