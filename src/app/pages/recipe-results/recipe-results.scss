@@ -146,6 +146,20 @@
   display: none;
 }
 
+@media (max-width: 1439px) {
+  .recipe-results__recipes {
+    grid-template-columns: repeat(2, functions.px-to-rem(411));
+    width: functions.px-to-rem(846);
+  }
+}
+
+@media (max-width: 925px) {
+  .recipe-results__recipes {
+    grid-template-columns: functions.px-to-rem(411);
+    width: functions.px-to-rem(411);
+  }
+}
+
 @media (max-width: 767px) {
   .recipe-results {
     width: calc(100% - functions.px-to-rem(35));
