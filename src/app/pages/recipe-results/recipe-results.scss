@@ -157,7 +157,7 @@
     &__intro {
       flex-direction: column;
       gap: functions.px-to-rem(16);
-      height: functions.px-to-rem(320);
+      height: auto;
       padding: 0;
     }
 
@@ -197,13 +197,19 @@
     &__description {
       order: 3;
       width: 100%;
-      height: functions.px-to-rem(69);
+      height: auto;
       font-size: functions.px-to-rem(18);
       line-height: functions.px-to-rem(23);
     }
 
     &__preferences {
       order: 4;
+      flex-wrap: wrap;
+      height: auto;
+    }
+
+    &__preference {
+      flex: 0 0 auto;
     }
 
     &__recipes {
