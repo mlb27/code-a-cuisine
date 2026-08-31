@@ -3,6 +3,7 @@
 
 :host {
   display: block;
+  height: 100%;
 }
 
 .recipe-card {
@@ -10,6 +11,7 @@
   flex-direction: column;
   gap: functions.px-to-rem(48);
   width: functions.px-to-rem(411);
+  height: 100%;
   min-height: functions.px-to-rem(338);
   padding: functions.px-to-rem(32) functions.px-to-rem(24);
   border-radius: functions.px-to-rem(20);
@@ -93,6 +95,7 @@
     justify-content: center;
     width: functions.px-to-rem(106);
     height: functions.px-to-rem(60);
+    margin-top: auto;
     background-color: variables.$cream;
     color: variables.$button-green;
     font-family: 'Quicksand', sans-serif;
@@ -125,12 +128,14 @@
 @media (max-width: 767px) {
   :host {
     width: 100%;
+    height: auto;
     min-height: functions.px-to-rem(294);
   }
 
   .recipe-card {
     gap: functions.px-to-rem(32);
     width: 100%;
+    height: auto;
     min-height: functions.px-to-rem(294);
     padding: functions.px-to-rem(32) functions.px-to-rem(24);
 

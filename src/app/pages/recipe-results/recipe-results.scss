@@ -10,7 +10,6 @@
 }
 
 .recipe-results {
-  width: 100%;
   max-width: functions.px-to-rem(1440);
   min-height: functions.px-to-rem(648);
   margin: functions.px-to-rem(64) auto 0;
@@ -18,7 +17,6 @@
   &__intro {
     display: flex;
     gap: functions.px-to-rem(96);
-    width: 100%;
     height: functions.px-to-rem(222);
     padding: 0 functions.px-to-rem(40) 0 functions.px-to-rem(80);
   }
@@ -37,9 +35,7 @@
   }
 
   &__title {
-    width: 100%;
     height: functions.px-to-rem(65);
-    font-family: 'Quicksand', sans-serif;
     font-size: functions.px-to-rem(54);
     font-weight: 600;
     line-height: functions.px-to-rem(65);
@@ -48,7 +44,6 @@
   &__description {
     width: functions.px-to-rem(617);
     height: functions.px-to-rem(60);
-    font-family: 'Quicksand', sans-serif;
     font-size: functions.px-to-rem(24);
     font-weight: 500;
     line-height: functions.px-to-rem(30);
@@ -69,24 +64,20 @@
     border-radius: functions.px-to-rem(30);
     background-color: variables.$cream;
     color: variables.$middle-green;
-    font-family: 'Quicksand', sans-serif;
     font-size: functions.px-to-rem(18);
     font-weight: 500;
     line-height: functions.px-to-rem(23);
   }
 
   &__visual {
-    position: relative;
     flex: 0 0 functions.px-to-rem(574);
     height: functions.px-to-rem(222);
     overflow: hidden;
     margin: 0;
     border-radius: functions.px-to-rem(20);
-    background-color: variables.$white;
   }
 
   &__visual-image {
-    display: block;
     width: 100%;
     height: 100%;
     object-fit: fill;
@@ -95,6 +86,7 @@
   &__recipes {
     display: grid;
     grid-template-columns: repeat(3, functions.px-to-rem(411));
+    grid-auto-rows: 1fr;
     gap: functions.px-to-rem(24);
     width: functions.px-to-rem(1281);
     min-height: functions.px-to-rem(338);
@@ -118,7 +110,6 @@
     padding-inline: functions.px-to-rem(26);
     border-radius: functions.px-to-rem(5);
     color: variables.$cream;
-    font-family: 'Quicksand', sans-serif;
     font-size: functions.px-to-rem(20);
     font-weight: 500;
     line-height: functions.px-to-rem(20);
@@ -147,16 +138,63 @@
 }
 
 @media (max-width: 1439px) {
-  .recipe-results__recipes {
-    grid-template-columns: repeat(2, functions.px-to-rem(411));
-    width: functions.px-to-rem(846);
+  .recipe-results {
+    &__intro {
+      gap: clamp(functions.px-to-rem(32), 6vw, functions.px-to-rem(96));
+      height: auto;
+      padding-inline: functions.px-to-rem(40);
+    }
+
+    &__intro-copy {
+      flex: 1 1 functions.px-to-rem(610);
+      min-width: 0;
+      height: auto;
+    }
+
+    &__title {
+      height: auto;
+    }
+
+    &__description {
+      width: 100%;
+      height: auto;
+    }
+
+    &__visual {
+      flex: 0 1 functions.px-to-rem(574);
+      min-width: 0;
+    }
+
+    &__visual-image {
+      object-fit: cover;
+    }
+
+    &__recipes {
+      grid-template-columns: repeat(2, functions.px-to-rem(411));
+      width: functions.px-to-rem(846);
+    }
   }
 }
 
 @media (max-width: 925px) {
-  .recipe-results__recipes {
-    grid-template-columns: functions.px-to-rem(411);
-    width: functions.px-to-rem(411);
+  .recipe-results {
+    &__intro {
+      flex-direction: column;
+      gap: functions.px-to-rem(32);
+    }
+
+    &__intro-copy {
+      flex: 0 0 auto;
+    }
+
+    &__visual {
+      flex: 0 0 functions.px-to-rem(222);
+    }
+
+    &__recipes {
+      grid-template-columns: functions.px-to-rem(411);
+      width: functions.px-to-rem(411);
+    }
   }
 }
 
@@ -169,9 +207,7 @@
     margin-bottom: functions.px-to-rem(40);
 
     &__intro {
-      flex-direction: column;
       gap: functions.px-to-rem(16);
-      height: auto;
       padding: 0;
     }
 
@@ -197,7 +233,6 @@
     &__visual {
       order: 2;
       flex-basis: functions.px-to-rem(131);
-      width: 100%;
       height: functions.px-to-rem(131);
     }
 
@@ -210,8 +245,6 @@
 
     &__description {
       order: 3;
-      width: 100%;
-      height: auto;
       font-size: functions.px-to-rem(18);
       line-height: functions.px-to-rem(23);
     }
