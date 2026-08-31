@@ -8,7 +8,7 @@
 .preference-tag {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: functions.px-to-rem(12);
 
   &__button {
@@ -45,6 +45,7 @@
     font-size: functions.px-to-rem(14);
     font-weight: 500;
     line-height: functions.px-to-rem(10);
+    text-align: left;
     white-space: nowrap;
   }
 }
