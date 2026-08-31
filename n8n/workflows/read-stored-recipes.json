@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const query = $input.first().json.query ?? {};\nconst generationId = typeof query.generationId === 'string' ? query.generationId.trim() : '';\nconst recipeId = typeof query.recipeId === 'string' ? query.recipeId.trim() : '';\nconst generationIdPattern = /^[a-zA-Z0-9_-]{1,100}$/;\nconst recipeIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\nconst hasOneLookupValue = Boolean(generationId) !== Boolean(recipeId);\nconst isGenerationLookup = Boolean(generationId);\nconst isValid = hasOneLookupValue && (\n  isGenerationLookup\n    ? generationIdPattern.test(generationId)\n    : recipeIdPattern.test(recipeId)\n);\n\nreturn [{\n  json: {\n    isValid,\n    lookupType: isGenerationLookup ? 'generation' : 'recipe',\n    filterColumn: isGenerationLookup ? 'generation_id' : 'id',\n    filterValue: isGenerationLookup ? generationId : recipeId,\n  },\n}];"
+        "jsCode": "const query = $input.first().json.query ?? {};\nconst generationId = typeof query.generationId === 'string' ? query.generationId.trim() : '';\nconst recipeId = typeof query.recipeId === 'string' ? query.recipeId.trim() : '';\nconst view = typeof query.view === 'string' ? query.view.trim().toLowerCase() : '';\nconst cuisineStyle = typeof query.cuisine === 'string' ? query.cuisine.trim().toLowerCase() : '';\nconst sort = typeof query.sort === 'string' ? query.sort.trim().toLowerCase() : 'latest';\nconst page = Number(query.page ?? 1);\nconst pageSize = Number(query.pageSize ?? 20);\nconst generationIdPattern = /^[a-zA-Z0-9_-]{1,100}$/;\nconst recipeIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\nconst cuisineStyles = ['german', 'italian', 'indian', 'japanese', 'gourmet', 'fusion'];\nconst sortOrders = ['latest', 'likes'];\nconst isListLookup = view === 'list';\nconst hasOneLookupValue = Boolean(generationId) !== Boolean(recipeId);\nconst isGenerationLookup = Boolean(generationId);\nconst isValidListLookup = isListLookup\n  && !generationId\n  && !recipeId\n  && (!cuisineStyle || cuisineStyles.includes(cuisineStyle))\n  && sortOrders.includes(sort)\n  && Number.isInteger(page)\n  && page >= 1\n  && Number.isInteger(pageSize)\n  && pageSize >= 1\n  && pageSize <= 20;\nconst isValidDirectLookup = !view\n  && hasOneLookupValue\n  && (isGenerationLookup ? generationIdPattern.test(generationId) : recipeIdPattern.test(recipeId));\n\nreturn [{\n  json: {\n    isValid: isValidListLookup || isValidDirectLookup,\n    lookupType: isListLookup ? 'list' : isGenerationLookup ? 'generation' : 'recipe',\n    filterColumn: isGenerationLookup ? 'generation_id' : 'id',\n    filterValue: isGenerationLookup ? generationId : recipeId,\n    cuisineStyle: cuisineStyle || null,\n    page,\n    pageSize,\n    sort,\n  },\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -60,8 +60,72 @@
     },
     {
       "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f5803e97-7caf-4a42-a1df-1ff3a52365b9",
+              "leftValue": "={{ $json.lookupType }}",
+              "rightValue": "list",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [672, 64],
+      "id": "512459d1-e07b-42d3-9c9c-093ea927a72b",
+      "name": "Is recipe list requested?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oehlaiclgsbpanmvhmtu.supabase.co/rest/v1/rpc/list_public_recipes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { p_cuisine_style: $('Validate lookup request').first().json.cuisineStyle, p_page: $('Validate lookup request').first().json.page, p_page_size: $('Validate lookup request').first().json.pageSize, p_sort: $('Validate lookup request').first().json.sort } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [896, -96],
+      "id": "6ee7ef59-879f-4ccf-934d-8c43ea0b80fe",
+      "name": "List public recipes",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JC4MSAvPxn40CcR3",
+          "name": "Supabase n8n secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const listRequest = $('Validate lookup request').first().json;\nconst rawResponse = $input.first().json;\nconst listResult = Array.isArray(rawResponse) ? rawResponse[0] : rawResponse;\nconst storedRecipes = Array.isArray(listResult?.recipes) ? listResult.recipes : [];\n\nfunction mapRecipe(recipe) {\n  return {\n    id: recipe.id,\n    generationId: recipe.generation_id,\n    createdAt: recipe.created_at,\n    title: recipe.title,\n    summary: recipe.summary,\n    cuisineStyle: recipe.cuisine_style,\n    dietPreference: recipe.diet_preference,\n    cookingTimeCategory: recipe.cooking_time_category,\n    cookingTimeMinutes: recipe.cooking_time_minutes,\n    portionCount: recipe.portion_count,\n    cookingPeopleCount: recipe.cooking_people_count,\n    usedIngredientPercentage: recipe.used_ingredient_percentage,\n    availableIngredients: recipe.available_ingredients,\n    additionalIngredients: recipe.additional_ingredients,\n    nutritionPerPortion: recipe.nutrition_per_portion,\n    nutritionTotal: recipe.nutrition_total,\n    steps: recipe.steps,\n    imageUrl: recipe.image_url,\n    likesCount: recipe.likes_count,\n    isPublic: recipe.is_public,\n  };\n}\n\nconst recipes = storedRecipes\n  .filter(recipe => recipe && typeof recipe.id === 'string')\n  .map(mapRecipe);\nconst totalItems = Number(listResult?.total_items ?? 0);\nconst totalPages = totalItems === 0 ? 0 : Math.ceil(totalItems / listRequest.pageSize);\n\nreturn [{\n  json: {\n    responseBody: {\n      success: true,\n      recipes,\n      pagination: {\n        page: listRequest.page,\n        pageSize: listRequest.pageSize,\n        totalItems,\n        totalPages,\n      },\n    },\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, -96],
+      "id": "e1823e06-b385-48a5-be01-d159081ef96e",
+      "name": "Prepare recipe list response"
+    },
+    {
+      "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { success: false, code: 'INVALID_LOOKUP', message: 'Provide either one generationId or one valid recipeId.' } }}",
+        "responseBody": "={{ { success: false, code: 'INVALID_LOOKUP', message: 'Provide one valid recipe lookup or list request.' } }}",
         "options": {
           "responseCode": 400
         }
@@ -81,7 +145,7 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
-      "position": [672, 64],
+      "position": [896, 96],
       "id": "34a60699-dd65-454f-bbbe-7c6581d11502",
       "name": "Fetch stored recipes",
       "alwaysOutputData": true,
@@ -98,7 +162,7 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [896, 64],
+      "position": [1120, 96],
       "id": "6d397f11-46c0-4866-b7f3-dedfd3bd3f32",
       "name": "Prepare lookup response"
     },
@@ -129,7 +193,7 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
-      "position": [1120, 64],
+      "position": [1344, 96],
       "id": "3818cfcb-63e7-4647-8b67-62c57246982c",
       "name": "Were recipes found?"
     },
@@ -143,7 +207,7 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [1344, -32],
+      "position": [1568, -32],
       "id": "a5e189ea-55b6-4a84-98a2-a5b2e51c6f61",
       "name": "Return stored recipes"
     },
@@ -157,7 +221,7 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [1344, 160],
+      "position": [1568, 160],
       "id": "52ea8145-e0fb-472d-9233-dd30128394ea",
       "name": "Return lookup not found"
     }
@@ -172,9 +236,21 @@
     },
     "Is lookup valid?": {
       "main": [
-        [{ "node": "Fetch stored recipes", "type": "main", "index": 0 }],
+        [{ "node": "Is recipe list requested?", "type": "main", "index": 0 }],
         [{ "node": "Return lookup validation error", "type": "main", "index": 0 }]
       ]
+    },
+    "Is recipe list requested?": {
+      "main": [
+        [{ "node": "List public recipes", "type": "main", "index": 0 }],
+        [{ "node": "Fetch stored recipes", "type": "main", "index": 0 }]
+      ]
+    },
+    "List public recipes": {
+      "main": [[{ "node": "Prepare recipe list response", "type": "main", "index": 0 }]]
+    },
+    "Prepare recipe list response": {
+      "main": [[{ "node": "Return stored recipes", "type": "main", "index": 0 }]]
     },
     "Fetch stored recipes": {
       "main": [[{ "node": "Prepare lookup response", "type": "main", "index": 0 }]]
