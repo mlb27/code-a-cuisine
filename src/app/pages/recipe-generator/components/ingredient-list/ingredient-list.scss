@@ -67,8 +67,8 @@
 
   &__quantity {
     display: flex;
-    flex: 0 0 functions.px-to-rem(62);
-    width: functions.px-to-rem(62);
+    flex: 0 0 functions.px-to-rem(110);
+    width: functions.px-to-rem(110);
     height: functions.px-to-rem(26);
   }
 
@@ -79,6 +79,9 @@
   }
 
   &__amount {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
