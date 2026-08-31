@@ -139,7 +139,7 @@
   }
 
   &__nutrition-title {
-    height: functions.px-to-rem(23);
+    min-height: functions.px-to-rem(23);
     margin: 0 0 functions.px-to-rem(8);
     font-size: functions.px-to-rem(18);
     font-weight: 500;
