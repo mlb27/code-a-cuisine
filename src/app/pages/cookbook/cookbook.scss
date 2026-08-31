@@ -2,7 +2,7 @@
 @use '../../../styles/variables' as variables;
 
 :host {
-  display: block;
+  display: flow-root;
   min-height: functions.px-to-rem(1696);
   background-color: variables.$white;
   color: variables.$dark-green;
