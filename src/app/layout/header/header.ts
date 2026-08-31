@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, UrlTree } from '@angular/router';
 
 export type HeaderBackgroundTheme = 'dark' | 'light';
 
@@ -13,7 +13,7 @@ export type HeaderBackgroundTheme = 'dark' | 'light';
 export class Header {
   @Input() backgroundTheme: HeaderBackgroundTheme = 'dark';
   @Input() backLabel = '';
-  @Input() backLink = '';
+  @Input() backLink: string | UrlTree = '';
   @Input() compact = false;
 
   protected readonly logoPaths: Record<HeaderBackgroundTheme, string> = {

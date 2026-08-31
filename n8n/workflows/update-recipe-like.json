@@ -1,0 +1,209 @@
+{
+  "name": "Update recipe like",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "recipes/like",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:4200"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 160],
+      "id": "3237b06e-2478-44c7-a20b-eae28e8773a2",
+      "name": "Update recipe like webhook",
+      "webhookId": "9fb4239d-13be-4b20-94c9-bcaa3f1ef699"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? {};\nconst recipeId = typeof body.recipeId === 'string' ? body.recipeId.trim() : '';\nconst liked = body.liked;\nconst recipeIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\n\nreturn [{\n  json: {\n    isValid: recipeIdPattern.test(recipeId) && typeof liked === 'boolean',\n    recipeId,\n    liked,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [224, 160],
+      "id": "75570be6-f110-4539-b3c4-b2b5fc29a2e5",
+      "name": "Validate recipe like"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6235a714-7d47-46cd-9104-752506fd5ae0",
+              "leftValue": "={{ $json.isValid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [448, 160],
+      "id": "ae190496-7153-4cad-bd15-70e1fc14e3a1",
+      "name": "Is recipe like valid?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, code: 'INVALID_RECIPE_LIKE', message: 'Provide one valid recipeId and liked state.' } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [672, 288],
+      "id": "63650d89-f7bc-4598-a4e5-f29ae52223c3",
+      "name": "Return like validation error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oehlaiclgsbpanmvhmtu.supabase.co/rest/v1/rpc/set_recipe_like",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { p_recipe_id: $json.recipeId, p_should_like: $json.liked } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [672, 64],
+      "id": "09135994-da6a-46d7-8590-b7c9524036ea",
+      "name": "Persist recipe like",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JC4MSAvPxn40CcR3",
+          "name": "Supabase n8n secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const likeRequest = $('Validate recipe like').first().json;\nconst rawResponse = $input.first().json;\nconst likeResult = Array.isArray(rawResponse) ? rawResponse[0] : rawResponse;\nconst likesCount = Number(likeResult?.likes_count);\nconst found = likeResult?.recipe_id === likeRequest.recipeId && Number.isInteger(likesCount);\nconst responseBody = found\n  ? {\n      success: true,\n      recipeId: likeRequest.recipeId,\n      liked: likeRequest.liked,\n      likesCount,\n    }\n  : {\n      success: false,\n      code: 'RECIPE_NOT_FOUND',\n      message: 'The requested public recipe could not be found.',\n    };\n\nreturn [{ json: { found, responseBody } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [896, 64],
+      "id": "ccdefec8-1ec8-4298-ac58-c3ab3f229ac9",
+      "name": "Prepare recipe like response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c47e1326-b871-44eb-9b72-7e0d9cce5cfd",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [1120, 64],
+      "id": "f3bd32e2-77be-46ca-be89-81b9ad253a09",
+      "name": "Was recipe updated?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.responseBody }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1344, -32],
+      "id": "0512500a-25f1-4d97-ae95-d63872cf100f",
+      "name": "Return updated recipe like"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.responseBody }}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1344, 160],
+      "id": "8628f3e8-3e85-49ea-96bc-7d90f1fcbd1e",
+      "name": "Return recipe like not found"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Update recipe like webhook": {
+      "main": [[{ "node": "Validate recipe like", "type": "main", "index": 0 }]]
+    },
+    "Validate recipe like": {
+      "main": [[{ "node": "Is recipe like valid?", "type": "main", "index": 0 }]]
+    },
+    "Is recipe like valid?": {
+      "main": [
+        [{ "node": "Persist recipe like", "type": "main", "index": 0 }],
+        [{ "node": "Return like validation error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Persist recipe like": {
+      "main": [[{ "node": "Prepare recipe like response", "type": "main", "index": 0 }]]
+    },
+    "Prepare recipe like response": {
+      "main": [[{ "node": "Was recipe updated?", "type": "main", "index": 0 }]]
+    },
+    "Was recipe updated?": {
+      "main": [
+        [{ "node": "Return updated recipe like", "type": "main", "index": 0 }],
+        [{ "node": "Return recipe like not found", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0429c7b2-13ee-4fd7-a789-f595e11f75e6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9f819cdace379d8afeba11bd299f64cd92748f28354faa13c8ea20f924aac48f"
+  },
+  "nodeGroups": [],
+  "id": "updateRecipeLike1",
+  "tags": []
+}

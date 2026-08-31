@@ -6,6 +6,9 @@ export const recipeGenerationWebhookUrl = 'http://localhost:5678/webhook/generat
 /** Public endpoint used to restore stored recipe results. */
 export const recipeLookupWebhookUrl = 'http://localhost:5678/webhook/recipes';
 
+/** Public endpoint used to add or remove one recipe heart. */
+export const recipeLikeWebhookUrl = 'http://localhost:5678/webhook/recipes/like';
+
 /** Makes the workflow URL replaceable for local and hosted environments. */
 export const RECIPE_GENERATION_WEBHOOK_URL = new InjectionToken<string>(
   'RECIPE_GENERATION_WEBHOOK_URL',
@@ -13,3 +16,6 @@ export const RECIPE_GENERATION_WEBHOOK_URL = new InjectionToken<string>(
 
 /** Makes the recipe lookup URL replaceable for local and hosted environments. */
 export const RECIPE_LOOKUP_WEBHOOK_URL = new InjectionToken<string>('RECIPE_LOOKUP_WEBHOOK_URL');
+
+/** Makes the recipe-like URL replaceable for local and hosted environments. */
+export const RECIPE_LIKE_WEBHOOK_URL = new InjectionToken<string>('RECIPE_LIKE_WEBHOOK_URL');

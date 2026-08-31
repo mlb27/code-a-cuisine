@@ -92,6 +92,24 @@ export class RecipeGenerationService {
     );
   }
 
+  /** Synchronizes a changed heart count with cached generation and detail data. */
+  public updateRecipeLikes(recipeId: string, likesCount: number): void {
+    const response: RecipeGenerationResponse | null = this.responseState();
+    if (response?.recipes.some((recipe: GeneratedRecipe): boolean => recipe.id === recipeId)) {
+      this.storeResponse({
+        ...response,
+        recipes: response.recipes.map((recipe: GeneratedRecipe): GeneratedRecipe =>
+          recipe.id === recipeId ? { ...recipe, likesCount } : recipe,
+        ),
+      });
+    }
+
+    const restoredRecipe: GeneratedRecipe | null = this.restoredRecipeState();
+    if (restoredRecipe?.id === recipeId) {
+      this.restoredRecipeState.set({ ...restoredRecipe, likesCount });
+    }
+  }
+
   /** Converts HTTP and workflow errors into safe user-facing information. */
   public getFailure(error: unknown): RecipeGenerationFailure {
     const fallbackFailure: RecipeGenerationFailure = {

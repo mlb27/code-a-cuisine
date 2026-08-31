@@ -84,6 +84,21 @@
       width: functions.px-to-rem(40);
       height: functions.px-to-rem(36);
       fill: currentColor;
+      transition: transform 200ms ease-out;
+    }
+
+    &[aria-pressed='true'] {
+      background-color: rgba(variables.$primary-green, 0.1);
+      color: variables.$primary-green;
+
+      svg {
+        transform: scale(1.08);
+      }
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: wait;
     }
 
     &:focus-visible {
@@ -200,6 +215,10 @@
   .recipe-details__heart-button,
   .recipe-details__cookbook-button,
   .recipe-details__generate-link {
+    transition: none;
+  }
+
+  .recipe-details__heart-button svg {
     transition: none;
   }
 }

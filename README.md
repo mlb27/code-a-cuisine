@@ -10,6 +10,8 @@ Ein responsiver KI-Rezeptgenerator, der aus vorhandenen Zutaten und persönliche
 - Validierung der Eingaben und der generierten Rezepte im n8n-Workflow
 - Lade-, Fehler-, Ergebnis- und Rezeptdetailansichten
 - Dauerhafte Ergebnis- und Rezept-URLs über Supabase
+- Öffentliche Rezeptbibliothek mit Küchenfiltern und Pagination
+- Persistente Herzen mit globalem Like-Zähler
 - Tageslimit pro IP-Adresse und systemweites Tageslimit
 - Cookbook- und Länderküche-Ansichten
 - Responsive Darstellung für Desktop, Widescreen und mobile Geräte
@@ -44,7 +46,7 @@ Das KI-Modell muss strukturierte Ausgaben zuverlässig erzeugen können. Der Wor
 
 1. Ein neues Supabase-Projekt erstellen.
 2. Den SQL Editor des Projekts öffnen.
-3. Den vollständigen Inhalt von `supabase/migrations/20260830150000_create_recipe_generation_backend.sql` einfügen und ausführen.
+3. Die Dateien aus `supabase/migrations/` in der Reihenfolge ihrer Dateinamen vollständig in den SQL Editor einfügen und ausführen.
 4. Die Supabase Project URL und den serverseitigen Secret- beziehungsweise Service-Role-Key bereithalten.
 
 Die Migration erstellt die Tabellen für generierte Rezepte und Nutzungslimits, passende Indizes, Row Level Security sowie die Funktion `consume_generation_quota`.
@@ -52,10 +54,11 @@ Die Migration erstellt die Tabellen für generierte Rezepte und Nutzungslimits, 
 ### 3. n8n einrichten
 
 1. n8n starten und die Benutzeroberfläche öffnen. Bei der lokalen Standardkonfiguration ist sie unter `http://localhost:5678` erreichbar.
-2. Diese beiden Workflows über **Import from File** importieren:
+2. Diese drei Workflows über **Import from File** importieren:
 
    - `n8n/workflows/generate-and-store-recipe-suggestions.json`
    - `n8n/workflows/read-stored-recipes.json`
+   - `n8n/workflows/update-recipe-like.json`
 
 3. In n8n ein Credential vom Typ **Header Auth** mit dem Namen `Supabase n8n secret` anlegen:
 
@@ -67,11 +70,13 @@ Die Migration erstellt die Tabellen für generierte Rezepte und Nutzungslimits, 
    - `Consume generation quota`
    - `Save generated recipes`
    - `Fetch stored recipes`
+   - `List public recipes`
+   - `Persist recipe like`
 
 5. Ein Ollama-Credential mit dem Namen `Ollama account` anlegen und dort die für n8n erreichbare Ollama Base URL eintragen.
 6. Im Modell-Node des Generierungsworkflows ein installiertes Modell auswählen.
-7. In beiden Webhook-Nodes unter **Allowed Origins (CORS)** die Adresse des Frontends eintragen. Lokal ist das `http://localhost:4200`.
-8. Beide Workflows veröffentlichen beziehungsweise aktivieren.
+7. In allen Webhook-Nodes unter **Allowed Origins (CORS)** die Adresse des Frontends eintragen. Lokal ist das `http://localhost:4200`.
+8. Alle drei Workflows veröffentlichen beziehungsweise aktivieren.
 
 Wenn n8n in Docker läuft, verweist `localhost` innerhalb des Containers auf den n8n-Container selbst. Ein Ollama-Server auf einem anderen Rechner muss deshalb über dessen Netzwerkadresse erreichbar sein.
 
@@ -84,6 +89,7 @@ Für die lokale Standardkonfiguration sind bereits diese Endpunkte eingetragen:
 ```text
 http://localhost:5678/webhook/generate-recipe
 http://localhost:5678/webhook/recipes
+http://localhost:5678/webhook/recipes/like
 ```
 
 Falls n8n unter einer anderen Adresse läuft, müssen die Werte in `src/app/shared/config/recipe-api.config.ts` angepasst werden.
@@ -100,7 +106,7 @@ Für einen Produktions-Build kann `npm run build` verwendet werden.
 
 ## Datenspeicherung
 
-Zutaten, Präferenzen und die zuletzt generierte Antwort werden für die aktuelle Browser-Sitzung im SessionStorage gespeichert. Erfolgreich validierte Rezepte werden in Supabase abgelegt. Dadurch können Ergebnis- und Rezeptdetailseiten auch über ihre jeweilige ID neu geladen und direkt aufgerufen werden.
+Zutaten, Präferenzen und die zuletzt generierte Antwort werden für die aktuelle Browser-Sitzung im SessionStorage gespeichert. Erfolgreich validierte Rezepte und ihre globalen Like-Zähler werden in Supabase abgelegt. Dadurch können Ergebnis- und Rezeptdetailseiten auch über ihre jeweilige ID neu geladen und direkt aufgerufen werden. Der Browser merkt sich gelikte Rezept-IDs im LocalStorage, damit ein Herz später wieder entfernt werden kann.
 
 Zur Durchsetzung des Generierungslimits speichert Supabase die IP-Adresse und das zugehörige Datum serverseitig. Einträge, die älter als sieben Tage sind, werden beim nächsten Aufruf der Quota-Funktion entfernt. Bei einer öffentlichen Bereitstellung muss diese Verarbeitung zusätzlich in der Datenschutzerklärung beschrieben werden.
 
@@ -115,9 +121,9 @@ Zur Durchsetzung des Generierungslimits speichert Supabase die IP-Adresse und da
 
 Für eine veröffentlichte Version müssen n8n und das KI-Modell dauerhaft erreichbar sein. Danach sind folgende Werte anzupassen:
 
-1. Die beiden lokalen Webhook-Adressen in `recipe-api.config.ts` durch die veröffentlichten n8n-Adressen ersetzen.
-2. In beiden n8n-Webhooks unter **Allowed Origins (CORS)** die Domain des veröffentlichten Angular-Frontends eintragen.
-3. Beide Workflows in der gehosteten n8n-Instanz importieren, Credentials neu anlegen und veröffentlichen.
+1. Die drei lokalen Webhook-Adressen in `recipe-api.config.ts` durch die veröffentlichten n8n-Adressen ersetzen.
+2. In allen n8n-Webhooks unter **Allowed Origins (CORS)** die Domain des veröffentlichten Angular-Frontends eintragen.
+3. Alle Workflows in der gehosteten n8n-Instanz importieren, Credentials neu anlegen und veröffentlichen.
 4. Prüfen, dass die gehostete n8n-Instanz Supabase und den Ollama-Server erreichen kann.
 
 ## Technologien
