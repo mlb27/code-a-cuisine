@@ -97,7 +97,7 @@
     grid-template-columns: repeat(3, functions.px-to-rem(411));
     gap: functions.px-to-rem(24);
     width: functions.px-to-rem(1281);
-    height: functions.px-to-rem(338);
+    min-height: functions.px-to-rem(338);
     margin: functions.px-to-rem(88) auto 0;
   }
 
@@ -217,7 +217,7 @@
       flex-direction: column;
       gap: functions.px-to-rem(16);
       width: 100%;
-      height: functions.px-to-rem(914);
+      min-height: functions.px-to-rem(914);
       margin-top: functions.px-to-rem(48);
     }
 
@@ -243,11 +243,6 @@
   }
 }
 
-@media (max-width: 349px) {
-  .recipe-results__recipes {
-    height: auto;
-  }
-}
 @media (hover: hover) and (pointer: fine) {
   .recipe-results__generate-link:hover {
     background-color: rgba(variables.$cream-hover, 0.2);

@@ -10,7 +10,7 @@
   flex-direction: column;
   gap: functions.px-to-rem(48);
   width: functions.px-to-rem(411);
-  height: functions.px-to-rem(338);
+  min-height: functions.px-to-rem(338);
   padding: functions.px-to-rem(32) functions.px-to-rem(24);
   border-radius: functions.px-to-rem(20);
   background-color: variables.$card-gray;
@@ -22,7 +22,7 @@
     flex-direction: column;
     gap: functions.px-to-rem(16);
     width: functions.px-to-rem(363);
-    height: functions.px-to-rem(166);
+    min-height: functions.px-to-rem(166);
   }
 
   &__number {
@@ -54,12 +54,12 @@
     flex-direction: column;
     gap: functions.px-to-rem(16);
     width: 100%;
-    height: functions.px-to-rem(120);
+    min-height: functions.px-to-rem(120);
   }
 
   &__title {
     width: 100%;
-    height: functions.px-to-rem(80);
+    min-height: functions.px-to-rem(80);
     margin: 0;
     font-family: 'Quicksand', sans-serif;
     font-size: functions.px-to-rem(32);
@@ -125,18 +125,18 @@
 @media (max-width: 767px) {
   :host {
     width: 100%;
-    height: functions.px-to-rem(294);
+    min-height: functions.px-to-rem(294);
   }
 
   .recipe-card {
     gap: functions.px-to-rem(32);
     width: 100%;
-    height: functions.px-to-rem(294);
+    min-height: functions.px-to-rem(294);
     padding: functions.px-to-rem(32) functions.px-to-rem(24);
 
     &__content {
       width: min(100%, functions.px-to-rem(299));
-      height: functions.px-to-rem(146);
+      min-height: functions.px-to-rem(146);
     }
 
     &__number {
@@ -150,11 +150,11 @@
     }
 
     &__details {
-      height: functions.px-to-rem(100);
+      min-height: functions.px-to-rem(100);
     }
 
     &__title {
-      height: functions.px-to-rem(60);
+      min-height: functions.px-to-rem(60);
       font-size: functions.px-to-rem(24);
       line-height: functions.px-to-rem(30);
     }
@@ -174,22 +174,6 @@
   }
 }
 
-@media (max-width: 349px) {
-  :host,
-  .recipe-card {
-    height: auto;
-    min-height: functions.px-to-rem(294);
-  }
-
-  .recipe-card {
-    &__content,
-    &__details,
-    &__title {
-      height: auto;
-      min-height: functions.px-to-rem(60);
-    }
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .recipe-card,
   .recipe-card__button {
