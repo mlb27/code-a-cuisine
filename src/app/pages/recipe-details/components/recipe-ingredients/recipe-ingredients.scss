@@ -31,15 +31,14 @@
 
   &__title {
     position: absolute;
-    top: functions.px-to-rem(54);
-    left: 50%;
-    height: functions.px-to-rem(40);
-    margin: 0;
-    color: variables.$middle-green;
-    font-size: functions.px-to-rem(32);
-    font-weight: 600;
-    line-height: functions.px-to-rem(40);
-    transform: translateX(-50%);
+    width: functions.px-to-rem(1);
+    height: functions.px-to-rem(1);
+    margin: functions.px-to-rem(-1);
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   &__columns {
@@ -117,13 +116,6 @@
 
     &__heading-picture {
       height: functions.px-to-rem(87);
-    }
-
-    &__title {
-      top: functions.px-to-rem(28.5);
-      height: functions.px-to-rem(30);
-      font-size: functions.px-to-rem(24);
-      line-height: functions.px-to-rem(30);
     }
 
     &__columns {

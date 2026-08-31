@@ -33,15 +33,14 @@
 
   &__title {
     position: absolute;
-    top: functions.px-to-rem(60);
-    left: 50%;
-    height: functions.px-to-rem(40);
-    margin: 0;
-    color: variables.$middle-green;
-    font-size: functions.px-to-rem(32);
-    font-weight: 600;
-    line-height: functions.px-to-rem(40);
-    transform: translateX(-50%);
+    width: functions.px-to-rem(1);
+    height: functions.px-to-rem(1);
+    margin: functions.px-to-rem(-1);
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   &__steps {
@@ -144,13 +143,6 @@
 
     &__heading-image {
       height: functions.px-to-rem(90);
-    }
-
-    &__title {
-      top: functions.px-to-rem(30);
-      height: functions.px-to-rem(30);
-      font-size: functions.px-to-rem(24);
-      line-height: functions.px-to-rem(30);
     }
 
     &__steps {
