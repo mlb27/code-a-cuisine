@@ -55,6 +55,7 @@
     font-size: functions.px-to-rem(54);
     font-weight: 600;
     line-height: functions.px-to-rem(65);
+    overflow-wrap: anywhere;
   }
 
   &__cooks {
@@ -193,7 +194,7 @@
     padding: functions.px-to-rem(24);
 
     &__main {
-      flex-basis: functions.px-to-rem(135);
+      flex: 0 0 auto;
       width: 100%;
       min-height: functions.px-to-rem(135);
     }
