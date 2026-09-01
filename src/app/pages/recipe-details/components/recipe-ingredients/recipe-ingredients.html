@@ -30,7 +30,7 @@
           @for (ingredient of recipe().availableIngredients; track ingredient.name) {
             <li>
               <span class="recipe-ingredients__quantity">{{ formatQuantity(ingredient) }}</span>
-              <span>{{ ingredient.name }}</span>
+              <span class="recipe-ingredients__name">{{ ingredient.name }}</span>
             </li>
           }
         </ul>
@@ -47,10 +47,12 @@
           @for (ingredient of recipe().additionalIngredients; track ingredient.name) {
             <li>
               <span class="recipe-ingredients__quantity">{{ formatQuantity(ingredient) }}</span>
-              <span>{{ ingredient.name }}</span>
+              <span class="recipe-ingredients__name">{{ ingredient.name }}</span>
             </li>
           } @empty {
-            <li>No extra ingredients needed</li>
+            <li class="recipe-ingredients__empty">
+              <span>No extra ingredients needed</span>
+            </li>
           }
         </ul>
       </section>
