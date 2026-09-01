@@ -59,6 +59,23 @@
   }
 }
 
+@media (min-width: 768px) and (max-width: 1439px) {
+  :host {
+    width: 100%;
+    height: auto;
+  }
+
+  .cuisine-card {
+    height: auto;
+
+    &__image-frame {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+    }
+  }
+}
+
 @media (max-width: 767px) {
   :host {
     width: 100%;
