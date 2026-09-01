@@ -137,7 +137,8 @@
 @media (max-width: 767px) {
   :host {
     width: 100%;
-    height: functions.px-to-rem(117);
+    height: auto;
+    min-height: functions.px-to-rem(117);
   }
 
   .recipe-card {
@@ -145,6 +146,8 @@
     align-items: stretch;
     justify-content: flex-start;
     gap: functions.px-to-rem(16);
+    height: auto;
+    min-height: functions.px-to-rem(117);
     padding: functions.px-to-rem(6) functions.px-to-rem(10);
 
     &__details {
@@ -177,12 +180,6 @@
   }
 }
 
-@media (max-width: 349px) {
-  :host {
-    height: auto;
-    min-height: functions.px-to-rem(117);
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .recipe-card {
     transition: none;
