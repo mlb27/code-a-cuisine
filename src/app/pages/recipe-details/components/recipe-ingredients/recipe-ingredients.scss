@@ -120,7 +120,8 @@
 
   .recipe-ingredients {
     &__heading {
-      min-height: functions.px-to-rem(120);
+      height: functions.px-to-rem(87);
+      min-height: 0;
     }
 
     &__heading-picture {
@@ -131,19 +132,19 @@
       flex-direction: column;
       gap: functions.px-to-rem(24);
       width: min(100%, functions.px-to-rem(312));
-      min-height: functions.px-to-rem(242);
+      min-height: 0;
       margin-top: 0;
     }
 
     &__column {
       flex: 0 0 auto;
       width: functions.px-to-rem(264);
-      min-height: functions.px-to-rem(119);
+      min-height: 0;
 
       &--extra {
         flex-basis: auto;
         width: functions.px-to-rem(312);
-        min-height: functions.px-to-rem(99);
+        min-height: 0;
       }
     }
 
@@ -155,13 +156,12 @@
 
     &__list {
       column-gap: functions.px-to-rem(6);
-      min-height: functions.px-to-rem(80);
+      min-height: 0;
       margin-top: functions.px-to-rem(16);
       font-size: functions.px-to-rem(16);
       line-height: functions.px-to-rem(20);
 
       &--extra {
-        min-height: functions.px-to-rem(60);
         margin-top: functions.px-to-rem(16);
       }
     }
@@ -213,10 +213,10 @@
 
 @media (max-width: 767px) {
   .recipe-ingredients {
-    min-height: functions.px-to-rem(420);
+    min-height: 0;
 
     &--collapsed {
-      min-height: functions.px-to-rem(178);
+      min-height: 0;
     }
 
     &__toggle-icon {

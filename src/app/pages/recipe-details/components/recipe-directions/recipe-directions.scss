@@ -150,7 +150,7 @@
       flex-direction: column;
       gap: functions.px-to-rem(32);
       width: 100%;
-      min-height: functions.px-to-rem(675);
+      min-height: 0;
       margin: functions.px-to-rem(24) 0 0;
     }
 
@@ -242,7 +242,7 @@
 
 @media (max-width: 767px) {
   .recipe-directions {
-    min-height: functions.px-to-rem(847);
+    min-height: 0;
 
     &--collapsed {
       min-height: functions.px-to-rem(148);
