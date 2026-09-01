@@ -100,18 +100,38 @@
 
 @media (min-width: 768px) and (max-width: 1439px) {
   :host {
-    flex: 1 1 0;
+    flex: 0 0 calc((100% - functions.px-to-rem(24)) / 3);
     width: auto;
     min-width: 0;
   }
 
   .recipe-card {
+    position: relative;
+    gap: 0;
+
     &__copy {
       flex: 1 1 auto;
+      width: 100%;
+    }
+
+    &__time {
+      padding-right: functions.px-to-rem(58);
+
+      span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     &__title {
       width: 100%;
+    }
+
+    &__likes {
+      position: absolute;
+      top: functions.px-to-rem(16);
+      right: functions.px-to-rem(12);
     }
   }
 }
