@@ -1,0 +1,20 @@
+<ul id="ingredient-suggestions" class="ingredient-suggestions" role="listbox">
+  @for (ingredient of suggestions(); track ingredient; let index = $index) {
+    <li role="presentation">
+      <button
+        [id]="'ingredient-suggestion-' + index"
+        class="ingredient-suggestions__option"
+        type="button"
+        role="option"
+        [class.ingredient-suggestions__option--active]="index === activeIndex()"
+        [attr.aria-selected]="index === activeIndex()"
+        (mousedown)="$event.preventDefault()"
+        (click)="ingredientSelected.emit(ingredient)"
+      >
+        {{ ingredient }}
+      </button>
+    </li>
+  } @empty {
+    <li class="ingredient-suggestions__empty">No matching ingredients</li>
+  }
+</ul>

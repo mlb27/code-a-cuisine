@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   effect,
   ElementRef,
   inject,
@@ -13,9 +14,17 @@ import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
+  ValidatorFn,
 } from '@angular/forms';
 
+import {
+  getIngredientSuggestions,
+  getSupportedIngredient,
+  isSupportedIngredient,
+  normalizeIngredientName,
+} from '../../../../shared/data/supported-ingredients';
 import {
   Ingredient,
   IngredientDraft,
@@ -25,9 +34,20 @@ import {
   IngredientUnitOption,
 } from '../../../../shared/models/ingredient';
 import { RecipeGeneratorService } from '../../../../shared/services/recipe-generator.service';
+import { IngredientSuggestions } from '../ingredient-suggestions/ingredient-suggestions';
 
 const MAX_INGREDIENT_AMOUNT: number = 100000;
 const MAX_INGREDIENT_NAME_LENGTH: number = 50;
+const MINIMUM_SUGGESTION_QUERY_LENGTH: number = 1;
+const MAXIMUM_VISIBLE_SUGGESTIONS: number = 8;
+
+const supportedIngredientValidator: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
+  const value: unknown = control.value;
+  if (typeof value !== 'string' || value.trim().length === 0) return null;
+  return isSupportedIngredient(value) ? null : { unsupportedIngredient: true };
+};
 
 interface IngredientFormControls {
   amount: FormControl<number | null>;
@@ -40,7 +60,7 @@ type IngredientFormGroup = FormGroup<IngredientFormControls>;
 /** Displays and manages the ingredient entry form for the first generator step. */
 @Component({
   selector: 'app-ingredient-input',
-  imports: [ReactiveFormsModule],
+  imports: [IngredientSuggestions, ReactiveFormsModule],
   templateUrl: './ingredient-input.html',
   styleUrl: './ingredient-input.scss',
 })
@@ -54,6 +74,21 @@ export class IngredientInput {
   protected readonly ingredientUnits: readonly IngredientUnitOption[] = INGREDIENT_UNIT_OPTIONS;
   protected readonly submissionError: WritableSignal<string | null> = signal(null);
   protected readonly submitted: WritableSignal<boolean> = signal(false);
+  protected readonly ingredientQuery: WritableSignal<string> = signal('');
+  protected readonly suggestionsOpen: WritableSignal<boolean> = signal(false);
+  protected readonly activeSuggestionIndex: WritableSignal<number> = signal(0);
+  protected readonly ingredientSuggestions: Signal<readonly string[]> = computed(
+    (): readonly string[] => {
+      const normalizedQuery: string = normalizeIngredientName(this.ingredientQuery());
+      if (normalizedQuery.length < MINIMUM_SUGGESTION_QUERY_LENGTH) return [];
+      return getIngredientSuggestions(normalizedQuery, MAXIMUM_VISIBLE_SUGGESTIONS);
+    },
+  );
+  protected readonly suggestionPanelVisible: Signal<boolean> = computed(
+    (): boolean =>
+      this.suggestionsOpen() &&
+      normalizeIngredientName(this.ingredientQuery()).length >= MINIMUM_SUGGESTION_QUERY_LENGTH,
+  );
   protected readonly ingredientForm: IngredientFormGroup = this.formBuilder.group({
     amount: this.formBuilder.control<number | null>(null, [
       Validators.required,
@@ -64,6 +99,7 @@ export class IngredientInput {
       Validators.required,
       Validators.pattern(/\S/),
       Validators.maxLength(MAX_INGREDIENT_NAME_LENGTH),
+      supportedIngredientValidator,
     ]),
     unit: this.formBuilder.nonNullable.control<IngredientUnit>('gram', Validators.required),
   });
@@ -103,12 +139,66 @@ export class IngredientInput {
     this.submissionError.set(null);
   }
 
+  /** Filters and opens the suggestions after the ingredient text changes. */
+  protected onIngredientInput(): void {
+    this.clearSubmissionError();
+    this.ingredientQuery.set(this.ingredientForm.controls.name.value);
+    this.activeSuggestionIndex.set(0);
+    this.suggestionsOpen.set(true);
+  }
+
+  /** Reopens matching suggestions when the ingredient field receives focus. */
+  protected showIngredientSuggestions(): void {
+    this.suggestionsOpen.set(true);
+  }
+
+  /** Closes the suggestion panel when focus leaves the ingredient field. */
+  protected hideIngredientSuggestions(): void {
+    this.suggestionsOpen.set(false);
+  }
+
+  /** Supports keyboard navigation and selection in the ingredient listbox. */
+  protected onIngredientKeydown(event: KeyboardEvent): void {
+    const suggestions: readonly string[] = this.ingredientSuggestions();
+
+    if (event.key === 'Escape') {
+      this.hideIngredientSuggestions();
+      return;
+    }
+    if (suggestions.length === 0) return;
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const direction: number = event.key === 'ArrowDown' ? 1 : -1;
+      const currentIndex: number = this.suggestionsOpen() ? this.activeSuggestionIndex() : 0;
+      this.suggestionsOpen.set(true);
+      this.activeSuggestionIndex.set(
+        (currentIndex + direction + suggestions.length) % suggestions.length,
+      );
+      return;
+    }
+
+    if (event.key === 'Enter' && this.suggestionPanelVisible()) {
+      event.preventDefault();
+      this.selectIngredient(suggestions[this.activeSuggestionIndex()]);
+    }
+  }
+
+  /** Applies one canonical catalog entry to the ingredient form. */
+  protected selectIngredient(ingredient: string): void {
+    this.ingredientForm.controls.name.setValue(ingredient);
+    this.ingredientForm.controls.name.markAsDirty();
+    this.ingredientQuery.set(ingredient);
+    this.hideIngredientSuggestions();
+    this.clearSubmissionError();
+  }
+
   /** Converts the valid form value into the shared ingredient draft shape. */
   private createDraft(): IngredientDraft {
     const formValue = this.ingredientForm.getRawValue();
     return {
       amount: formValue.amount ?? 0,
-      name: formValue.name,
+      name: getSupportedIngredient(formValue.name) ?? formValue.name,
       unit: formValue.unit,
     };
   }
@@ -120,6 +210,8 @@ export class IngredientInput {
       name: ingredient?.name ?? '',
       unit: ingredient?.unit ?? 'gram',
     });
+    this.ingredientQuery.set(ingredient?.name ?? '');
+    this.hideIngredientSuggestions();
     this.submitted.set(false);
     this.submissionError.set(null);
   }
@@ -139,8 +231,11 @@ export class IngredientInput {
 
   /** Returns the validation message belonging to the ingredient name. */
   private getNameError(): string {
-    return this.ingredientForm.controls.name.hasError('maxlength')
-      ? `Use no more than ${MAX_INGREDIENT_NAME_LENGTH} characters.`
+    if (this.ingredientForm.controls.name.hasError('maxlength')) {
+      return `Use no more than ${MAX_INGREDIENT_NAME_LENGTH} characters.`;
+    }
+    return this.ingredientForm.controls.name.hasError('unsupportedIngredient')
+      ? 'Choose an ingredient from the suggestions.'
       : 'Enter an ingredient.';
   }
 

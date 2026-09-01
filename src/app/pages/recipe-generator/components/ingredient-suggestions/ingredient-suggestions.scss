@@ -1,0 +1,46 @@
+@use '../../../../../styles/functions';
+@use '../../../../../styles/variables' as variables;
+
+:host {
+  display: block;
+  width: 100%;
+  margin-top: functions.px-to-rem(4);
+}
+
+.ingredient-suggestions {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: functions.px-to-rem(4) 0;
+  border-radius: functions.px-to-rem(12);
+  background-color: variables.$cream;
+  list-style: none;
+
+  &__option {
+    width: 100%;
+    min-height: functions.px-to-rem(32);
+    padding: functions.px-to-rem(6) functions.px-to-rem(12);
+    border: 0;
+    background-color: transparent;
+    color: variables.$dark-green;
+    font-family: 'Quicksand', sans-serif;
+    font-size: functions.px-to-rem(16);
+    font-weight: 500;
+    line-height: functions.px-to-rem(20);
+    text-align: left;
+    cursor: pointer;
+
+    &--active,
+    &:hover {
+      background-color: rgba(variables.$primary-green, 0.14);
+    }
+  }
+
+  &__empty {
+    padding: functions.px-to-rem(6) functions.px-to-rem(12);
+    color: variables.$middle-green;
+    font-size: functions.px-to-rem(14);
+    line-height: functions.px-to-rem(20);
+  }
+}

@@ -5,7 +5,7 @@
   display: block;
   flex: 0 0 auto;
   width: functions.px-to-rem(577);
-  height: functions.px-to-rem(176);
+  min-height: functions.px-to-rem(176);
 }
 
 .ingredient-input {
@@ -14,7 +14,7 @@
   gap: functions.px-to-rem(32);
   width: 100%;
   min-width: 0;
-  height: 100%;
+  min-height: functions.px-to-rem(176);
   margin: 0;
   padding: functions.px-to-rem(25) functions.px-to-rem(33);
   border: 0;
@@ -34,7 +34,7 @@
   &__ingredient-column {
     flex: 0 0 functions.px-to-rem(301);
     min-width: 0;
-    height: functions.px-to-rem(72);
+    min-height: functions.px-to-rem(72);
   }
 
   &__serving-column {
@@ -211,7 +211,7 @@
   :host {
     width: 100%;
     max-width: functions.px-to-rem(340);
-    height: functions.px-to-rem(211);
+    min-height: functions.px-to-rem(211);
   }
 
   .ingredient-input {
@@ -222,7 +222,7 @@
     &__ingredient-column {
       flex-basis: functions.px-to-rem(70);
       width: 100%;
-      height: functions.px-to-rem(70);
+      min-height: functions.px-to-rem(70);
     }
 
     &__serving-column {

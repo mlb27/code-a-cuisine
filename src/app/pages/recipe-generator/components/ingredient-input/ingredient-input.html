@@ -10,10 +10,30 @@
       formControlName="name"
       maxlength="50"
       autocomplete="off"
+      role="combobox"
+      aria-autocomplete="list"
+      aria-controls="ingredient-suggestions"
       aria-describedby="ingredient-form-feedback"
+      [attr.aria-expanded]="suggestionPanelVisible()"
+      [attr.aria-activedescendant]="
+        suggestionPanelVisible() && ingredientSuggestions().length > 0
+          ? 'ingredient-suggestion-' + activeSuggestionIndex()
+          : null
+      "
       [attr.aria-invalid]="showError(ingredientForm.controls.name)"
-      (input)="clearSubmissionError()"
+      (focus)="showIngredientSuggestions()"
+      (input)="onIngredientInput()"
+      (keydown)="onIngredientKeydown($event)"
+      (blur)="hideIngredientSuggestions()"
     />
+
+    @if (suggestionPanelVisible()) {
+      <app-ingredient-suggestions
+        [suggestions]="ingredientSuggestions()"
+        [activeIndex]="activeSuggestionIndex()"
+        (ingredientSelected)="selectIngredient($event)"
+      />
+    }
   </div>
 
   <div class="ingredient-input__serving-column">
@@ -51,7 +71,7 @@
           }
         </select>
 
-        <span class='ingredient-input__unit-value' aria-hidden='true'>
+        <span class="ingredient-input__unit-value" aria-hidden="true">
           {{ ingredientForm.controls.unit.value }}
         </span>
 
