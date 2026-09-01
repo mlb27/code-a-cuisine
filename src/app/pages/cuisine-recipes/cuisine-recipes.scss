@@ -226,6 +226,13 @@
     }
   }
 }
+
+@media (max-width: 380px) {
+  .cuisine-recipes__hero img {
+    object-fit: contain;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .cuisine-recipes__generate-button:hover {
     background-color: variables.$button-green-hover;
