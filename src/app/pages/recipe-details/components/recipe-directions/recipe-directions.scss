@@ -131,6 +131,19 @@
   display: none;
 }
 
+@media (min-width: 768px) and (max-width: 1439px) {
+  .recipe-directions {
+    &__heading {
+      height: auto;
+      aspect-ratio: 1152 / 134;
+    }
+
+    &__heading-image {
+      height: 100%;
+    }
+  }
+}
+
 @media (max-width: 767px) {
   :host {
     min-height: 0;

@@ -113,6 +113,13 @@
   display: none;
 }
 
+@media (min-width: 768px) and (max-width: 1439px) {
+  .recipe-ingredients__heading {
+    height: auto;
+    aspect-ratio: 1152 / 148;
+  }
+}
+
 @media (max-width: 767px) {
   :host {
     min-height: 0;
