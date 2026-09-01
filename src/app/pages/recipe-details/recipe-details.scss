@@ -194,6 +194,42 @@
   }
 }
 
+@media (min-width: 768px) and (max-width: 1439px) {
+  .recipe-details {
+    width: min(calc(100% - functions.px-to-rem(64)), functions.px-to-rem(1248));
+
+    &__card {
+      padding: functions.px-to-rem(32);
+    }
+
+    &__meal-feedback {
+      width: min(100%, functions.px-to-rem(709));
+      height: auto;
+    }
+
+    &__feedback-copy {
+      flex: 1 1 auto;
+      flex-wrap: wrap;
+      width: auto;
+      height: auto;
+      white-space: normal;
+    }
+
+    &__cookbook-promo {
+      flex-wrap: wrap;
+      height: auto;
+      min-height: functions.px-to-rem(142);
+      padding: functions.px-to-rem(24);
+
+      h2 {
+        flex: 1 1 functions.px-to-rem(420);
+        width: auto;
+        height: auto;
+      }
+    }
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .recipe-details {
     &__heart-button:hover {

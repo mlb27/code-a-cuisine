@@ -141,6 +141,16 @@
     &__heading-image {
       height: 100%;
     }
+
+    &__steps {
+      grid-template-columns: repeat(auto-fit, minmax(functions.px-to-rem(320), 1fr));
+      column-gap: functions.px-to-rem(32);
+      width: min(100%, functions.px-to-rem(864));
+    }
+
+    &__step {
+      width: 100%;
+    }
   }
 }
 

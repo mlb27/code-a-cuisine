@@ -114,9 +114,21 @@
 }
 
 @media (min-width: 768px) and (max-width: 1439px) {
-  .recipe-ingredients__heading {
-    height: auto;
-    aspect-ratio: 1152 / 148;
+  .recipe-ingredients {
+    &__heading {
+      height: auto;
+      aspect-ratio: 1152 / 148;
+    }
+
+    &__columns {
+      gap: clamp(functions.px-to-rem(24), 5vw, functions.px-to-rem(80));
+      width: min(100%, functions.px-to-rem(730));
+    }
+
+    &__column,
+    &__column--extra {
+      flex: 1 1 0;
+    }
   }
 }
 

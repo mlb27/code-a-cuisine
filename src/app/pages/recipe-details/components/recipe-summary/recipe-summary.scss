@@ -180,6 +180,15 @@
     }
   }
 }
+
+@media (min-width: 768px) and (max-width: 1439px) {
+  .recipe-summary {
+    display: grid;
+    align-items: stretch;
+    gap: functions.px-to-rem(32);
+  }
+}
+
 @media (max-width: 767px) {
   :host {
     min-height: 0;
@@ -261,14 +270,6 @@
 }
 
 @media (max-width: 349px) {
-  :host,
-  .recipe-summary,
-  .recipe-summary__main,
-  .recipe-summary__title,
-  .recipe-summary__metadata {
-    height: auto;
-  }
-
   .recipe-summary {
     min-height: functions.px-to-rem(372);
   }
