@@ -35,6 +35,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/angular-projects/code-a-cuisine/",
               "budgets": [
                 {
                   "type": "initial",

@@ -126,6 +126,18 @@ Für eine veröffentlichte Version müssen n8n und das KI-Modell dauerhaft errei
 3. Alle Workflows in der gehosteten n8n-Instanz importieren, Credentials neu anlegen und veröffentlichen.
 4. Prüfen, dass die gehostete n8n-Instanz Supabase und den Ollama-Server erreichen kann.
 
+### Angular unter einem Server-Unterpfad bereitstellen
+
+Der Production-Build verwendet den Basis-Pfad `/angular-projects/code-a-cuisine/`. Der normale Build-Befehl reicht deshalb aus:
+
+```bash
+npm run build
+```
+
+Anschließend den kompletten Inhalt von `dist/code-a-cuisine/browser/` direkt nach `/angular-projects/code-a-cuisine/` auf dem Server kopieren. Der Ordner `browser` selbst wird nicht mit hochgeladen. Die `index.html` muss danach also direkt unter `/angular-projects/code-a-cuisine/index.html` liegen.
+
+Damit direkt aufgerufene Angular-Routen funktionieren, muss der Webserver Anfragen unter `/angular-projects/code-a-cuisine/`, die keine vorhandene Datei treffen, auf die dortige `index.html` zurückleiten. Nach einem neuen Upload verhindert ein Hard-Reload mit `Ctrl + F5`, dass eine alte `index.html` aus dem Browser-Cache verwendet wird.
+
 ## Technologien
 
 - Angular
