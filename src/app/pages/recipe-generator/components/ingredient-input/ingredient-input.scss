@@ -220,7 +220,7 @@
     padding: functions.px-to-rem(25) functions.px-to-rem(20);
 
     &__ingredient-column {
-      flex-basis: functions.px-to-rem(70);
+      flex-basis: auto;
       width: 100%;
       min-height: functions.px-to-rem(70);
     }
