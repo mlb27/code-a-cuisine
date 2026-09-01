@@ -26,12 +26,6 @@
     max-width: none;
   }
 
-  &__mobile-visual {
-    display: none;
-    position: absolute;
-    max-width: none;
-  }
-
   &__main-cta {
     position: absolute;
     top: functions.px-to-rem(104);
@@ -182,32 +176,10 @@
     }
 
     &__visual {
-      display: none;
-    }
-
-    &__mobile-visual {
-      display: block;
-
-      &--chicken {
-        top: functions.px-to-rem(-31);
-        left: max(functions.px-to-rem(234), calc(100% - functions.px-to-rem(141)));
-        width: functions.px-to-rem(141);
-        height: functions.px-to-rem(304);
-      }
-
-      &--salmon {
-        top: functions.px-to-rem(235);
-        left: max(functions.px-to-rem(233), calc(100% - functions.px-to-rem(142)));
-        width: functions.px-to-rem(142);
-        height: functions.px-to-rem(311);
-      }
-
-      &--steak {
-        top: functions.px-to-rem(518);
-        left: max(functions.px-to-rem(216.6), calc(100% - functions.px-to-rem(158.4)));
-        width: functions.px-to-rem(158.4);
-        height: functions.px-to-rem(266.77);
-      }
+      top: functions.px-to-rem(-31);
+      left: max(functions.px-to-rem(241.6), calc(100% - functions.px-to-rem(158.4)));
+      width: functions.px-to-rem(258.4);
+      height: auto;
     }
 
     &__main-cta {
