@@ -1,6 +1,11 @@
 import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 
 import {
+  getSupportedIngredient,
+  isSupportedIngredient,
+  normalizeIngredientName,
+} from '../data/supported-ingredients';
+import {
   Ingredient,
   IngredientDraft,
   IngredientSaveResult,
@@ -192,24 +197,27 @@ export class RecipeGeneratorService {
 
   /** Normalizes text and numeric values before they enter the state. */
   private normalizeDraft(draft: IngredientDraft): IngredientDraft {
+    const supportedIngredient: string | null = getSupportedIngredient(draft.name);
     return {
       amount: Number.isFinite(draft.amount) ? draft.amount : 0,
-      name: draft.name.trim().replace(/\s+/g, ' '),
+      name: supportedIngredient ?? draft.name.trim().replace(/\s+/g, ' '),
       unit: draft.unit,
     };
   }
 
   /** Returns whether a submitted draft has a valid shape. */
   private isDraftValid(draft: IngredientDraft): boolean {
-    return draft.name.length > 0 && draft.amount > 0 && this.isIngredientUnit(draft.unit);
+    return (
+      isSupportedIngredient(draft.name) && draft.amount > 0 && this.isIngredientUnit(draft.unit)
+    );
   }
 
   /** Returns whether another ingredient already uses the submitted name. */
   private hasDuplicateName(name: string, excludedId: number | null): boolean {
-    const normalizedName: string = name.toLocaleLowerCase();
+    const normalizedName: string = normalizeIngredientName(name);
     return this.ingredientsState().some(
       (ingredient: Ingredient): boolean =>
-        ingredient.id !== excludedId && ingredient.name.toLocaleLowerCase() === normalizedName,
+        ingredient.id !== excludedId && normalizeIngredientName(ingredient.name) === normalizedName,
     );
   }
 
@@ -355,6 +363,7 @@ export class RecipeGeneratorService {
     return (
       Number.isInteger(ingredient.id) &&
       typeof ingredient.name === 'string' &&
+      isSupportedIngredient(ingredient.name) &&
       typeof ingredient.amount === 'number' &&
       ingredient.amount > 0 &&
       this.isIngredientUnit(ingredient.unit)
