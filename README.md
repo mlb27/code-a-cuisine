@@ -84,15 +84,15 @@ Die Angular-App verwendet die Production-Webhooks. Test-Webhooks funktionieren n
 
 ### 4. Webhook-Adressen prüfen
 
-Für die lokale Standardkonfiguration sind bereits diese Endpunkte eingetragen:
+Für die veröffentlichte Version sind diese Production-Endpunkte eingetragen:
 
 ```text
-http://localhost:5678/webhook/generate-recipe
-http://localhost:5678/webhook/recipes
-http://localhost:5678/webhook/recipes/like
+https://morleon.app.n8n.cloud/webhook/generate-recipe
+https://morleon.app.n8n.cloud/webhook/recipes
+https://morleon.app.n8n.cloud/webhook/recipes/like
 ```
 
-Falls n8n unter einer anderen Adresse läuft, müssen die Werte in `src/app/shared/config/recipe-api.config.ts` angepasst werden.
+Für eine eigene lokale oder gehostete n8n-Instanz müssen die Werte in `src/app/shared/config/recipe-api.config.ts` angepasst werden.
 
 ### 5. Angular starten
 
@@ -119,9 +119,9 @@ Zur Durchsetzung des Generierungslimits speichert Supabase die IP-Adresse und da
 
 ## Deployment
 
-Für eine veröffentlichte Version müssen n8n und das KI-Modell dauerhaft erreichbar sein. Danach sind folgende Werte anzupassen:
+Für eine veröffentlichte Version müssen n8n und das KI-Modell dauerhaft erreichbar sein. Dabei sind folgende Punkte zu prüfen:
 
-1. Die drei lokalen Webhook-Adressen in `recipe-api.config.ts` durch die veröffentlichten n8n-Adressen ersetzen.
+1. In `recipe-api.config.ts` müssen die Production-Webhooks der veröffentlichten n8n-Instanz eingetragen sein.
 2. In allen n8n-Webhooks unter **Allowed Origins (CORS)** die Domain des veröffentlichten Angular-Frontends eintragen.
 3. Alle Workflows in der gehosteten n8n-Instanz importieren, Credentials neu anlegen und veröffentlichen.
 4. Prüfen, dass die gehostete n8n-Instanz Supabase und den Ollama-Server erreichen kann.

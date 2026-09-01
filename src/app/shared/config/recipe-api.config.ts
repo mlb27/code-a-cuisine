@@ -1,13 +1,14 @@
 import { InjectionToken } from '@angular/core';
 
 /** Public endpoint used to start the recipe-generation workflow. */
-export const recipeGenerationWebhookUrl = 'http://localhost:5678/webhook/generate-recipe';
+export const recipeGenerationWebhookUrl =
+  'https://morleon.app.n8n.cloud/webhook/generate-recipe';
 
 /** Public endpoint used to restore stored recipe results. */
-export const recipeLookupWebhookUrl = 'http://localhost:5678/webhook/recipes';
+export const recipeLookupWebhookUrl = 'https://morleon.app.n8n.cloud/webhook/recipes';
 
 /** Public endpoint used to add or remove one recipe heart. */
-export const recipeLikeWebhookUrl = 'http://localhost:5678/webhook/recipes/like';
+export const recipeLikeWebhookUrl = 'https://morleon.app.n8n.cloud/webhook/recipes/like';
 
 /** Makes the workflow URL replaceable for local and hosted environments. */
 export const RECIPE_GENERATION_WEBHOOK_URL = new InjectionToken<string>(
