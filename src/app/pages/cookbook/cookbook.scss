@@ -73,7 +73,7 @@
     display: flex;
     align-items: center;
     gap: functions.px-to-rem(16);
-    height: functions.px-to-rem(30);
+    min-height: functions.px-to-rem(30);
     color: variables.$middle-green;
 
     h2 {
@@ -217,14 +217,15 @@
     &__overview {
       flex-direction: column;
       gap: functions.px-to-rem(24);
-      height: functions.px-to-rem(360);
+      height: auto;
+      min-height: functions.px-to-rem(360);
       padding: functions.px-to-rem(16) functions.px-to-rem(10);
     }
 
     &__intro {
-      flex-basis: functions.px-to-rem(152);
+      flex-basis: auto;
       width: 100%;
-      height: functions.px-to-rem(152);
+      min-height: functions.px-to-rem(152);
     }
 
     &__title {
@@ -234,15 +235,15 @@
     }
 
     &__description {
-      height: functions.px-to-rem(92);
+      min-height: functions.px-to-rem(92);
       font-size: functions.px-to-rem(18);
       line-height: functions.px-to-rem(23);
     }
 
     &__most-liked {
-      flex-basis: functions.px-to-rem(152);
+      flex-basis: auto;
       width: 100%;
-      height: functions.px-to-rem(152);
+      min-height: functions.px-to-rem(152);
       margin-top: 0;
     }
 
@@ -256,7 +257,7 @@
       gap: functions.px-to-rem(24);
       width: calc(100% - functions.px-to-rem(20));
       max-width: functions.px-to-rem(320);
-      height: functions.px-to-rem(1938);
+      height: auto;
       margin: 0 auto;
     }
 
@@ -275,23 +276,6 @@
   }
 }
 
-@media (max-width: 349px) {
-  .cookbook {
-    &__overview,
-    &__intro,
-    &__description {
-      height: auto;
-    }
-
-    &__overview {
-      min-height: functions.px-to-rem(360);
-    }
-
-    &__intro {
-      flex-basis: auto;
-    }
-  }
-}
 @media (hover: hover) and (pointer: fine) {
   .cookbook__generate-link:hover {
     background-color: rgba(variables.$primary-green, 0.1);

@@ -80,11 +80,16 @@
   :host {
     width: 100%;
     max-width: functions.px-to-rem(320);
-    height: functions.px-to-rem(303);
+    height: auto;
   }
 
   .cuisine-card {
-    height: functions.px-to-rem(303);
+    height: auto;
+
+    &__title {
+      height: auto;
+      min-height: functions.px-to-rem(35);
+    }
 
     &__image-frame {
       width: 100%;
