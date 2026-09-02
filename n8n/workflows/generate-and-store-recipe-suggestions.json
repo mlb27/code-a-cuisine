@@ -1,564 +1,493 @@
 ﻿{
-    "name":  "Generate and store recipe suggestions",
-    "nodes":  [
-                  {
-                      "parameters":  {
-                                         "httpMethod":  "POST",
-                                         "path":  "generate-recipe",
-                                         "responseMode":  "responseNode",
-                                         "options":  {
-                                                         "allowedOrigins":  "https://moritz-boehm.developerakademie.net"
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.webhook",
-                      "typeVersion":  2.1,
-                      "position":  [
-                                       -1120,
-                                       352
-                                   ],
-                      "id":  "d25495cd-14c8-4253-82d1-aebcbcc80b64",
-                      "name":  "Webhook",
-                      "webhookId":  "77d0c6dc-ea4b-408f-b484-361e998b8017"
-                  },
-                  {
-                      "parameters":  {
-                                         "respondWith":  "json",
-                                         "responseBody":  "={{ $json }}",
-                                         "options":  {
-                                                         "responseCode":  201
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.respondToWebhook",
-                      "typeVersion":  1.5,
-                      "position":  [
-                                       1472,
-                                       16
-                                   ],
-                      "id":  "868e063c-e9ba-4a2d-9542-dc79f3868a0c",
-                      "name":  "Return generated recipes"
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "const MAX_INGREDIENTS = 30;\nconst MAX_INGREDIENT_AMOUNT = 100000;\nconst MAX_INGREDIENT_NAME_LENGTH = 50;\n\nconst ALLOWED_COOKING_TIMES = [\"quick\", \"medium\", \"complex\"];\nconst ALLOWED_CUISINES = [\n  \"german\",\n  \"italian\",\n  \"indian\",\n  \"japanese\",\n  \"gourmet\",\n  \"fusion\",\n];\nconst ALLOWED_DIETS = [\"vegetarian\", \"vegan\", \"keto\", \"unrestricted\"];\nconst ALLOWED_UNITS = [\"gram\", \"liter\", \"piece\"];\n\nconst input = $input.first().json;\nconst bodyIsObject =\n  typeof input.body === \"object\" \u0026\u0026\n  input.body !== null \u0026\u0026\n  !Array.isArray(input.body);\n\nconst request = bodyIsObject ? input.body : {};\nconst validationErrors = [];\n\nif (!bodyIsObject) {\n  validationErrors.push(\"Request body must be a JSON object.\");\n}\n\nvalidateInteger(request.portionCount, 1, 12, \"Portion count\");\nvalidateInteger(request.cookingPeopleCount, 1, 3, \"Cooking people count\");\nvalidateOption(request.cookingTime, ALLOWED_COOKING_TIMES, \"Cooking time\");\nvalidateOption(request.cuisineStyle, ALLOWED_CUISINES, \"Cuisine style\");\nvalidateOption(request.dietPreference, ALLOWED_DIETS, \"Diet preference\");\nvalidateIngredients(request.ingredients);\n\nconst isValid = validationErrors.length === 0;\nconst validatedRequest = isValid\n  ? {\n      cookingPeopleCount: request.cookingPeopleCount,\n      cookingTime: request.cookingTime,\n      cuisineStyle: request.cuisineStyle,\n      dietPreference: request.dietPreference,\n      ingredients: request.ingredients.map(({ amount, name, unit }) =\u003e ({\n        amount,\n        name: name.trim(),\n        unit,\n      })),\n      portionCount: request.portionCount,\n    }\n  : null;\n\nreturn [\n  {\n    json: {\n      clientIp: getClientIp(input.headers),\n      isValid,\n      request: validatedRequest,\n      validationErrors,\n    },\n  },\n];\n\nfunction validateInteger(value, minimum, maximum, label) {\n  if (!Number.isInteger(value) || value \u003c minimum || value \u003e maximum) {\n    validationErrors.push(\n      `${label} must be between ${minimum} and ${maximum}.`,\n    );\n  }\n}\n\nfunction validateOption(value, allowedValues, label) {\n  if (!allowedValues.includes(value)) {\n    validationErrors.push(`${label} is invalid.`);\n  }\n}\n\nfunction validateIngredients(ingredients) {\n  if (!Array.isArray(ingredients) || ingredients.length === 0) {\n    validationErrors.push(\"At least one ingredient is required.\");\n    return;\n  }\n\n  if (ingredients.length \u003e MAX_INGREDIENTS) {\n    validationErrors.push(\n      `No more than ${MAX_INGREDIENTS} ingredients are allowed.`,\n    );\n  }\n\n  ingredients.forEach(validateIngredient);\n}\n\nfunction validateIngredient(ingredient, index) {\n  if (\n    typeof ingredient !== \"object\" ||\n    ingredient === null ||\n    Array.isArray(ingredient)\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} is invalid.`);\n    return;\n  }\n\n  validateIngredientName(ingredient.name, index);\n  validateIngredientAmount(ingredient.amount, index);\n\n  if (!ALLOWED_UNITS.includes(ingredient.unit)) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid unit.`);\n  }\n}\n\nfunction validateIngredientName(name, index) {\n  if (\n    typeof name !== \"string\" ||\n    name.trim().length === 0 ||\n    name.trim().length \u003e MAX_INGREDIENT_NAME_LENGTH\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid name.`);\n  }\n}\n\nfunction validateIngredientAmount(amount, index) {\n  if (\n    typeof amount !== \"number\" ||\n    !Number.isFinite(amount) ||\n    amount \u003c 0.01 ||\n    amount \u003e MAX_INGREDIENT_AMOUNT\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid amount.`);\n  }\n}\n\nfunction getClientIp(headers = {}) {\n  const forwardedIp = headers[\"x-forwarded-for\"];\n\n  if (typeof forwardedIp === \"string\" \u0026\u0026 forwardedIp.length \u003e 0) {\n    return forwardedIp.split(\",\")[0].trim();\n  }\n\n  const realIp = headers[\"x-real-ip\"];\n  return typeof realIp === \"string\" \u0026\u0026 realIp.length \u003e 0\n    ? realIp.trim()\n    : \"127.0.0.1\";\n}\n"
-                                     },
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       -896,
-                                       352
-                                   ],
-                      "id":  "9de8728c-dd40-405b-96db-27afa6f7d6aa",
-                      "name":  "Validate recipe request"
-                  },
-                  {
-                      "parameters":  {
-                                         "conditions":  {
-                                                            "options":  {
-                                                                            "caseSensitive":  true,
-                                                                            "leftValue":  "",
-                                                                            "typeValidation":  "strict",
-                                                                            "version":  3
-                                                                        },
-                                                            "conditions":  [
-                                                                               {
-                                                                                   "id":  "ca570be8-f225-4c0e-9f98-bd418221619a",
-                                                                                   "leftValue":  "={{ $json.isValid }}",
-                                                                                   "rightValue":  "",
-                                                                                   "operator":  {
-                                                                                                    "type":  "boolean",
-                                                                                                    "operation":  "true",
-                                                                                                    "singleValue":  true
-                                                                                                }
-                                                                               }
-                                                                           ],
-                                                            "combinator":  "and"
-                                                        },
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.if",
-                      "typeVersion":  2.3,
-                      "position":  [
-                                       -672,
-                                       352
-                                   ],
-                      "id":  "d2a9d7eb-3087-43f2-aa5e-8dd794bfb7a6",
-                      "name":  "Is request valid?"
-                  },
-                  {
-                      "parameters":  {
-                                         "respondWith":  "json",
-                                         "responseBody":  "={{ {\n  success: false,\n  code: \u0027INVALID_REQUEST\u0027,\n  message: \u0027The recipe request contains invalid data.\u0027,\n  validationErrors: $json.validationErrors\n} }}",
-                                         "options":  {
-                                                         "responseCode":  400
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.respondToWebhook",
-                      "typeVersion":  1.5,
-                      "position":  [
-                                       -448,
-                                       448
-                                   ],
-                      "id":  "1c1a2cb7-1e44-4d20-a3f1-def0df4ccfc6",
-                      "name":  "Return validation error"
-                  },
-                  {
-                      "parameters":  {
-                                         "method":  "POST",
-                                         "url":  "https://oehlaiclgsbpanmvhmtu.supabase.co/rest/v1/rpc/consume_generation_quota",
-                                         "authentication":  "genericCredentialType",
-                                         "genericAuthType":  "httpHeaderAuth",
-                                         "sendBody":  true,
-                                         "specifyBody":  "json",
-                                         "jsonBody":  "={{ {\n  p_ip_address: $json.clientIp\n} }}",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.httpRequest",
-                      "typeVersion":  4.5,
-                      "position":  [
-                                       -448,
-                                       256
-                                   ],
-                      "id":  "b59806ac-debb-453b-be7a-36221d1b9be0",
-                      "name":  "Consume generation quota",
-                      "credentials":  {
-                                          "httpHeaderAuth":  {
-                                                                 "id":  "zRJCJKoVqAzy2xcz",
-                                                                 "name":  "Supabase n8n secret"
-                                                             }
-                                      }
-                  },
-                  {
-                      "parameters":  {
-                                         "conditions":  {
-                                                            "options":  {
-                                                                            "caseSensitive":  true,
-                                                                            "leftValue":  "",
-                                                                            "typeValidation":  "strict",
-                                                                            "version":  3
-                                                                        },
-                                                            "conditions":  [
-                                                                               {
-                                                                                   "id":  "58bd0d86-1384-4ce1-b8c3-4fa0955f7fe8",
-                                                                                   "leftValue":  "={{ $json.allowed }}",
-                                                                                   "rightValue":  "",
-                                                                                   "operator":  {
-                                                                                                    "type":  "boolean",
-                                                                                                    "operation":  "true",
-                                                                                                    "singleValue":  true
-                                                                                                }
-                                                                               }
-                                                                           ],
-                                                            "combinator":  "and"
-                                                        },
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.if",
-                      "typeVersion":  2.3,
-                      "position":  [
-                                       -224,
-                                       256
-                                   ],
-                      "id":  "542aa933-82b0-4cd8-99c4-4b160cbd792c",
-                      "name":  "Is quota available?"
-                  },
-                  {
-                      "parameters":  {
-                                         "respondWith":  "json",
-                                         "responseBody":  "={{ {\n  success: false,\n  code: $json.rejection_code,\n  message:\n    $json.rejection_code === \u0027IP_DAILY_LIMIT_REACHED\u0027\n      ? \u0027You have reached your daily limit of 3 recipe generations.\u0027\n      : $json.rejection_code === \u0027SYSTEM_DAILY_LIMIT_REACHED\u0027\n        ? \u0027The daily recipe generation limit has been reached. Please try again tomorrow.\u0027\n        : \u0027Your IP address could not be validated.\u0027,\n  remainingGenerations: {\n    ip: $json.remaining_for_ip,\n    systemWide: $json.remaining_system_wide\n  }\n} }}",
-                                         "options":  {
-                                                         "responseCode":  "={{ $json.rejection_code === \u0027INVALID_IP_ADDRESS\u0027 ? 400 : 429 }}"
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.respondToWebhook",
-                      "typeVersion":  1.5,
-                      "position":  [
-                                       64,
-                                       400
-                                   ],
-                      "id":  "27f8c094-37c6-4d49-a58c-80d96db6a268",
-                      "name":  "Return quota error"
-                  },
-                  {
-                      "parameters":  {
-                                         "promptType":  "define",
-                                         "text":  "={{ \"Generate exactly three recipe suggestions for this validated request:\\n\\n\" + JSON.stringify($(\u0027Validate recipe request\u0027).first().json.request, null, 2) }}",
-                                         "hasOutputParser":  true,
-                                         "messages":  {
-                                                          "messageValues":  [
-                                                                                {
-                                                                                    "message":  "You are the recipe generation engine for Code Ã  Cuisine.  Return only structured data matching the connected output schema. Do not include markdown, explanations, comments, or text outside the required structure.  Generate exactly three clearly distinct recipe suggestions in English.  Rules: - Follow the requested cuisine style, diet preference, cooking time category, portion count, and number of cooks exactly. - Each recipe should use at least 2 distinct provided ingredients when the request contains 4 or more ingredients. For smaller requests, use at least 1 distinct provided ingredient per recipe. - Across all three recipes together, use at least 70% of the distinct provided ingredients. - Calculate usedIngredientPercentage accurately from the distinct provided ingredients used in that recipe. - Put used provided ingredients into availableIngredients. - Add no more than three additional basic ingredients per recipe and list them only under additionalIngredients. - Scale all ingredient quantities for the requested portion count. - Make the three recipes meaningfully different in title, preparation method, and flavor. - Keep cookingTimeMinutes realistic and consistent with the selected category:   quick: up to 20 minutes   medium: 21 to 45 minutes   complex: more than 45 minutes - Write chronological, beginner-friendly preparation steps. - assignedCook must be between 1 and the requested cookingPeopleCount. - Distribute work sensibly when multiple cooks are requested. - Set canRunInParallel to true only when the step can safely run alongside another step. - Provide realistic estimated nutrition values per portion and for the entire recipe. - Total nutrition values must approximately equal the per-portion values multiplied by portionCount. - Protein, carbohydrate, and fat percentages should be plausible and total approximately 100%. - Never violate the selected diet preference. - Use only values permitted by the output schema. - Every ingredient mentioned in a summary or preparation step must appear in either availableIngredients or additionalIngredients. Do not silently assume oil, salt, pepper, spices, or seasonings. Water is the only exception and does not need to be listed. - cookingTimeMinutes must represent the realistic total elapsed cooking time after considering parallel work, not merely the duration of the longest individual step. Your entire response must start with { and end with }. The top-level object must contain exactly one property named recipes. Never wrap the response in output, data, result, or any other property. Never use Markdown or JSON code fences."
-                                                                                }
-                                                                            ]
-                                                      },
-                                         "batching":  {
-
-                                                      }
-                                     },
-                      "type":  "@n8n/n8n-nodes-langchain.chainLlm",
-                      "typeVersion":  1.9,
-                      "position":  [
-                                       0,
-                                       0
-                                   ],
-                      "id":  "7b84d62e-9239-481c-b4f2-ee77af29f7ef",
-                      "name":  "Generate recipe suggestions"
-                  },
-                  {
-                      "parameters":  {
-                                         "model":  "glm-5.3-flash:cloud",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "type":  "@n8n/n8n-nodes-langchain.lmChatOllama",
-                      "typeVersion":  1,
-                      "position":  [
-                                       16,
-                                       240
-                                   ],
-                      "id":  "93caabef-430c-4077-a1ea-2d3812d0d37a",
-                      "name":  "DeepSeek recipe model",
-                      "credentials":  {
-                                          "ollamaApi":  {
-                                                            "id":  "FjiJczgQL0a4Nw1j",
-                                                            "name":  "Ollama account"
-                                                        }
-                                      }
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "const generatedOutput = $input.first().json.output;\nconst request = $(\u0027Validate recipe request\u0027).first().json.request;\nconst recipes = generatedOutput?.recipes;\nconst validationErrors = [];\n\nfunction normalizeName(value) {\n  return String(value ?? \u0027\u0027).trim().toLowerCase();\n}\n\nfunction addError(recipeIndex, message) {\n  validationErrors.push(`Recipe ${recipeIndex + 1}: ${message}`);\n}\n\nfunction isFiniteNumber(value) {\n  return typeof value === \u0027number\u0027 \u0026\u0026 Number.isFinite(value);\n}\n\nfunction applyCalculatedMacroPercentages(perPortion, total) {\n  const proteinCalories = Number(perPortion.proteinGrams) * 4;\n  const carbohydrateCalories = Number(perPortion.carbohydratesGrams) * 4;\n  const fatCalories = Number(perPortion.fatGrams) * 9;\n  const macroCalories = proteinCalories + carbohydrateCalories + fatCalories;\n\n  if (\n    ![proteinCalories, carbohydrateCalories, fatCalories, macroCalories].every(Number.isFinite) ||\n    macroCalories \u003c= 0\n  ) {\n    return false;\n  }\n\n  const proteinPercentage = Math.round((proteinCalories / macroCalories) * 100);\n  const carbohydratesPercentage = Math.round(\n    (carbohydrateCalories / macroCalories) * 100,\n  );\n  const fatPercentage = 100 - proteinPercentage - carbohydratesPercentage;\n  const percentages = {\n    proteinPercentage,\n    carbohydratesPercentage,\n    fatPercentage,\n  };\n\n  Object.assign(perPortion, percentages);\n  Object.assign(total, percentages);\n  return true;\n}\n\nif (!Array.isArray(recipes) || recipes.length !== 3) {\n  validationErrors.push(\u0027The AI must return exactly three recipes.\u0027);\n} else {\n  const providedNames = [\n    ...new Set(request.ingredients.map(ingredient =\u003e normalizeName(ingredient.name))),\n  ];\n\n  const providedNameSet = new Set(providedNames);\n  const allUsedProvidedIngredients = new Set();\n  const minimumIngredientsPerRecipe = providedNames.length \u003e= 4 ? 2 : 1;\n  const minimumOverallUsedIngredients = Math.ceil(providedNames.length * 0.7);\n  const usedTitles = new Set();\n\n  const timeLimits = {\n    quick: { min: 1, max: 20 },\n    medium: { min: 21, max: 45 },\n    complex: { min: 46, max: Number.POSITIVE_INFINITY },\n  };\n\n  recipes.forEach((recipe, recipeIndex) =\u003e {\n    recipe.cuisineStyle = request.cuisineStyle;\n    recipe.dietPreference = request.dietPreference;\n    recipe.cookingTimeCategory = request.cookingTime;\n    recipe.portionCount = request.portionCount;\n    recipe.cookingPeopleCount = request.cookingPeopleCount;\n\n    const normalizedTitle = normalizeName(recipe.title);\n\n    if (!normalizedTitle) {\n      addError(recipeIndex, \u0027The title is missing.\u0027);\n    } else if (usedTitles.has(normalizedTitle)) {\n      addError(recipeIndex, \u0027The title is not unique.\u0027);\n    }\n\n    usedTitles.add(normalizedTitle);\n\n    if (recipe.cuisineStyle !== request.cuisineStyle) {\n      addError(recipeIndex, \u0027The cuisine style does not match the request.\u0027);\n    }\n\n    if (recipe.dietPreference !== request.dietPreference) {\n      addError(recipeIndex, \u0027The diet preference does not match the request.\u0027);\n    }\n\n    if (recipe.cookingTimeCategory !== request.cookingTime) {\n      addError(recipeIndex, \u0027The cooking time category does not match the request.\u0027);\n    }\n\n    if (recipe.portionCount !== request.portionCount) {\n      addError(recipeIndex, \u0027The portion count does not match the request.\u0027);\n    }\n\n    if (recipe.cookingPeopleCount !== request.cookingPeopleCount) {\n      addError(recipeIndex, \u0027The number of cooks does not match the request.\u0027);\n    }\n\n    const selectedTimeLimit = timeLimits[request.cookingTime];\n\n    if (\n      !isFiniteNumber(recipe.cookingTimeMinutes) ||\n      recipe.cookingTimeMinutes \u003c selectedTimeLimit.min ||\n      recipe.cookingTimeMinutes \u003e selectedTimeLimit.max\n    ) {\n      addError(recipeIndex, \u0027The cooking duration does not match its category.\u0027);\n    }\n\n    const availableIngredients = Array.isArray(recipe.availableIngredients)\n      ? recipe.availableIngredients\n      : [];\n\n    const additionalIngredients = Array.isArray(recipe.additionalIngredients)\n      ? recipe.additionalIngredients\n      : [];\n\n    recipe.additionalIngredients = additionalIngredients.filter(\n      ingredient =\u003e !providedNameSet.has(normalizeName(ingredient.name)),\n    );\n\n    const availableNames = new Set(\n      availableIngredients\n        .map(ingredient =\u003e normalizeName(ingredient.name))\n        .filter(Boolean),\n    );\n\n    const usedProvidedIngredients = providedNames.filter(name =\u003e\n      availableNames.has(name),\n    );\n\n    const calculatedPercentage = Math.round(\n      (usedProvidedIngredients.length / providedNames.length) * 100,\n    );\n\n    usedProvidedIngredients.forEach(name =\u003e allUsedProvidedIngredients.add(name));\n\n    if (usedProvidedIngredients.length \u003c minimumIngredientsPerRecipe) {\n      addError(\n        recipeIndex,\n        `Only ${usedProvidedIngredients.length} provided ingredients are used.`,\n      );\n    }\n\n    recipe.usedIngredientPercentage = calculatedPercentage;\n\n    const unknownAvailableIngredients = [...availableNames].filter(\n      name =\u003e !providedNameSet.has(name),\n    );\n\n    if (unknownAvailableIngredients.length \u003e 0) {\n      addError(\n        recipeIndex,\n        \u0027Additional ingredients were incorrectly listed as available ingredients.\u0027,\n      );\n    }\n\n    if (recipe.additionalIngredients.length \u003e 3) {\n      addError(recipeIndex, \u0027More than three additional ingredients are used.\u0027);\n    }\n\n    const steps = Array.isArray(recipe.steps) ? recipe.steps : [];\n    const assignedCooks = new Set();\n\n    steps.forEach((step, stepIndex) =\u003e {\n      if (step.number !== stepIndex + 1) {\n        addError(recipeIndex, \u0027The preparation steps are not numbered sequentially.\u0027);\n      }\n\n      if (\n        !Number.isInteger(step.assignedCook) ||\n        step.assignedCook \u003c 1 ||\n        step.assignedCook \u003e request.cookingPeopleCount\n      ) {\n        addError(recipeIndex, `Step ${stepIndex + 1} has an invalid cook assignment.`);\n      } else {\n        assignedCooks.add(step.assignedCook);\n      }\n\n      if (!isFiniteNumber(step.durationMinutes) || step.durationMinutes \u003c 1) {\n        addError(recipeIndex, `Step ${stepIndex + 1} has an invalid duration.`);\n      }\n    });\n\n    if (\n      request.cookingPeopleCount \u003e 1 \u0026\u0026\n      assignedCooks.size !== request.cookingPeopleCount\n    ) {\n      addError(recipeIndex, \u0027The work is not distributed across all requested cooks.\u0027);\n    }\n\n    const perPortion = recipe.nutritionPerPortion;\n    const total = recipe.nutritionTotal;\n\n    if (!perPortion || !total) {\n      addError(recipeIndex, \u0027Nutrition information is incomplete.\u0027);\n      return;\n    }\n\n    if (!applyCalculatedMacroPercentages(perPortion, total)) {\n      addError(recipeIndex, \u0027Macro gram values are invalid.\u0027);\n      return;\n    }\n\n    const percentageKeys = [\n      \u0027proteinPercentage\u0027,\n      \u0027carbohydratesPercentage\u0027,\n      \u0027fatPercentage\u0027,\n    ];\n\n    const percentageSum = percentageKeys.reduce(\n      (sum, key) =\u003e sum + Number(perPortion[key]),\n      0,\n    );\n\n    if (!Number.isFinite(percentageSum) || Math.abs(percentageSum - 100) \u003e 2) {\n      addError(recipeIndex, \u0027The macro percentages do not total approximately 100%.\u0027);\n    }\n\n    const scalableNutritionKeys = [\n      \u0027caloriesKcal\u0027,\n      \u0027proteinGrams\u0027,\n      \u0027carbohydratesGrams\u0027,\n      \u0027fatGrams\u0027,\n    ];\n\n    scalableNutritionKeys.forEach(key =\u003e {\n      const expectedTotal = Number(perPortion[key]) * request.portionCount;\n      const actualTotal = Number(total[key]);\n      const tolerance = Math.max(2, expectedTotal * 0.05);\n\n      if (\n        !Number.isFinite(expectedTotal) ||\n        !Number.isFinite(actualTotal) ||\n        Math.abs(actualTotal - expectedTotal) \u003e tolerance\n      ) {\n        addError(recipeIndex, `${key} is inconsistent with the portion count.`);\n      }\n    });\n\n    percentageKeys.forEach(key =\u003e {\n      if (Math.abs(Number(perPortion[key]) - Number(total[key])) \u003e 1) {\n        addError(recipeIndex, `${key} differs between per-portion and total values.`);\n      }\n    });\n  });\n\n  if (allUsedProvidedIngredients.size \u003c minimumOverallUsedIngredients) {\n    validationErrors.push(\n      `The recipe suggestions use only ${allUsedProvidedIngredients.size} of ${providedNames.length} provided ingredients overall.`,\n    );\n  }\n}\n\nreturn [\n  {\n    json: {\n      isValid: validationErrors.length === 0,\n      request,\n      recipes: Array.isArray(recipes) ? recipes : [],\n      validationErrors,\n    },\n  },\n];"
-                                     },
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       352,
-                                       112
-                                   ],
-                      "id":  "b3248806-9d88-48b2-b627-a41b32735c60",
-                      "name":  "Validate generated recipes"
-                  },
-                  {
-                      "parameters":  {
-                                         "conditions":  {
-                                                            "options":  {
-                                                                            "caseSensitive":  true,
-                                                                            "leftValue":  "",
-                                                                            "typeValidation":  "strict",
-                                                                            "version":  3
-                                                                        },
-                                                            "conditions":  [
-                                                                               {
-                                                                                   "id":  "05e30e03-f541-47bc-b0ed-2cf05624de6b",
-                                                                                   "leftValue":  "={{ $json.isValid }}",
-                                                                                   "rightValue":  "",
-                                                                                   "operator":  {
-                                                                                                    "type":  "boolean",
-                                                                                                    "operation":  "true",
-                                                                                                    "singleValue":  true
-                                                                                                }
-                                                                               }
-                                                                           ],
-                                                            "combinator":  "and"
-                                                        },
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.if",
-                      "typeVersion":  2.3,
-                      "position":  [
-                                       576,
-                                       112
-                                   ],
-                      "id":  "2cf734ce-ba66-4505-923a-0590e506883b",
-                      "name":  "Are generated recipes valid?"
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "const recipes = $input.first().json.recipes;\nconst generationId = String($execution.id);\n\nif (!Array.isArray(recipes) || recipes.length !== 3) {\n  throw new Error(\u0027Exactly three validated recipes are required for storage.\u0027);\n}\n\nconst rows = recipes.map(recipe =\u003e ({\n  generation_id: generationId,\n  title: recipe.title,\n  summary: recipe.summary,\n  cuisine_style: recipe.cuisineStyle,\n  diet_preference: recipe.dietPreference,\n  cooking_time_category: recipe.cookingTimeCategory,\n  cooking_time_minutes: recipe.cookingTimeMinutes,\n  portion_count: recipe.portionCount,\n  cooking_people_count: recipe.cookingPeopleCount,\n  used_ingredient_percentage: recipe.usedIngredientPercentage,\n  available_ingredients: recipe.availableIngredients,\n  additional_ingredients: recipe.additionalIngredients,\n  nutrition_per_portion: recipe.nutritionPerPortion,\n  nutrition_total: recipe.nutritionTotal,\n  steps: recipe.steps,\n}));\n\nreturn [\n  {\n    json: {\n      generationId,\n      rows,\n    },\n  },\n];"
-                                     },
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       800,
-                                       16
-                                   ],
-                      "id":  "72e60d83-17b5-4f02-9b04-39327836ba41",
-                      "name":  "Prepare recipes for storage"
-                  },
-                  {
-                      "parameters":  {
-                                         "respondWith":  "json",
-                                         "responseBody":  "={{ {\n  success: false,\n  code: \u0027INVALID_GENERATED_RECIPES\u0027,\n  message: \u0027The generated recipes did not meet the required quality rules.\u0027,\n  validationErrors: $json.validationErrors\n} }}",
-                                         "options":  {
-                                                         "responseCode":  502
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.respondToWebhook",
-                      "typeVersion":  1.5,
-                      "position":  [
-                                       800,
-                                       208
-                                   ],
-                      "id":  "eda552ce-3945-4156-a9d2-254531d64290",
-                      "name":  "Return generation error"
-                  },
-                  {
-                      "parameters":  {
-                                         "method":  "POST",
-                                         "url":  "https://oehlaiclgsbpanmvhmtu.supabase.co/rest/v1/recipes",
-                                         "authentication":  "genericCredentialType",
-                                         "genericAuthType":  "httpHeaderAuth",
-                                         "sendHeaders":  true,
-                                         "headerParameters":  {
-                                                                  "parameters":  [
-                                                                                     {
-                                                                                         "name":  "Prefer",
-                                                                                         "value":  "return=representation"
-                                                                                     }
-                                                                                 ]
-                                                              },
-                                         "sendBody":  true,
-                                         "specifyBody":  "json",
-                                         "jsonBody":  "={{ $json.rows }}",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "type":  "n8n-nodes-base.httpRequest",
-                      "typeVersion":  4.5,
-                      "position":  [
-                                       1024,
-                                       16
-                                   ],
-                      "id":  "7f8d5c1d-021f-4135-b0de-d42eed0bd567",
-                      "name":  "Save generated recipes",
-                      "credentials":  {
-                                          "httpHeaderAuth":  {
-                                                                 "id":  "zRJCJKoVqAzy2xcz",
-                                                                 "name":  "Supabase n8n secret"
-                                                             }
-                                      }
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "const savedRecipes = $input\n  .all()\n  .flatMap(item =\u003e (Array.isArray(item.json) ? item.json : [item.json]));\n\nif (savedRecipes.length !== 3) {\n  throw new Error(\u0027Exactly three saved recipes are required for the response.\u0027);\n}\n\nconst quota = $(\u0027Consume generation quota\u0027).first().json;\n\nconst recipes = savedRecipes.map(recipe =\u003e ({\n  id: recipe.id,\n  generationId: recipe.generation_id,\n  createdAt: recipe.created_at,\n  title: recipe.title,\n  summary: recipe.summary,\n  cuisineStyle: recipe.cuisine_style,\n  dietPreference: recipe.diet_preference,\n  cookingTimeCategory: recipe.cooking_time_category,\n  cookingTimeMinutes: recipe.cooking_time_minutes,\n  portionCount: recipe.portion_count,\n  cookingPeopleCount: recipe.cooking_people_count,\n  usedIngredientPercentage: recipe.used_ingredient_percentage,\n  availableIngredients: recipe.available_ingredients,\n  additionalIngredients: recipe.additional_ingredients,\n  nutritionPerPortion: recipe.nutrition_per_portion,\n  nutritionTotal: recipe.nutrition_total,\n  steps: recipe.steps,\n  imageUrl: recipe.image_url,\n  likesCount: recipe.likes_count,\n  isPublic: recipe.is_public,\n}));\n\nreturn [\n  {\n    json: {\n      success: true,\n      generationId: recipes[0].generationId,\n      remainingGenerations: {\n        ip: quota.remaining_for_ip,\n        systemWide: quota.remaining_system_wide,\n      },\n      recipes,\n    },\n  },\n];"
-                                     },
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       1248,
-                                       16
-                                   ],
-                      "id":  "32a3226c-c1e2-4870-8073-d2fa6e05a241",
-                      "name":  "Prepare generation response"
-                  },
-                  {
-                      "parameters":  {
-                                         "schemaType":  "manual",
-                                         "inputSchema":  "{\r\n    \"$schema\":  \"http://json-schema.org/draft-07/schema#\",\r\n    \"type\":  \"object\",\r\n    \"additionalProperties\":  false,\r\n    \"required\":  [\r\n                     \"recipes\"\r\n                 ],\r\n    \"properties\":  {\r\n                       \"recipes\":  {\r\n                                       \"type\":  \"array\",\r\n                                       \"minItems\":  3,\r\n                                       \"maxItems\":  3,\r\n                                       \"items\":  {\r\n                                                     \"type\":  \"object\",\r\n                                                     \"additionalProperties\":  false,\r\n                                                     \"required\":  [\r\n                                                                      \"title\",\r\n                                                                      \"summary\",\r\n                                                                      \"cuisineStyle\",\r\n                                                                      \"dietPreference\",\r\n                                                                      \"cookingTimeCategory\",\r\n                                                                      \"cookingTimeMinutes\",\r\n                                                                      \"portionCount\",\r\n                                                                      \"cookingPeopleCount\",\r\n                                                                      \"usedIngredientPercentage\",\r\n                                                                      \"availableIngredients\",\r\n                                                                      \"additionalIngredients\",\r\n                                                                      \"nutritionPerPortion\",\r\n                                                                      \"nutritionTotal\",\r\n                                                                      \"steps\"\r\n                                                                  ],\r\n                                                     \"properties\":  {\r\n                                                                        \"title\":  {\r\n                                                                                      \"type\":  \"string\",\r\n                                                                                      \"minLength\":  3,\r\n                                                                                      \"maxLength\":  100\r\n                                                                                  },\r\n                                                                        \"summary\":  {\r\n                                                                                        \"type\":  \"string\",\r\n                                                                                        \"minLength\":  10,\r\n                                                                                        \"maxLength\":  300\r\n                                                                                    },\r\n                                                                        \"cuisineStyle\":  {\r\n                                                                                             \"type\":  \"string\",\r\n                                                                                             \"enum\":  [\r\n                                                                                                          \"german\",\r\n                                                                                                          \"italian\",\r\n                                                                                                          \"indian\",\r\n                                                                                                          \"japanese\",\r\n                                                                                                          \"gourmet\",\r\n                                                                                                          \"fusion\"\r\n                                                                                                      ]\r\n                                                                                         },\r\n                                                                        \"dietPreference\":  {\r\n                                                                                               \"type\":  \"string\",\r\n                                                                                               \"enum\":  [\r\n                                                                                                            \"vegetarian\",\r\n                                                                                                            \"vegan\",\r\n                                                                                                            \"keto\",\r\n                                                                                                            \"unrestricted\"\r\n                                                                                                        ]\r\n                                                                                           },\r\n                                                                        \"cookingTimeCategory\":  {\r\n                                                                                                    \"type\":  \"string\",\r\n                                                                                                    \"enum\":  [\r\n                                                                                                                 \"quick\",\r\n                                                                                                                 \"medium\",\r\n                                                                                                                 \"complex\"\r\n                                                                                                             ]\r\n                                                                                                },\r\n                                                                        \"cookingTimeMinutes\":  {\r\n                                                                                                   \"type\":  \"integer\",\r\n                                                                                                   \"minimum\":  1,\r\n                                                                                                   \"maximum\":  180\r\n                                                                                               },\r\n                                                                        \"portionCount\":  {\r\n                                                                                             \"type\":  \"integer\",\r\n                                                                                             \"minimum\":  1,\r\n                                                                                             \"maximum\":  12\r\n                                                                                         },\r\n                                                                        \"cookingPeopleCount\":  {\r\n                                                                                                   \"type\":  \"integer\",\r\n                                                                                                   \"minimum\":  1,\r\n                                                                                                   \"maximum\":  3\r\n                                                                                               },\r\n                                                                        \"usedIngredientPercentage\":  {\r\n                                                                                                         \"type\":  \"number\",\r\n                                                                                                         \"minimum\":  0,\r\n                                                                                                         \"maximum\":  100\r\n                                                                                                     },\r\n                                                                        \"availableIngredients\":  {\r\n                                                                                                     \"type\":  \"array\",\r\n                                                                                                     \"minItems\":  1,\r\n                                                                                                     \"items\":  {\r\n                                                                                                                   \"type\":  \"object\",\r\n                                                                                                                   \"additionalProperties\":  false,\r\n                                                                                                                   \"required\":  [\r\n                                                                                                                                    \"name\",\r\n                                                                                                                                    \"amount\",\r\n                                                                                                                                    \"unit\"\r\n                                                                                                                                ],\r\n                                                                                                                   \"properties\":  {\r\n                                                                                                                                      \"name\":  {\r\n                                                                                                                                                   \"type\":  \"string\",\r\n                                                                                                                                                   \"minLength\":  1,\r\n                                                                                                                                                   \"maxLength\":  50\r\n                                                                                                                                               },\r\n                                                                                                                                      \"amount\":  {\r\n                                                                                                                                                     \"type\":  \"number\",\r\n                                                                                                                                                     \"exclusiveMinimum\":  0\r\n                                                                                                                                                 },\r\n                                                                                                                                      \"unit\":  {\r\n                                                                                                                                                   \"type\":  \"string\",\r\n                                                                                                                                                   \"enum\":  [\r\n                                                                                                                                                                \"gram\",\r\n                                                                                                                                                                \"kilogram\",\r\n                                                                                                                                                                \"milliliter\",\r\n                                                                                                                                                                \"liter\",\r\n                                                                                                                                                                \"piece\",\r\n                                                                                                                                                                \"teaspoon\",\r\n                                                                                                                                                                \"tablespoon\",\r\n                                                                                                                                                                \"pinch\",\r\n                                                                                                                                                                \"clove\"\r\n                                                                                                                                                            ]\r\n                                                                                                                                               }\r\n                                                                                                                                  }\r\n                                                                                                               }\r\n                                                                                                 },\r\n                                                                        \"additionalIngredients\":  {\r\n                                                                                                      \"type\":  \"array\",\r\n                                                                                                      \"maxItems\":  3,\r\n                                                                                                      \"items\":  {\r\n                                                                                                                    \"type\":  \"object\",\r\n                                                                                                                    \"additionalProperties\":  false,\r\n                                                                                                                    \"required\":  [\r\n                                                                                                                                     \"name\",\r\n                                                                                                                                     \"amount\",\r\n                                                                                                                                     \"unit\"\r\n                                                                                                                                 ],\r\n                                                                                                                    \"properties\":  {\r\n                                                                                                                                       \"name\":  {\r\n                                                                                                                                                    \"type\":  \"string\",\r\n                                                                                                                                                    \"minLength\":  1,\r\n                                                                                                                                                    \"maxLength\":  50\r\n                                                                                                                                                },\r\n                                                                                                                                       \"amount\":  {\r\n                                                                                                                                                      \"type\":  \"number\",\r\n                                                                                                                                                      \"exclusiveMinimum\":  0\r\n                                                                                                                                                  },\r\n                                                                                                                                       \"unit\":  {\r\n                                                                                                                                                    \"type\":  \"string\",\r\n                                                                                                                                                    \"enum\":  [\r\n                                                                                                                                                                 \"gram\",\r\n                                                                                                                                                                 \"kilogram\",\r\n                                                                                                                                                                 \"milliliter\",\r\n                                                                                                                                                                 \"liter\",\r\n                                                                                                                                                                 \"piece\",\r\n                                                                                                                                                                 \"teaspoon\",\r\n                                                                                                                                                                 \"tablespoon\",\r\n                                                                                                                                                                 \"pinch\",\r\n                                                                                                                                                                 \"clove\"\r\n                                                                                                                                                             ]\r\n                                                                                                                                                }\r\n                                                                                                                                   }\r\n                                                                                                                }\r\n                                                                                                  },\r\n                                                                        \"nutritionPerPortion\":  {\r\n                                                                                                    \"type\":  \"object\",\r\n                                                                                                    \"additionalProperties\":  false,\r\n                                                                                                    \"required\":  [\r\n                                                                                                                     \"caloriesKcal\",\r\n                                                                                                                     \"proteinGrams\",\r\n                                                                                                                     \"proteinPercentage\",\r\n                                                                                                                     \"carbohydratesGrams\",\r\n                                                                                                                     \"carbohydratesPercentage\",\r\n                                                                                                                     \"fatGrams\",\r\n                                                                                                                     \"fatPercentage\"\r\n                                                                                                                 ],\r\n                                                                                                    \"properties\":  {\r\n                                                                                                                       \"caloriesKcal\":  {\r\n                                                                                                                                            \"type\":  \"number\",\r\n                                                                                                                                            \"minimum\":  0\r\n                                                                                                                                        },\r\n                                                                                                                       \"proteinGrams\":  {\r\n                                                                                                                                            \"type\":  \"number\",\r\n                                                                                                                                            \"minimum\":  0\r\n                                                                                                                                        },\r\n                                                                                                                       \"proteinPercentage\":  {\r\n                                                                                                                                                 \"type\":  \"number\",\r\n                                                                                                                                                 \"minimum\":  0,\r\n                                                                                                                                                 \"maximum\":  100\r\n                                                                                                                                             },\r\n                                                                                                                       \"carbohydratesGrams\":  {\r\n                                                                                                                                                  \"type\":  \"number\",\r\n                                                                                                                                                  \"minimum\":  0\r\n                                                                                                                                              },\r\n                                                                                                                       \"carbohydratesPercentage\":  {\r\n                                                                                                                                                       \"type\":  \"number\",\r\n                                                                                                                                                       \"minimum\":  0,\r\n                                                                                                                                                       \"maximum\":  100\r\n                                                                                                                                                   },\r\n                                                                                                                       \"fatGrams\":  {\r\n                                                                                                                                        \"type\":  \"number\",\r\n                                                                                                                                        \"minimum\":  0\r\n                                                                                                                                    },\r\n                                                                                                                       \"fatPercentage\":  {\r\n                                                                                                                                             \"type\":  \"number\",\r\n                                                                                                                                             \"minimum\":  0,\r\n                                                                                                                                             \"maximum\":  100\r\n                                                                                                                                         }\r\n                                                                                                                   }\r\n                                                                                                },\r\n                                                                        \"nutritionTotal\":  {\r\n                                                                                               \"type\":  \"object\",\r\n                                                                                               \"additionalProperties\":  false,\r\n                                                                                               \"required\":  [\r\n                                                                                                                \"caloriesKcal\",\r\n                                                                                                                \"proteinGrams\",\r\n                                                                                                                \"proteinPercentage\",\r\n                                                                                                                \"carbohydratesGrams\",\r\n                                                                                                                \"carbohydratesPercentage\",\r\n                                                                                                                \"fatGrams\",\r\n                                                                                                                \"fatPercentage\"\r\n                                                                                                            ],\r\n                                                                                               \"properties\":  {\r\n                                                                                                                  \"caloriesKcal\":  {\r\n                                                                                                                                       \"type\":  \"number\",\r\n                                                                                                                                       \"minimum\":  0\r\n                                                                                                                                   },\r\n                                                                                                                  \"proteinGrams\":  {\r\n                                                                                                                                       \"type\":  \"number\",\r\n                                                                                                                                       \"minimum\":  0\r\n                                                                                                                                   },\r\n                                                                                                                  \"proteinPercentage\":  {\r\n                                                                                                                                            \"type\":  \"number\",\r\n                                                                                                                                            \"minimum\":  0,\r\n                                                                                                                                            \"maximum\":  100\r\n                                                                                                                                        },\r\n                                                                                                                  \"carbohydratesGrams\":  {\r\n                                                                                                                                             \"type\":  \"number\",\r\n                                                                                                                                             \"minimum\":  0\r\n                                                                                                                                         },\r\n                                                                                                                  \"carbohydratesPercentage\":  {\r\n                                                                                                                                                  \"type\":  \"number\",\r\n                                                                                                                                                  \"minimum\":  0,\r\n                                                                                                                                                  \"maximum\":  100\r\n                                                                                                                                              },\r\n                                                                                                                  \"fatGrams\":  {\r\n                                                                                                                                   \"type\":  \"number\",\r\n                                                                                                                                   \"minimum\":  0\r\n                                                                                                                               },\r\n                                                                                                                  \"fatPercentage\":  {\r\n                                                                                                                                        \"type\":  \"number\",\r\n                                                                                                                                        \"minimum\":  0,\r\n                                                                                                                                        \"maximum\":  100\r\n                                                                                                                                    }\r\n                                                                                                              }\r\n                                                                                           },\r\n                                                                        \"steps\":  {\r\n                                                                                      \"type\":  \"array\",\r\n                                                                                      \"minItems\":  2,\r\n                                                                                      \"maxItems\":  12,\r\n                                                                                      \"items\":  {\r\n                                                                                                    \"type\":  \"object\",\r\n                                                                                                    \"additionalProperties\":  false,\r\n                                                                                                    \"required\":  [\r\n                                                                                                                     \"number\",\r\n                                                                                                                     \"title\",\r\n                                                                                                                     \"description\",\r\n                                                                                                                     \"assignedCook\",\r\n                                                                                                                     \"durationMinutes\",\r\n                                                                                                                     \"canRunInParallel\"\r\n                                                                                                                 ],\r\n                                                                                                    \"properties\":  {\r\n                                                                                                                       \"number\":  {\r\n                                                                                                                                      \"type\":  \"integer\",\r\n                                                                                                                                      \"minimum\":  1,\r\n                                                                                                                                      \"maximum\":  12\r\n                                                                                                                                  },\r\n                                                                                                                       \"title\":  {\r\n                                                                                                                                     \"type\":  \"string\",\r\n                                                                                                                                     \"minLength\":  3,\r\n                                                                                                                                     \"maxLength\":  80\r\n                                                                                                                                 },\r\n                                                                                                                       \"description\":  {\r\n                                                                                                                                           \"type\":  \"string\",\r\n                                                                                                                                           \"minLength\":  10,\r\n                                                                                                                                           \"maxLength\":  600\r\n                                                                                                                                       },\r\n                                                                                                                       \"assignedCook\":  {\r\n                                                                                                                                            \"type\":  \"integer\",\r\n                                                                                                                                            \"minimum\":  1,\r\n                                                                                                                                            \"maximum\":  3\r\n                                                                                                                                        },\r\n                                                                                                                       \"durationMinutes\":  {\r\n                                                                                                                                               \"type\":  \"integer\",\r\n                                                                                                                                               \"minimum\":  1,\r\n                                                                                                                                               \"maximum\":  180\r\n                                                                                                                                           },\r\n                                                                                                                       \"canRunInParallel\":  {\r\n                                                                                                                                                \"type\":  \"boolean\"\r\n                                                                                                                                            }\r\n                                                                                                                   }\r\n                                                                                                }\r\n                                                                                  }\r\n                                                                    }\r\n                                                 }\r\n                                   }\r\n                   }\r\n}"
-                                     },
-                      "type":  "@n8n/n8n-nodes-langchain.outputParserStructured",
-                      "typeVersion":  1.3,
-                      "position":  [
-                                       144,
-                                       240
-                                   ],
-                      "id":  "77682c33-d244-486b-bd86-02ec3d25acf2",
-                      "name":  "Parse recipe suggestions"
-                  }
-              ],
-    "pinData":  {
-
-                },
-    "connections":  {
-                        "Webhook":  {
-                                        "main":  [
-                                                     [
-                                                         {
-                                                             "node":  "Validate recipe request",
-                                                             "type":  "main",
-                                                             "index":  0
-                                                         }
-                                                     ]
-                                                 ]
-                                    },
-                        "Validate recipe request":  {
-                                                        "main":  [
-                                                                     [
-                                                                         {
-                                                                             "node":  "Is request valid?",
-                                                                             "type":  "main",
-                                                                             "index":  0
-                                                                         }
-                                                                     ]
-                                                                 ]
-                                                    },
-                        "Is request valid?":  {
-                                                  "main":  [
-                                                               [
-                                                                   {
-                                                                       "node":  "Consume generation quota",
-                                                                       "type":  "main",
-                                                                       "index":  0
-                                                                   }
-                                                               ],
-                                                               [
-                                                                   {
-                                                                       "node":  "Return validation error",
-                                                                       "type":  "main",
-                                                                       "index":  0
-                                                                   }
-                                                               ]
-                                                           ]
-                                              },
-                        "Consume generation quota":  {
-                                                         "main":  [
-                                                                      [
-                                                                          {
-                                                                              "node":  "Is quota available?",
-                                                                              "type":  "main",
-                                                                              "index":  0
-                                                                          }
-                                                                      ]
-                                                                  ]
-                                                     },
-                        "Is quota available?":  {
-                                                    "main":  [
-                                                                 [
-                                                                     {
-                                                                         "node":  "Generate recipe suggestions",
-                                                                         "type":  "main",
-                                                                         "index":  0
-                                                                     }
-                                                                 ],
-                                                                 [
-                                                                     {
-                                                                         "node":  "Return quota error",
-                                                                         "type":  "main",
-                                                                         "index":  0
-                                                                     }
-                                                                 ]
-                                                             ]
-                                                },
-                        "DeepSeek recipe model":  {
-                                                      "ai_languageModel":  [
-                                                                               [
-                                                                                   {
-                                                                                       "node":  "Generate recipe suggestions",
-                                                                                       "type":  "ai_languageModel",
-                                                                                       "index":  0
-                                                                                   }
-                                                                               ]
-                                                                           ]
-                                                  },
-                        "Generate recipe suggestions":  {
-                                                            "main":  [
-                                                                         [
-                                                                             {
-                                                                                 "node":  "Validate generated recipes",
-                                                                                 "type":  "main",
-                                                                                 "index":  0
-                                                                             }
-                                                                         ]
-                                                                     ]
-                                                        },
-                        "Validate generated recipes":  {
-                                                           "main":  [
-                                                                        [
-                                                                            {
-                                                                                "node":  "Are generated recipes valid?",
-                                                                                "type":  "main",
-                                                                                "index":  0
-                                                                            }
-                                                                        ]
-                                                                    ]
-                                                       },
-                        "Are generated recipes valid?":  {
-                                                             "main":  [
-                                                                          [
-                                                                              {
-                                                                                  "node":  "Prepare recipes for storage",
-                                                                                  "type":  "main",
-                                                                                  "index":  0
-                                                                              }
-                                                                          ],
-                                                                          [
-                                                                              {
-                                                                                  "node":  "Return generation error",
-                                                                                  "type":  "main",
-                                                                                  "index":  0
-                                                                              }
-                                                                          ]
-                                                                      ]
-                                                         },
-                        "Prepare recipes for storage":  {
-                                                            "main":  [
-                                                                         [
-                                                                             {
-                                                                                 "node":  "Save generated recipes",
-                                                                                 "type":  "main",
-                                                                                 "index":  0
-                                                                             }
-                                                                         ]
-                                                                     ]
-                                                        },
-                        "Save generated recipes":  {
-                                                       "main":  [
-                                                                    [
-                                                                        {
-                                                                            "node":  "Prepare generation response",
-                                                                            "type":  "main",
-                                                                            "index":  0
-                                                                        }
-                                                                    ]
-                                                                ]
-                                                   },
-                        "Prepare generation response":  {
-                                                            "main":  [
-                                                                         [
-                                                                             {
-                                                                                 "node":  "Return generated recipes",
-                                                                                 "type":  "main",
-                                                                                 "index":  0
-                                                                             }
-                                                                         ]
-                                                                     ]
-                                                        },
-                        "Parse recipe suggestions":  {
-                                                         "ai_outputParser":  [
-                                                                                 [
-                                                                                     {
-                                                                                         "node":  "Generate recipe suggestions",
-                                                                                         "type":  "ai_outputParser",
-                                                                                         "index":  0
-                                                                                     }
-                                                                                 ]
-                                                                             ]
-                                                     }
-                    },
-    "active":  true,
-    "settings":  {
-                     "executionOrder":  "v1",
-                     "binaryMode":  "separate"
-                 },
-    "versionId":  "f35c0531-f90c-4486-9d41-9e0413d8c29c",
-    "meta":  {
-                 "templateCredsSetupCompleted":  true,
-                 "instanceId":  "c67e986e88ffadb095c935ddf65a5b76705b52cfb2021b0ca64959653b261f90"
-             },
-    "nodeGroups":  [
-
-                   ],
-    "id":  "ZY91QH9YBci1lejs",
-    "tags":  [
-
-             ]
+  "name": "Generate and store recipe suggestions",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-recipe",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://moritz-boehm.developerakademie.net"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-1120, 352],
+      "id": "d25495cd-14c8-4253-82d1-aebcbcc80b64",
+      "name": "Webhook",
+      "webhookId": "77d0c6dc-ea4b-408f-b484-361e998b8017"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1472, 16],
+      "id": "868e063c-e9ba-4a2d-9542-dc79f3868a0c",
+      "name": "Return generated recipes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const MAX_INGREDIENTS = 30;\nconst MAX_INGREDIENT_AMOUNT = 100000;\nconst MAX_INGREDIENT_NAME_LENGTH = 50;\n\nconst ALLOWED_COOKING_TIMES = [\"quick\", \"medium\", \"complex\"];\nconst ALLOWED_CUISINES = [\n  \"german\",\n  \"italian\",\n  \"indian\",\n  \"japanese\",\n  \"gourmet\",\n  \"fusion\",\n];\nconst ALLOWED_DIETS = [\"vegetarian\", \"vegan\", \"keto\", \"unrestricted\"];\nconst ALLOWED_UNITS = [\"gram\", \"liter\", \"piece\"];\n\nconst input = $input.first().json;\nconst bodyIsObject =\n  typeof input.body === \"object\" \u0026\u0026\n  input.body !== null \u0026\u0026\n  !Array.isArray(input.body);\n\nconst request = bodyIsObject ? input.body : {};\nconst validationErrors = [];\n\nif (!bodyIsObject) {\n  validationErrors.push(\"Request body must be a JSON object.\");\n}\n\nvalidateInteger(request.portionCount, 1, 12, \"Portion count\");\nvalidateInteger(request.cookingPeopleCount, 1, 3, \"Cooking people count\");\nvalidateOption(request.cookingTime, ALLOWED_COOKING_TIMES, \"Cooking time\");\nvalidateOption(request.cuisineStyle, ALLOWED_CUISINES, \"Cuisine style\");\nvalidateOption(request.dietPreference, ALLOWED_DIETS, \"Diet preference\");\nvalidateIngredients(request.ingredients);\n\nconst isValid = validationErrors.length === 0;\nconst validatedRequest = isValid\n  ? {\n      cookingPeopleCount: request.cookingPeopleCount,\n      cookingTime: request.cookingTime,\n      cuisineStyle: request.cuisineStyle,\n      dietPreference: request.dietPreference,\n      ingredients: request.ingredients.map(({ amount, name, unit }) =\u003e ({\n        amount,\n        name: name.trim(),\n        unit,\n      })),\n      portionCount: request.portionCount,\n    }\n  : null;\n\nreturn [\n  {\n    json: {\n      clientIp: getClientIp(input.headers),\n      isValid,\n      request: validatedRequest,\n      validationErrors,\n    },\n  },\n];\n\nfunction validateInteger(value, minimum, maximum, label) {\n  if (!Number.isInteger(value) || value \u003c minimum || value \u003e maximum) {\n    validationErrors.push(\n      `${label} must be between ${minimum} and ${maximum}.`,\n    );\n  }\n}\n\nfunction validateOption(value, allowedValues, label) {\n  if (!allowedValues.includes(value)) {\n    validationErrors.push(`${label} is invalid.`);\n  }\n}\n\nfunction validateIngredients(ingredients) {\n  if (!Array.isArray(ingredients) || ingredients.length === 0) {\n    validationErrors.push(\"At least one ingredient is required.\");\n    return;\n  }\n\n  if (ingredients.length \u003e MAX_INGREDIENTS) {\n    validationErrors.push(\n      `No more than ${MAX_INGREDIENTS} ingredients are allowed.`,\n    );\n  }\n\n  ingredients.forEach(validateIngredient);\n}\n\nfunction validateIngredient(ingredient, index) {\n  if (\n    typeof ingredient !== \"object\" ||\n    ingredient === null ||\n    Array.isArray(ingredient)\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} is invalid.`);\n    return;\n  }\n\n  validateIngredientName(ingredient.name, index);\n  validateIngredientAmount(ingredient.amount, index);\n\n  if (!ALLOWED_UNITS.includes(ingredient.unit)) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid unit.`);\n  }\n}\n\nfunction validateIngredientName(name, index) {\n  if (\n    typeof name !== \"string\" ||\n    name.trim().length === 0 ||\n    name.trim().length \u003e MAX_INGREDIENT_NAME_LENGTH\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid name.`);\n  }\n}\n\nfunction validateIngredientAmount(amount, index) {\n  if (\n    typeof amount !== \"number\" ||\n    !Number.isFinite(amount) ||\n    amount \u003c 0.01 ||\n    amount \u003e MAX_INGREDIENT_AMOUNT\n  ) {\n    validationErrors.push(`Ingredient ${index + 1} has an invalid amount.`);\n  }\n}\n\nfunction getClientIp(headers = {}) {\n  const forwardedIp = headers[\"x-forwarded-for\"];\n\n  if (typeof forwardedIp === \"string\" \u0026\u0026 forwardedIp.length \u003e 0) {\n    return forwardedIp.split(\",\")[0].trim();\n  }\n\n  const realIp = headers[\"x-real-ip\"];\n  return typeof realIp === \"string\" \u0026\u0026 realIp.length \u003e 0\n    ? realIp.trim()\n    : \"127.0.0.1\";\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-896, 352],
+      "id": "9de8728c-dd40-405b-96db-27afa6f7d6aa",
+      "name": "Validate recipe request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ca570be8-f225-4c0e-9f98-bd418221619a",
+              "leftValue": "={{ $json.isValid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-672, 352],
+      "id": "d2a9d7eb-3087-43f2-aa5e-8dd794bfb7a6",
+      "name": "Is request valid?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  success: false,\n  code: \u0027INVALID_REQUEST\u0027,\n  message: \u0027The recipe request contains invalid data.\u0027,\n  validationErrors: $json.validationErrors\n} }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-448, 448],
+      "id": "1c1a2cb7-1e44-4d20-a3f1-def0df4ccfc6",
+      "name": "Return validation error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oehlaiclgsbpanmvhmtu.supabase.co/rest/v1/rpc/consume_generation_quota",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  p_ip_address: $json.clientIp\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [-448, 256],
+      "id": "b59806ac-debb-453b-be7a-36221d1b9be0",
+      "name": "Consume generation quota",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zRJCJKoVqAzy2xcz",
+          "name": "Supabase n8n secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "58bd0d86-1384-4ce1-b8c3-4fa0955f7fe8",
+              "leftValue": "={{ $json.allowed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-224, 256],
+      "id": "542aa933-82b0-4cd8-99c4-4b160cbd792c",
+      "name": "Is quota available?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  success: false,\n  code: $json.rejection_code,\n  message:\n    $json.rejection_code === \u0027IP_DAILY_LIMIT_REACHED\u0027\n      ? \u0027You have reached your daily limit of 3 recipe generations.\u0027\n      : $json.rejection_code === \u0027SYSTEM_DAILY_LIMIT_REACHED\u0027\n        ? \u0027The daily recipe generation limit has been reached. Please try again tomorrow.\u0027\n        : \u0027Your IP address could not be validated.\u0027,\n  remainingGenerations: {\n    ip: $json.remaining_for_ip,\n    systemWide: $json.remaining_system_wide\n  }\n} }}",
+        "options": {
+          "responseCode": "={{ $json.rejection_code === \u0027INVALID_IP_ADDRESS\u0027 ? 400 : 429 }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [64, 400],
+      "id": "27f8c094-37c6-4d49-a58c-80d96db6a268",
+      "name": "Return quota error"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Generate exactly three recipe suggestions for this validated request:\\n\\n\" + JSON.stringify($(\u0027Validate recipe request\u0027).first().json.request, null, 2) }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the recipe generation engine for Code Ã  Cuisine.  Return only structured data matching the connected output schema. Do not include markdown, explanations, comments, or text outside the required structure.  Generate exactly three clearly distinct recipe suggestions in English.  Rules: - Follow the requested cuisine style, diet preference, cooking time category, portion count, and number of cooks exactly. - Each recipe should use at least 2 distinct provided ingredients when the request contains 4 or more ingredients. For smaller requests, use at least 1 distinct provided ingredient per recipe. - Across all three recipes together, use at least 70% of the distinct provided ingredients. - Calculate usedIngredientPercentage accurately from the distinct provided ingredients used in that recipe. - Put used provided ingredients into availableIngredients. - Add no more than three additional basic ingredients per recipe and list them only under additionalIngredients. - Scale all ingredient quantities for the requested portion count. - Make the three recipes meaningfully different in title, preparation method, and flavor. - Keep cookingTimeMinutes realistic and consistent with the selected category:   quick: up to 20 minutes   medium: 21 to 45 minutes   complex: more than 45 minutes - Write chronological, beginner-friendly preparation steps. - assignedCook must be between 1 and the requested cookingPeopleCount. - Distribute work sensibly when multiple cooks are requested. - Set canRunInParallel to true only when the step can safely run alongside another step. - Provide realistic estimated nutrition values per portion and for the entire recipe. - Total nutrition values must approximately equal the per-portion values multiplied by portionCount. - Protein, carbohydrate, and fat percentages should be plausible and total approximately 100%. - Never violate the selected diet preference. - Use only values permitted by the output schema. - Every ingredient mentioned in a summary or preparation step must appear in either availableIngredients or additionalIngredients. Do not silently assume oil, salt, pepper, spices, or seasonings. Water is the only exception and does not need to be listed. - cookingTimeMinutes must represent the realistic total elapsed cooking time after considering parallel work, not merely the duration of the longest individual step. Your entire response must start with { and end with }. The top-level object must contain exactly one property named recipes. Never wrap the response in output, data, result, or any other property. Never use Markdown or JSON code fences."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [0, 0],
+      "id": "7b84d62e-9239-481c-b4f2-ee77af29f7ef",
+      "name": "Generate recipe suggestions"
+    },
+    {
+      "parameters": {
+        "model": "glm-5.3-flash:cloud",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [16, 240],
+      "id": "93caabef-430c-4077-a1ea-2d3812d0d37a",
+      "name": "DeepSeek recipe model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "FjiJczgQL0a4Nw1j",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const generatedOutput = $input.first().json.output;\nconst request = $(\u0027Validate recipe request\u0027).first().json.request;\nconst recipes = generatedOutput?.recipes;\nconst validationErrors = [];\n\nfunction normalizeName(value) {\n  return String(value ?? \u0027\u0027).trim().toLowerCase();\n}\n\nfunction addError(recipeIndex, message) {\n  validationErrors.push(`Recipe ${recipeIndex + 1}: ${message}`);\n}\n\nfunction isFiniteNumber(value) {\n  return typeof value === \u0027number\u0027 \u0026\u0026 Number.isFinite(value);\n}\n\nfunction applyCalculatedMacroPercentages(perPortion, total) {\n  const proteinCalories = Number(perPortion.proteinGrams) * 4;\n  const carbohydrateCalories = Number(perPortion.carbohydratesGrams) * 4;\n  const fatCalories = Number(perPortion.fatGrams) * 9;\n  const macroCalories = proteinCalories + carbohydrateCalories + fatCalories;\n\n  if (\n    ![proteinCalories, carbohydrateCalories, fatCalories, macroCalories].every(Number.isFinite) ||\n    macroCalories \u003c= 0\n  ) {\n    return false;\n  }\n\n  const proteinPercentage = Math.round((proteinCalories / macroCalories) * 100);\n  const carbohydratesPercentage = Math.round(\n    (carbohydrateCalories / macroCalories) * 100,\n  );\n  const fatPercentage = 100 - proteinPercentage - carbohydratesPercentage;\n  const percentages = {\n    proteinPercentage,\n    carbohydratesPercentage,\n    fatPercentage,\n  };\n\n  Object.assign(perPortion, percentages);\n  Object.assign(total, percentages);\n  return true;\n}\n\nif (!Array.isArray(recipes) || recipes.length !== 3) {\n  validationErrors.push(\u0027The AI must return exactly three recipes.\u0027);\n} else {\n  const providedNames = [\n    ...new Set(request.ingredients.map(ingredient =\u003e normalizeName(ingredient.name))),\n  ];\n\n  const providedNameSet = new Set(providedNames);\n  const allUsedProvidedIngredients = new Set();\n  const minimumIngredientsPerRecipe = providedNames.length \u003e= 4 ? 2 : 1;\n  const minimumOverallUsedIngredients = Math.ceil(providedNames.length * 0.7);\n  const usedTitles = new Set();\n\n  const timeLimits = {\n    quick: { min: 1, max: 20 },\n    medium: { min: 21, max: 45 },\n    complex: { min: 46, max: Number.POSITIVE_INFINITY },\n  };\n\n  recipes.forEach((recipe, recipeIndex) =\u003e {\n    recipe.cuisineStyle = request.cuisineStyle;\n    recipe.dietPreference = request.dietPreference;\n    recipe.cookingTimeCategory = request.cookingTime;\n    recipe.portionCount = request.portionCount;\n    recipe.cookingPeopleCount = request.cookingPeopleCount;\n\n    const normalizedTitle = normalizeName(recipe.title);\n\n    if (!normalizedTitle) {\n      addError(recipeIndex, \u0027The title is missing.\u0027);\n    } else if (usedTitles.has(normalizedTitle)) {\n      addError(recipeIndex, \u0027The title is not unique.\u0027);\n    }\n\n    usedTitles.add(normalizedTitle);\n\n    if (recipe.cuisineStyle !== request.cuisineStyle) {\n      addError(recipeIndex, \u0027The cuisine style does not match the request.\u0027);\n    }\n\n    if (recipe.dietPreference !== request.dietPreference) {\n      addError(recipeIndex, \u0027The diet preference does not match the request.\u0027);\n    }\n\n    if (recipe.cookingTimeCategory !== request.cookingTime) {\n      addError(recipeIndex, \u0027The cooking time category does not match the request.\u0027);\n    }\n\n    if (recipe.portionCount !== request.portionCount) {\n      addError(recipeIndex, \u0027The portion count does not match the request.\u0027);\n    }\n\n    if (recipe.cookingPeopleCount !== request.cookingPeopleCount) {\n      addError(recipeIndex, \u0027The number of cooks does not match the request.\u0027);\n    }\n\n    const selectedTimeLimit = timeLimits[request.cookingTime];\n    const rawCookingTimeMinutes = Number(recipe.cookingTimeMinutes);\n\n    if (!Number.isFinite(rawCookingTimeMinutes)) {\n      recipe.cookingTimeMinutes = selectedTimeLimit.min;\n    } else {\n      recipe.cookingTimeMinutes = Math.round(rawCookingTimeMinutes);\n    }\n\n    recipe.cookingTimeMinutes = Math.max(\n      selectedTimeLimit.min,\n      Math.min(recipe.cookingTimeMinutes, selectedTimeLimit.max),\n    );\n\n    const availableIngredients = Array.isArray(recipe.availableIngredients)\n      ? recipe.availableIngredients\n      : [];\n\n    const additionalIngredients = Array.isArray(recipe.additionalIngredients)\n      ? recipe.additionalIngredients\n      : [];\n\n    recipe.additionalIngredients = additionalIngredients.filter(\n      ingredient =\u003e !providedNameSet.has(normalizeName(ingredient.name)),\n    );\n\n    const availableNames = new Set(\n      availableIngredients\n        .map(ingredient =\u003e normalizeName(ingredient.name))\n        .filter(Boolean),\n    );\n\n    const usedProvidedIngredients = providedNames.filter(name =\u003e\n      availableNames.has(name),\n    );\n\n    const calculatedPercentage = Math.round(\n      (usedProvidedIngredients.length / providedNames.length) * 100,\n    );\n\n    usedProvidedIngredients.forEach(name =\u003e allUsedProvidedIngredients.add(name));\n\n    if (usedProvidedIngredients.length \u003c minimumIngredientsPerRecipe) {\n      addError(\n        recipeIndex,\n        `Only ${usedProvidedIngredients.length} provided ingredients are used.`,\n      );\n    }\n\n    recipe.usedIngredientPercentage = calculatedPercentage;\n\n    const unknownAvailableIngredients = [...availableNames].filter(\n      name =\u003e !providedNameSet.has(name),\n    );\n\n    if (unknownAvailableIngredients.length \u003e 0) {\n      addError(\n        recipeIndex,\n        \u0027Additional ingredients were incorrectly listed as available ingredients.\u0027,\n      );\n    }\n\n    if (recipe.additionalIngredients.length \u003e 3) {\n      addError(recipeIndex, \u0027More than three additional ingredients are used.\u0027);\n    }\n\n    const steps = Array.isArray(recipe.steps) ? recipe.steps : [];\n    const assignedCooks = new Set();\n\n    steps.forEach((step, stepIndex) =\u003e {\n      if (step.number !== stepIndex + 1) {\n        addError(recipeIndex, \u0027The preparation steps are not numbered sequentially.\u0027);\n      }\n\n      if (\n        !Number.isInteger(step.assignedCook) ||\n        step.assignedCook \u003c 1 ||\n        step.assignedCook \u003e request.cookingPeopleCount\n      ) {\n        addError(recipeIndex, `Step ${stepIndex + 1} has an invalid cook assignment.`);\n      } else {\n        assignedCooks.add(step.assignedCook);\n      }\n\n      if (!isFiniteNumber(step.durationMinutes) || step.durationMinutes \u003c 1) {\n        addError(recipeIndex, `Step ${stepIndex + 1} has an invalid duration.`);\n      }\n    });\n\n    if (\n      request.cookingPeopleCount \u003e 1 \u0026\u0026\n      assignedCooks.size !== request.cookingPeopleCount\n    ) {\n      addError(recipeIndex, \u0027The work is not distributed across all requested cooks.\u0027);\n    }\n\n    const perPortion = recipe.nutritionPerPortion;\n    const total = recipe.nutritionTotal;\n\n    if (!perPortion || !total) {\n      addError(recipeIndex, \u0027Nutrition information is incomplete.\u0027);\n      return;\n    }\n\n    if (!applyCalculatedMacroPercentages(perPortion, total)) {\n      addError(recipeIndex, \u0027Macro gram values are invalid.\u0027);\n      return;\n    }\n\n    const percentageKeys = [\n      \u0027proteinPercentage\u0027,\n      \u0027carbohydratesPercentage\u0027,\n      \u0027fatPercentage\u0027,\n    ];\n\n    const percentageSum = percentageKeys.reduce(\n      (sum, key) =\u003e sum + Number(perPortion[key]),\n      0,\n    );\n\n    if (!Number.isFinite(percentageSum) || Math.abs(percentageSum - 100) \u003e 2) {\n      addError(recipeIndex, \u0027The macro percentages do not total approximately 100%.\u0027);\n    }\n\n    const scalableNutritionKeys = [\n      \u0027caloriesKcal\u0027,\n      \u0027proteinGrams\u0027,\n      \u0027carbohydratesGrams\u0027,\n      \u0027fatGrams\u0027,\n    ];\n\n    scalableNutritionKeys.forEach(key =\u003e {\n      const expectedTotal = Number(perPortion[key]) * request.portionCount;\n      const actualTotal = Number(total[key]);\n      const tolerance = Math.max(2, expectedTotal * 0.05);\n\n      if (\n        !Number.isFinite(expectedTotal) ||\n        !Number.isFinite(actualTotal) ||\n        Math.abs(actualTotal - expectedTotal) \u003e tolerance\n      ) {\n        addError(recipeIndex, `${key} is inconsistent with the portion count.`);\n      }\n    });\n\n    percentageKeys.forEach(key =\u003e {\n      if (Math.abs(Number(perPortion[key]) - Number(total[key])) \u003e 1) {\n        addError(recipeIndex, `${key} differs between per-portion and total values.`);\n      }\n    });\n  });\n\n  if (allUsedProvidedIngredients.size \u003c minimumOverallUsedIngredients) {\n    validationErrors.push(\n      `The recipe suggestions use only ${allUsedProvidedIngredients.size} of ${providedNames.length} provided ingredients overall.`,\n    );\n  }\n}\n\nreturn [\n  {\n    json: {\n      isValid: validationErrors.length === 0,\n      request,\n      recipes: Array.isArray(recipes) ? recipes : [],\n      validationErrors,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [352, 112],
+      "id": "b3248806-9d88-48b2-b627-a41b32735c60",
+      "name": "Validate generated recipes"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "05e30e03-f541-47bc-b0ed-2cf05624de6b",
+              "leftValue": "={{ $json.isValid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [576, 112],
+      "id": "2cf734ce-ba66-4505-923a-0590e506883b",
+      "name": "Are generated recipes valid?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const recipes = $input.first().json.recipes;\nconst generationId = String($execution.id);\n\nif (!Array.isArray(recipes) || recipes.length !== 3) {\n  throw new Error(\u0027Exactly three validated recipes are required for storage.\u0027);\n}\n\nconst rows = recipes.map(recipe =\u003e ({\n  generation_id: generationId,\n  title: recipe.title,\n  summary: recipe.summary,\n  cuisine_style: recipe.cuisineStyle,\n  diet_preference: recipe.dietPreference,\n  cooking_time_category: recipe.cookingTimeCategory,\n  cooking_time_minutes: recipe.cookingTimeMinutes,\n  portion_count: recipe.portionCount,\n  cooking_people_count: recipe.cookingPeopleCount,\n  used_ingredient_percentage: recipe.usedIngredientPercentage,\n  available_ingredients: recipe.availableIngredients,\n  additional_ingredients: recipe.additionalIngredients,\n  nutrition_per_portion: recipe.nutritionPerPortion,\n  nutrition_total: recipe.nutritionTotal,\n  steps: recipe.steps,\n}));\n\nreturn [\n  {\n    json: {\n      generationId,\n      rows,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 16],
+      "id": "72e60d83-17b5-4f02-9b04-39327836ba41",
+      "name": "Prepare recipes for storage"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  success: false,\n  code: \u0027INVALID_GENERATED_RECIPES\u0027,\n  message: \u0027The generated recipes did not meet the required quality rules.\u0027,\n  validationErrors: $json.validationErrors\n} }}",
+        "options": {
+          "responseCode": 502
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [800, 208],
+      "id": "eda552ce-3945-4156-a9d2-254531d64290",
+      "name": "Return generation error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oehlaiclgsbpanmvhmtu.supabase.co/rest/v1/recipes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.rows }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [1024, 16],
+      "id": "7f8d5c1d-021f-4135-b0de-d42eed0bd567",
+      "name": "Save generated recipes",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zRJCJKoVqAzy2xcz",
+          "name": "Supabase n8n secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const savedRecipes = $input\n  .all()\n  .flatMap(item =\u003e (Array.isArray(item.json) ? item.json : [item.json]));\n\nif (savedRecipes.length !== 3) {\n  throw new Error(\u0027Exactly three saved recipes are required for the response.\u0027);\n}\n\nconst quota = $(\u0027Consume generation quota\u0027).first().json;\n\nconst recipes = savedRecipes.map(recipe =\u003e ({\n  id: recipe.id,\n  generationId: recipe.generation_id,\n  createdAt: recipe.created_at,\n  title: recipe.title,\n  summary: recipe.summary,\n  cuisineStyle: recipe.cuisine_style,\n  dietPreference: recipe.diet_preference,\n  cookingTimeCategory: recipe.cooking_time_category,\n  cookingTimeMinutes: recipe.cooking_time_minutes,\n  portionCount: recipe.portion_count,\n  cookingPeopleCount: recipe.cooking_people_count,\n  usedIngredientPercentage: recipe.used_ingredient_percentage,\n  availableIngredients: recipe.available_ingredients,\n  additionalIngredients: recipe.additional_ingredients,\n  nutritionPerPortion: recipe.nutrition_per_portion,\n  nutritionTotal: recipe.nutrition_total,\n  steps: recipe.steps,\n  imageUrl: recipe.image_url,\n  likesCount: recipe.likes_count,\n  isPublic: recipe.is_public,\n}));\n\nreturn [\n  {\n    json: {\n      success: true,\n      generationId: recipes[0].generationId,\n      remainingGenerations: {\n        ip: quota.remaining_for_ip,\n        systemWide: quota.remaining_system_wide,\n      },\n      recipes,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1248, 16],
+      "id": "32a3226c-c1e2-4870-8073-d2fa6e05a241",
+      "name": "Prepare generation response"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\r\n    \"$schema\":  \"http://json-schema.org/draft-07/schema#\",\r\n    \"type\":  \"object\",\r\n    \"additionalProperties\":  false,\r\n    \"required\":  [\r\n                     \"recipes\"\r\n                 ],\r\n    \"properties\":  {\r\n                       \"recipes\":  {\r\n                                       \"type\":  \"array\",\r\n                                       \"minItems\":  3,\r\n                                       \"maxItems\":  3,\r\n                                       \"items\":  {\r\n                                                     \"type\":  \"object\",\r\n                                                     \"additionalProperties\":  false,\r\n                                                     \"required\":  [\r\n                                                                      \"title\",\r\n                                                                      \"summary\",\r\n                                                                      \"cuisineStyle\",\r\n                                                                      \"dietPreference\",\r\n                                                                      \"cookingTimeCategory\",\r\n                                                                      \"cookingTimeMinutes\",\r\n                                                                      \"portionCount\",\r\n                                                                      \"cookingPeopleCount\",\r\n                                                                      \"usedIngredientPercentage\",\r\n                                                                      \"availableIngredients\",\r\n                                                                      \"additionalIngredients\",\r\n                                                                      \"nutritionPerPortion\",\r\n                                                                      \"nutritionTotal\",\r\n                                                                      \"steps\"\r\n                                                                  ],\r\n                                                     \"properties\":  {\r\n                                                                        \"title\":  {\r\n                                                                                      \"type\":  \"string\",\r\n                                                                                      \"minLength\":  3,\r\n                                                                                      \"maxLength\":  100\r\n                                                                                  },\r\n                                                                        \"summary\":  {\r\n                                                                                        \"type\":  \"string\",\r\n                                                                                        \"minLength\":  10,\r\n                                                                                        \"maxLength\":  300\r\n                                                                                    },\r\n                                                                        \"cuisineStyle\":  {\r\n                                                                                             \"type\":  \"string\",\r\n                                                                                             \"enum\":  [\r\n                                                                                                          \"german\",\r\n                                                                                                          \"italian\",\r\n                                                                                                          \"indian\",\r\n                                                                                                          \"japanese\",\r\n                                                                                                          \"gourmet\",\r\n                                                                                                          \"fusion\"\r\n                                                                                                      ]\r\n                                                                                         },\r\n                                                                        \"dietPreference\":  {\r\n                                                                                               \"type\":  \"string\",\r\n                                                                                               \"enum\":  [\r\n                                                                                                            \"vegetarian\",\r\n                                                                                                            \"vegan\",\r\n                                                                                                            \"keto\",\r\n                                                                                                            \"unrestricted\"\r\n                                                                                                        ]\r\n                                                                                           },\r\n                                                                        \"cookingTimeCategory\":  {\r\n                                                                                                    \"type\":  \"string\",\r\n                                                                                                    \"enum\":  [\r\n                                                                                                                 \"quick\",\r\n                                                                                                                 \"medium\",\r\n                                                                                                                 \"complex\"\r\n                                                                                                             ]\r\n                                                                                                },\r\n                                                                        \"cookingTimeMinutes\":  {\r\n                                                                                                   \"type\":  \"integer\",\r\n                                                                                                   \"minimum\":  1,\r\n                                                                                                   \"maximum\":  180\r\n                                                                                               },\r\n                                                                        \"portionCount\":  {\r\n                                                                                             \"type\":  \"integer\",\r\n                                                                                             \"minimum\":  1,\r\n                                                                                             \"maximum\":  12\r\n                                                                                         },\r\n                                                                        \"cookingPeopleCount\":  {\r\n                                                                                                   \"type\":  \"integer\",\r\n                                                                                                   \"minimum\":  1,\r\n                                                                                                   \"maximum\":  3\r\n                                                                                               },\r\n                                                                        \"usedIngredientPercentage\":  {\r\n                                                                                                         \"type\":  \"number\",\r\n                                                                                                         \"minimum\":  0,\r\n                                                                                                         \"maximum\":  100\r\n                                                                                                     },\r\n                                                                        \"availableIngredients\":  {\r\n                                                                                                     \"type\":  \"array\",\r\n                                                                                                     \"minItems\":  1,\r\n                                                                                                     \"items\":  {\r\n                                                                                                                   \"type\":  \"object\",\r\n                                                                                                                   \"additionalProperties\":  false,\r\n                                                                                                                   \"required\":  [\r\n                                                                                                                                    \"name\",\r\n                                                                                                                                    \"amount\",\r\n                                                                                                                                    \"unit\"\r\n                                                                                                                                ],\r\n                                                                                                                   \"properties\":  {\r\n                                                                                                                                      \"name\":  {\r\n                                                                                                                                                   \"type\":  \"string\",\r\n                                                                                                                                                   \"minLength\":  1,\r\n                                                                                                                                                   \"maxLength\":  50\r\n                                                                                                                                               },\r\n                                                                                                                                      \"amount\":  {\r\n                                                                                                                                                     \"type\":  \"number\",\r\n                                                                                                                                                     \"exclusiveMinimum\":  0\r\n                                                                                                                                                 },\r\n                                                                                                                                      \"unit\":  {\r\n                                                                                                                                                   \"type\":  \"string\",\r\n                                                                                                                                                   \"enum\":  [\r\n                                                                                                                                                                \"gram\",\r\n                                                                                                                                                                \"kilogram\",\r\n                                                                                                                                                                \"milliliter\",\r\n                                                                                                                                                                \"liter\",\r\n                                                                                                                                                                \"piece\",\r\n                                                                                                                                                                \"teaspoon\",\r\n                                                                                                                                                                \"tablespoon\",\r\n                                                                                                                                                                \"pinch\",\r\n                                                                                                                                                                \"clove\"\r\n                                                                                                                                                            ]\r\n                                                                                                                                               }\r\n                                                                                                                                  }\r\n                                                                                                               }\r\n                                                                                                 },\r\n                                                                        \"additionalIngredients\":  {\r\n                                                                                                      \"type\":  \"array\",\r\n                                                                                                      \"maxItems\":  3,\r\n                                                                                                      \"items\":  {\r\n                                                                                                                    \"type\":  \"object\",\r\n                                                                                                                    \"additionalProperties\":  false,\r\n                                                                                                                    \"required\":  [\r\n                                                                                                                                     \"name\",\r\n                                                                                                                                     \"amount\",\r\n                                                                                                                                     \"unit\"\r\n                                                                                                                                 ],\r\n                                                                                                                    \"properties\":  {\r\n                                                                                                                                       \"name\":  {\r\n                                                                                                                                                    \"type\":  \"string\",\r\n                                                                                                                                                    \"minLength\":  1,\r\n                                                                                                                                                    \"maxLength\":  50\r\n                                                                                                                                                },\r\n                                                                                                                                       \"amount\":  {\r\n                                                                                                                                                      \"type\":  \"number\",\r\n                                                                                                                                                      \"exclusiveMinimum\":  0\r\n                                                                                                                                                  },\r\n                                                                                                                                       \"unit\":  {\r\n                                                                                                                                                    \"type\":  \"string\",\r\n                                                                                                                                                    \"enum\":  [\r\n                                                                                                                                                                 \"gram\",\r\n                                                                                                                                                                 \"kilogram\",\r\n                                                                                                                                                                 \"milliliter\",\r\n                                                                                                                                                                 \"liter\",\r\n                                                                                                                                                                 \"piece\",\r\n                                                                                                                                                                 \"teaspoon\",\r\n                                                                                                                                                                 \"tablespoon\",\r\n                                                                                                                                                                 \"pinch\",\r\n                                                                                                                                                                 \"clove\"\r\n                                                                                                                                                             ]\r\n                                                                                                                                                }\r\n                                                                                                                                   }\r\n                                                                                                                }\r\n                                                                                                  },\r\n                                                                        \"nutritionPerPortion\":  {\r\n                                                                                                    \"type\":  \"object\",\r\n                                                                                                    \"additionalProperties\":  false,\r\n                                                                                                    \"required\":  [\r\n                                                                                                                     \"caloriesKcal\",\r\n                                                                                                                     \"proteinGrams\",\r\n                                                                                                                     \"proteinPercentage\",\r\n                                                                                                                     \"carbohydratesGrams\",\r\n                                                                                                                     \"carbohydratesPercentage\",\r\n                                                                                                                     \"fatGrams\",\r\n                                                                                                                     \"fatPercentage\"\r\n                                                                                                                 ],\r\n                                                                                                    \"properties\":  {\r\n                                                                                                                       \"caloriesKcal\":  {\r\n                                                                                                                                            \"type\":  \"number\",\r\n                                                                                                                                            \"minimum\":  0\r\n                                                                                                                                        },\r\n                                                                                                                       \"proteinGrams\":  {\r\n                                                                                                                                            \"type\":  \"number\",\r\n                                                                                                                                            \"minimum\":  0\r\n                                                                                                                                        },\r\n                                                                                                                       \"proteinPercentage\":  {\r\n                                                                                                                                                 \"type\":  \"number\",\r\n                                                                                                                                                 \"minimum\":  0,\r\n                                                                                                                                                 \"maximum\":  100\r\n                                                                                                                                             },\r\n                                                                                                                       \"carbohydratesGrams\":  {\r\n                                                                                                                                                  \"type\":  \"number\",\r\n                                                                                                                                                  \"minimum\":  0\r\n                                                                                                                                              },\r\n                                                                                                                       \"carbohydratesPercentage\":  {\r\n                                                                                                                                                       \"type\":  \"number\",\r\n                                                                                                                                                       \"minimum\":  0,\r\n                                                                                                                                                       \"maximum\":  100\r\n                                                                                                                                                   },\r\n                                                                                                                       \"fatGrams\":  {\r\n                                                                                                                                        \"type\":  \"number\",\r\n                                                                                                                                        \"minimum\":  0\r\n                                                                                                                                    },\r\n                                                                                                                       \"fatPercentage\":  {\r\n                                                                                                                                             \"type\":  \"number\",\r\n                                                                                                                                             \"minimum\":  0,\r\n                                                                                                                                             \"maximum\":  100\r\n                                                                                                                                         }\r\n                                                                                                                   }\r\n                                                                                                },\r\n                                                                        \"nutritionTotal\":  {\r\n                                                                                               \"type\":  \"object\",\r\n                                                                                               \"additionalProperties\":  false,\r\n                                                                                               \"required\":  [\r\n                                                                                                                \"caloriesKcal\",\r\n                                                                                                                \"proteinGrams\",\r\n                                                                                                                \"proteinPercentage\",\r\n                                                                                                                \"carbohydratesGrams\",\r\n                                                                                                                \"carbohydratesPercentage\",\r\n                                                                                                                \"fatGrams\",\r\n                                                                                                                \"fatPercentage\"\r\n                                                                                                            ],\r\n                                                                                               \"properties\":  {\r\n                                                                                                                  \"caloriesKcal\":  {\r\n                                                                                                                                       \"type\":  \"number\",\r\n                                                                                                                                       \"minimum\":  0\r\n                                                                                                                                   },\r\n                                                                                                                  \"proteinGrams\":  {\r\n                                                                                                                                       \"type\":  \"number\",\r\n                                                                                                                                       \"minimum\":  0\r\n                                                                                                                                   },\r\n                                                                                                                  \"proteinPercentage\":  {\r\n                                                                                                                                            \"type\":  \"number\",\r\n                                                                                                                                            \"minimum\":  0,\r\n                                                                                                                                            \"maximum\":  100\r\n                                                                                                                                        },\r\n                                                                                                                  \"carbohydratesGrams\":  {\r\n                                                                                                                                             \"type\":  \"number\",\r\n                                                                                                                                             \"minimum\":  0\r\n                                                                                                                                         },\r\n                                                                                                                  \"carbohydratesPercentage\":  {\r\n                                                                                                                                                  \"type\":  \"number\",\r\n                                                                                                                                                  \"minimum\":  0,\r\n                                                                                                                                                  \"maximum\":  100\r\n                                                                                                                                              },\r\n                                                                                                                  \"fatGrams\":  {\r\n                                                                                                                                   \"type\":  \"number\",\r\n                                                                                                                                   \"minimum\":  0\r\n                                                                                                                               },\r\n                                                                                                                  \"fatPercentage\":  {\r\n                                                                                                                                        \"type\":  \"number\",\r\n                                                                                                                                        \"minimum\":  0,\r\n                                                                                                                                        \"maximum\":  100\r\n                                                                                                                                    }\r\n                                                                                                              }\r\n                                                                                           },\r\n                                                                        \"steps\":  {\r\n                                                                                      \"type\":  \"array\",\r\n                                                                                      \"minItems\":  2,\r\n                                                                                      \"maxItems\":  12,\r\n                                                                                      \"items\":  {\r\n                                                                                                    \"type\":  \"object\",\r\n                                                                                                    \"additionalProperties\":  false,\r\n                                                                                                    \"required\":  [\r\n                                                                                                                     \"number\",\r\n                                                                                                                     \"title\",\r\n                                                                                                                     \"description\",\r\n                                                                                                                     \"assignedCook\",\r\n                                                                                                                     \"durationMinutes\",\r\n                                                                                                                     \"canRunInParallel\"\r\n                                                                                                                 ],\r\n                                                                                                    \"properties\":  {\r\n                                                                                                                       \"number\":  {\r\n                                                                                                                                      \"type\":  \"integer\",\r\n                                                                                                                                      \"minimum\":  1,\r\n                                                                                                                                      \"maximum\":  12\r\n                                                                                                                                  },\r\n                                                                                                                       \"title\":  {\r\n                                                                                                                                     \"type\":  \"string\",\r\n                                                                                                                                     \"minLength\":  3,\r\n                                                                                                                                     \"maxLength\":  80\r\n                                                                                                                                 },\r\n                                                                                                                       \"description\":  {\r\n                                                                                                                                           \"type\":  \"string\",\r\n                                                                                                                                           \"minLength\":  10,\r\n                                                                                                                                           \"maxLength\":  600\r\n                                                                                                                                       },\r\n                                                                                                                       \"assignedCook\":  {\r\n                                                                                                                                            \"type\":  \"integer\",\r\n                                                                                                                                            \"minimum\":  1,\r\n                                                                                                                                            \"maximum\":  3\r\n                                                                                                                                        },\r\n                                                                                                                       \"durationMinutes\":  {\r\n                                                                                                                                               \"type\":  \"integer\",\r\n                                                                                                                                               \"minimum\":  1,\r\n                                                                                                                                               \"maximum\":  180\r\n                                                                                                                                           },\r\n                                                                                                                       \"canRunInParallel\":  {\r\n                                                                                                                                                \"type\":  \"boolean\"\r\n                                                                                                                                            }\r\n                                                                                                                   }\r\n                                                                                                }\r\n                                                                                  }\r\n                                                                    }\r\n                                                 }\r\n                                   }\r\n                   }\r\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [144, 240],
+      "id": "77682c33-d244-486b-bd86-02ec3d25acf2",
+      "name": "Parse recipe suggestions"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate recipe request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate recipe request": {
+      "main": [
+        [
+          {
+            "node": "Is request valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is request valid?": {
+      "main": [
+        [
+          {
+            "node": "Consume generation quota",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return validation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consume generation quota": {
+      "main": [
+        [
+          {
+            "node": "Is quota available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is quota available?": {
+      "main": [
+        [
+          {
+            "node": "Generate recipe suggestions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return quota error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek recipe model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate recipe suggestions",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate recipe suggestions": {
+      "main": [
+        [
+          {
+            "node": "Validate generated recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate generated recipes": {
+      "main": [
+        [
+          {
+            "node": "Are generated recipes valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Are generated recipes valid?": {
+      "main": [
+        [
+          {
+            "node": "Prepare recipes for storage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare recipes for storage": {
+      "main": [
+        [
+          {
+            "node": "Save generated recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save generated recipes": {
+      "main": [
+        [
+          {
+            "node": "Prepare generation response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare generation response": {
+      "main": [
+        [
+          {
+            "node": "Return generated recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse recipe suggestions": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate recipe suggestions",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f35c0531-f90c-4486-9d41-9e0413d8c29c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c67e986e88ffadb095c935ddf65a5b76705b52cfb2021b0ca64959653b261f90"
+  },
+  "nodeGroups": [],
+  "id": "ZY91QH9YBci1lejs",
+  "tags": []
 }
